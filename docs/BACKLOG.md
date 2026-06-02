@@ -18,7 +18,7 @@
 - [x] **02** — Repository de Note: interface + fake em memória (usado pelos testes). → `tasks/02-repository-anotacao.md`
 - [x] **03** — Implementação Prisma do Repository de Note + teste de contrato. → `tasks/03-prisma-anotacao.md`
 - [x] **04** — Schema Zod em `shared/` + rota `POST /notes` + `GET /notes` (Swagger sai de graça). → `tasks/04-rota-anotacoes.md`
-- [ ] **05** — UseCase `editNote` + `findNoteOfTheDay` (devocional/reflexão de hoje). → `tasks/05-usecase-editar-buscar-anotacao.md`
+- [x] **05** — UseCase `editNote` + `findNoteOfTheDay` (devocional/reflexão de hoje). → `tasks/05-usecase-editar-buscar-anotacao.md`
 
 ### Bloco B — Diário (devocional + reflexão)
 - [ ] **06** — Regra "um devocional/uma reflexão por dia" na aplicação (com timezone da Config). → `tasks/06-regra-diario-por-dia.md`
