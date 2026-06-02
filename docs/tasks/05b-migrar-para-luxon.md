@@ -75,9 +75,10 @@ Domínio (helpers de data) + UseCases que calculam intervalos/datas. Sem mudanç
 
 ## Definição de pronto
 
-- [ ] `luxon` instalado no backend.
-- [ ] `dayRange` reescrito com Luxon e centralizando o cálculo de dia/fuso.
-- [ ] Usos de `new Date` com lógica de calendário migrados; instantes triviais mantidos.
-- [ ] Todos os testes existentes verdes; +1 teste de DST/offset se aplicável.
-- [ ] Nenhum cálculo de "dia" usa a hora do servidor.
-- [ ] Reporte ao dono: arquivos tocados + checklist marcado.
+- [x] `luxon` instalado no backend (+ `@types/luxon` dev).
+- [x] `dayRange` reescrito com Luxon (3 linhas vs 80+ linhas de Intl manual).
+- [x] Único `new Date` restante é instante trivial (`createdAt: new Date()`) — correto.
+- [x] 33 testes unitários + 12 integração verdes; +1 teste de DST histórico (São Paulo 2018, UTC-2).
+- [x] Nota: Brasil aboliu DST em 2019; teste usa data histórica 2018-11-15.
+- [x] Nenhum cálculo de "dia" usa a hora do servidor.
+- [x] Reporte ao dono: arquivos tocados + checklist marcado.
