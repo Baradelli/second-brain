@@ -14,8 +14,8 @@
 > rota, depois tela. Cada tarefa nasce com testes conforme a política do `CLAUDE.md`.
 
 ### Bloco A — Anotação (o coração da escrita)
-- [ ] **01** — Domínio + UseCase `createNote` (deriva `plainText` do doc; valida type/scope). → `tasks/01-usecase-criar-anotacao.md`
-- [ ] **02** — Repository de Note: interface + fake em memória (usado pelos testes). → `tasks/02-repository-anotacao.md`
+- [x] **01** — Domínio + UseCase `createNote` (deriva `plainText` do doc; valida type/scope). → `tasks/01-usecase-criar-anotacao.md`
+- [x] **02** — Repository de Note: interface + fake em memória (usado pelos testes). → `tasks/02-repository-anotacao.md`
 - [ ] **03** — Implementação Prisma do Repository de Note + teste de contrato. → `tasks/03-prisma-anotacao.md`
 - [ ] **04** — Schema Zod em `shared/` + rota `POST /notes` + `GET /notes` (Swagger sai de graça). → `tasks/04-rota-anotacoes.md`
 - [ ] **05** — UseCase `editNote` + `findNoteOfTheDay` (devocional/reflexão de hoje). → `tasks/05-usecase-editar-buscar-anotacao.md`

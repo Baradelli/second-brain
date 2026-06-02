@@ -1,5 +1,18 @@
+import type { NoteType, NoteScope } from '@cerebro/shared';
 import type { Note } from '../../domain/note.js';
+
+export interface NoteFilter {
+  userId: string;
+  type?: NoteType;
+  scope?: NoteScope;
+  from?: Date;
+  to?: Date;
+  status?: 'ACTIVE' | 'ARCHIVED';
+}
 
 export interface NoteRepository {
   save(note: Note): Promise<Note>;
+  byId(id: string): Promise<Note | null>;
+  find(filter: NoteFilter): Promise<Note[]>;
+  update(id: string, patch: Partial<Note>): Promise<Note>;
 }

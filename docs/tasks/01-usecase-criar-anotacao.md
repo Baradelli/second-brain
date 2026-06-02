@@ -84,9 +84,9 @@ class CreateNote {
 - NÃO lidar com a regra "um por dia" (Tarefa 06).
 
 ## Definição de pronto
-- [ ] Schema Zod de Note em `shared/`, com `type`/`scope` como `z.enum`.
-- [ ] Função `docToText` pura, com testes próprios.
-- [ ] UseCase `CreateNote` implementado contra a interface de Repository.
-- [ ] Os 6 testes acima passando (`pnpm test`).
-- [ ] Nenhum import de Fastify ou Prisma no UseCase.
-- [ ] Reporte ao dono: arquivos tocados + checklist marcado.
+- [x] Schema Zod de Note em `shared/`, com `type`/`scope` como `z.enum`.
+- [x] Função `docToText` pura, com testes próprios.
+- [x] UseCase `CreateNote` implementado contra a interface de Repository.
+- [x] Os 6 testes acima passando (`pnpm test`).
+- [x] Nenhum import de Fastify ou Prisma no UseCase.
+- [x] Reporte ao dono: arquivos tocados + checklist marcado.

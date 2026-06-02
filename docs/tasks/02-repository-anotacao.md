@@ -58,8 +58,8 @@ interface NoteRepository {
 - NÃO adicionar métodos que nenhum UseCase do MVP 1 usa (YAGNI).
 
 ## Definição de pronto
-- [ ] Interface `NoteRepository` definida e usada pela Tarefa 01.
-- [ ] Fake em memória implementando todos os métodos.
-- [ ] 5 testes do fake passando.
-- [ ] Teste da Tarefa 01 atualizado para usar o fake consolidado, ainda verde.
-- [ ] Reporte ao dono: arquivos tocados + checklist marcado.
+- [x] Interface `NoteRepository` definida e usada pela Tarefa 01.
+- [x] Fake em memória implementando todos os métodos.
+- [x] 5 testes do fake passando (+ 1 extra: update lança erro para id inexistente).
+- [x] Teste da Tarefa 01 atualizado para usar o fake consolidado, ainda verde.
+- [x] Reporte ao dono: arquivos tocados + checklist marcado.
