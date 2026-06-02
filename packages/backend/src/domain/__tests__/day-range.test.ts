@@ -36,6 +36,18 @@ describe('dayRange — scope DAY', () => {
   });
 });
 
+describe('dayRange — DST histórico (horário de verão)', () => {
+  // Brasil aboliu o horário de verão em 2019. Para testar o DST usamos 2018,
+  // quando São Paulo ainda usava UTC-2 de novembro a março.
+  it('São Paulo usava UTC-2 durante o DST de 2018 — from reflete offset correto', () => {
+    // Nov 15 2018: DST ativo → São Paulo = UTC-2
+    const reference = new Date('2018-11-15T12:00:00.000Z'); // noon UTC = 10:00 SP (UTC-2)
+    const { from } = dayRange(reference, TZ, 'DAY');
+    // midnight São Paulo UTC-2 = 2018-11-15T02:00:00Z
+    expect(from).toEqual(new Date('2018-11-15T02:00:00.000Z'));
+  });
+});
+
 describe('dayRange — scope WEEK', () => {
   it('returns a 7-day interval (Monday–Sunday local week)', () => {
     // June 1 2026 is a Monday in São Paulo

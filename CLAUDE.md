@@ -33,6 +33,7 @@ Rota/Controller (Fastify) → UseCase → Repository (interface) → Prisma
 ```
 
 Regras de camada que você NUNCA viola:
+
 - A **Rota** valida com Zod e chama o UseCase. Não contém regra de negócio.
 - O **UseCase** contém a regra. **Não importa Fastify nem Prisma.** Recebe dados já
   validados e tipados; depende só de interfaces de Repository.
@@ -43,6 +44,7 @@ Regras de camada que você NUNCA viola:
 ## TDD — como você trabalha (outside-in), SEMPRE
 
 Para cada caso de uso, nesta ordem:
+
 1. Definir o mini-domínio **só da fatia atual** (não modelar o sistema inteiro).
 2. Criar a assinatura/contrato do UseCase.
 3. **Escrever os testes do UseCase primeiro** (com o Repository fake).
@@ -69,6 +71,11 @@ Meta: **nunca ter medo de refatorar.** Não perseguir 100% de cobertura de UI.
 - Schemas Zod ficam em `shared/`; back e front importam de lá. Nunca duplicar schema.
 - Datas: o banco guarda UTC. "Que dia é hoje" SEMPRE se calcula no `timezone` do Settings,
   nunca na hora do servidor.
+- **Datas com Luxon, nunca `new Date` para lógica de calendário/fuso.** Use Luxon
+  (`DateTime`) para qualquer raciocínio sobre dia/semana/mês e timezone. `new Date` só é
+  aceitável para instantes triviais. Todo cálculo "instante ↔ dia do calendário" passa pelos
+  helpers de data (ex.: `dayRange` em `domain/`), nunca espalhado pelo código — assim trocar
+  de lib mexe num arquivo só. Luxon vive principalmente no `backend`.
 - Soft delete: tabelas de UI usam `status` + `archivedAt`. **Event é log imutável** (não
   se arquiva).
 - Progresso/streak/pendente são **calculados** a partir dos eventos, nunca guardados.
