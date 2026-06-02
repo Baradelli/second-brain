@@ -1,4 +1,5 @@
-import type { PrismaClient, Note as PrismaNote } from '@prisma/client';
+import type { Note as PrismaNote,PrismaClient } from '@prisma/client';
+
 import type { Note } from '../domain/note.js';
 import type { NoteFilter, NoteRepository } from '../usecases/ports/note-repository.js';
 

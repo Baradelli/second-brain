@@ -1,4 +1,5 @@
-import type { PrismaClient, Capture as PrismaCapture, Label } from '@prisma/client';
+import type { Capture as PrismaCapture, Label,PrismaClient } from '@prisma/client';
+
 import type { Capture } from '../domain/capture.js';
 import type { CaptureFilter, CaptureRepository } from '../usecases/ports/capture-repository.js';
 

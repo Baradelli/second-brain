@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { CaptureRepositoryFake } from '../capture-repository-fake.js';
+import { beforeEach,describe, expect, it } from 'vitest';
+
 import type { Capture } from '../../../domain/capture.js';
+import { CaptureRepositoryFake } from '../capture-repository-fake.js';
 
 function makeCapture(overrides?: Partial<Capture>): Capture {
   return {

@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
+
 import { createNoteSchema } from '@cerebro/shared';
+
 import { docToText } from '../domain/doc-to-text.js';
 import type { Note } from '../domain/note.js';
 import type { NoteRepository } from './ports/note-repository.js';

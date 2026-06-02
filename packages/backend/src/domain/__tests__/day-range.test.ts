@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import { dayRange } from '../day-range.js';
 
 const TZ = 'America/Sao_Paulo'; // UTC-3 in June (no DST)

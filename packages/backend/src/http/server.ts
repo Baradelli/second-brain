@@ -1,12 +1,14 @@
-import Fastify from 'fastify';
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
 import { PrismaClient } from '@prisma/client';
+import Fastify from 'fastify';
 import {
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
-import swagger from '@fastify/swagger';
-import swaggerUi from '@fastify/swagger-ui';
+
+import { captureRoutes } from '../routes/capture-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
 
 export async function buildServer() {
@@ -26,6 +28,7 @@ export async function buildServer() {
   app.get('/health', async () => ({ status: 'ok' }));
 
   await app.register(noteRoutes, { prisma });
+  await app.register(captureRoutes, { prisma });
 
   return app;
 }

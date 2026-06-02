@@ -1,4 +1,4 @@
-import type { UserSettings, SettingsReader } from '../ports/settings-reader.js';
+import type { SettingsReader,UserSettings } from '../ports/settings-reader.js';
 
 export class SettingsReaderFake implements SettingsReader {
   private store = new Map<string, UserSettings>();

@@ -1,13 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { UpsertRecap } from '../upsert-recap.js';
-import { UpsertJournalNote } from '../upsert-journal-note.js';
+import type { NoteScope } from '@cerebro/shared';
+import { beforeEach,describe, expect, it } from 'vitest';
+
+import { dayRange } from '../../domain/day-range.js';
+import { NotARecapScopeError } from '../../domain/errors.js';
+import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { CreateNote } from '../create-note.js';
 import { EditNote } from '../edit-note.js';
 import { FindNoteOfTheDay } from '../find-note-of-the-day.js';
-import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
-import { NotARecapScopeError } from '../../domain/errors.js';
-import { dayRange } from '../../domain/day-range.js';
-import type { NoteScope } from '@cerebro/shared';
+import { UpsertJournalNote } from '../upsert-journal-note.js';
+import { UpsertRecap } from '../upsert-recap.js';
 
 const TZ = 'America/Sao_Paulo';
 const REF = new Date('2026-06-02T12:00:00.000Z'); // Tuesday June 2nd, 09:00 SP

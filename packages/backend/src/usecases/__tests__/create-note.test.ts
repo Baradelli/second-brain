@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { CreateNote } from '../create-note.js';
-import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { createNoteSchema } from '@cerebro/shared';
+import { describe, expect,it } from 'vitest';
+
+import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
+import { CreateNote } from '../create-note.js';
 
 const baseInput = {
   userId: 'user-1',

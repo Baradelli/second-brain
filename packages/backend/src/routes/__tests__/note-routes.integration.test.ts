@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
 import { PrismaClient } from '@prisma/client';
+import { afterAll,beforeAll, beforeEach, describe, expect, it } from 'vitest';
+
 import { buildServer } from '../../http/server.js';
 
 const prisma = new PrismaClient();

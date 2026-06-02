@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { NoteRepositoryFake } from '../note-repository-fake.js';
+import { beforeEach,describe, expect, it } from 'vitest';
+
 import type { Note } from '../../../domain/note.js';
+import { NoteRepositoryFake } from '../note-repository-fake.js';
 
 function makeNote(overrides?: Partial<Note>): Note {
   return {

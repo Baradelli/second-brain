@@ -1,5 +1,5 @@
-import { DateTime } from 'luxon';
 import type { NoteScope } from '@cerebro/shared';
+import { DateTime } from 'luxon';
 
 export interface DateRange {
   from: Date;

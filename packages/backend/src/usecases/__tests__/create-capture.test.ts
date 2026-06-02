@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { CreateCapture } from '../create-capture.js';
+import { createCaptureSchema } from '@cerebro/shared';
+import { beforeEach,describe, expect, it } from 'vitest';
+
 import { CaptureRepositoryFake } from '../_fakes/capture-repository-fake.js';
 import { SettingsReaderFake } from '../_fakes/settings-reader-fake.js';
-import { createCaptureSchema } from '@cerebro/shared';
+import { CreateCapture } from '../create-capture.js';
 
 const TZ = 'America/Sao_Paulo';
 // Fixed "now": June 2 2026 09:00 SP (Tuesday)

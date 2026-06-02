@@ -1,4 +1,5 @@
-import type { NoteType, NoteScope } from '@cerebro/shared';
+import type { NoteScope,NoteType } from '@cerebro/shared';
+
 import { NotARecapScopeError } from '../domain/errors.js';
 import type { Note } from '../domain/note.js';
 import type { UpsertJournalNote } from './upsert-journal-note.js';

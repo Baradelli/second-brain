@@ -1,4 +1,5 @@
-import type { NoteType, NoteScope } from '@cerebro/shared';
+import type { NoteScope,NoteType } from '@cerebro/shared';
+
 import { dayRange } from '../domain/day-range.js';
 import type { Note } from '../domain/note.js';
 import type { NoteRepository } from './ports/note-repository.js';

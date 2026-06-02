@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
-import { prisma, setupTestUser, clearNotes, TEST_USER_ID } from './_db.js';
-import { PrismaNoteRepository } from '../prisma-note-repository.js';
+import { afterAll,beforeAll, beforeEach, describe, expect, it } from 'vitest';
+
 import type { Note } from '../../domain/note.js';
+import { PrismaNoteRepository } from '../prisma-note-repository.js';
+import { clearNotes, prisma, setupTestUser, TEST_USER_ID } from './_db.js';
 
 const repo = new PrismaNoteRepository(prisma);
 

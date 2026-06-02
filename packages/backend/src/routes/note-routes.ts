@@ -1,11 +1,12 @@
-import type { FastifyInstance } from 'fastify';
-import type { PrismaClient } from '@prisma/client';
-import { z } from 'zod';
-import { createNoteSchema, listNotesQuerySchema, noteResponseSchema } from '@cerebro/shared';
-import { CreateNote } from '../usecases/create-note.js';
-import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
-import type { Note } from '../domain/note.js';
 import type { NoteResponse } from '@cerebro/shared';
+import { createNoteSchema, listNotesQuerySchema, noteResponseSchema } from '@cerebro/shared';
+import type { PrismaClient } from '@prisma/client';
+import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
+
+import type { Note } from '../domain/note.js';
+import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
+import { CreateNote } from '../usecases/create-note.js';
 
 function toResponse(note: Note): NoteResponse {
   return {

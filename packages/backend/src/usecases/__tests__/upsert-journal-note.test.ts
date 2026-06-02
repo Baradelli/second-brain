@@ -1,12 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { UpsertJournalNote } from '../upsert-journal-note.js';
+import type { NoteType } from '@cerebro/shared';
+import { beforeEach,describe, expect, it } from 'vitest';
+
+import { dayRange } from '../../domain/day-range.js';
+import { NotAJournalTypeError } from '../../domain/errors.js';
+import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { CreateNote } from '../create-note.js';
 import { EditNote } from '../edit-note.js';
 import { FindNoteOfTheDay } from '../find-note-of-the-day.js';
-import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
-import { NotAJournalTypeError } from '../../domain/errors.js';
-import { dayRange } from '../../domain/day-range.js';
-import type { NoteType } from '@cerebro/shared';
+import { UpsertJournalNote } from '../upsert-journal-note.js';
 
 const TZ = 'America/Sao_Paulo';
 const DAY1 = new Date('2026-06-01T12:00:00.000Z'); // June 1st 09:00 SP

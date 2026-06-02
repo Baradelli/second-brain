@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { FindNoteOfTheDay } from '../find-note-of-the-day.js';
-import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
+import { beforeEach,describe, expect, it } from 'vitest';
+
 import { dayRange } from '../../domain/day-range.js';
 import type { Note } from '../../domain/note.js';
+import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
+import { FindNoteOfTheDay } from '../find-note-of-the-day.js';
 
 const TZ = 'America/Sao_Paulo';
 // reference = June 2nd 2026 12:00 UTC = 09:00 São Paulo (clearly inside June 2nd local day)
