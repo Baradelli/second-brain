@@ -5,7 +5,7 @@ import {
   listCapturesQuerySchema,
 } from '@cerebro/shared';
 import type { PrismaClient } from '@prisma/client';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 import type { Capture } from '../domain/capture.js';
@@ -33,10 +33,7 @@ function toResponse(c: Capture): CaptureResponse {
   };
 }
 
-export async function captureRoutes(
-  app: FastifyInstance,
-  options: { prisma: PrismaClient },
-) {
+export const captureRoutes: FastifyPluginAsyncZod<{ prisma: PrismaClient }> = async (app, options) => {
   const repo = new PrismaCaptureRepository(options.prisma);
   const settingsReader = new PrismaSettingsReader(options.prisma);
   const createCapture = new CreateCapture(repo, settingsReader);
@@ -73,7 +70,6 @@ export async function captureRoutes(
         return captures.map(toResponse);
       }
 
-      // PENDING — use end-of-today in user's timezone
       const userSettings = await settingsReader.getByUserId(userId);
       const timezone = userSettings?.timezone ?? 'America/Sao_Paulo';
 
@@ -85,4 +81,4 @@ export async function captureRoutes(
       return captures.map(toResponse);
     },
   );
-}
+};
