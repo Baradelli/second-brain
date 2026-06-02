@@ -30,7 +30,7 @@
 
 ### Bloco C — Captura
 
-- [ ] **08** — Domínio + UseCase `createCapture` (texto livre + revisarEm padrão pela Config). → `tasks/08-usecase-criar-captura.md`
+- [x] **08** — Domínio + UseCase `createCapture` (texto livre + revisarEm padrão pela Config). → `tasks/08-usecase-criar-captura.md`
 - [ ] **09** — Repository de Capture (interface + fake + Prisma + contrato). → `tasks/09-repository-captura.md`
 - [ ] **10** — UseCase `listPendingCaptures` e `listArchived`. → `tasks/10-usecase-listar-capturas.md`
 - [ ] **11** — Rota de Capture (`POST /captures`, `GET /captures?status=`). → `tasks/11-rota-capturas.md`
