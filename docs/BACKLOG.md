@@ -26,7 +26,7 @@
 ### Bloco B — Diário (devocional + reflexão)
 
 - [x] **06** — Regra "um devocional/uma reflexão por dia" na aplicação (com timezone da Config). → `tasks/06-regra-diario-por-dia.md`
-- [ ] **07** — UseCase de recapitulação: criar Note de escopo WEEK/MONTH/YEAR. → `tasks/07-usecase-recapitulacao.md`
+- [x] **07** — UseCase de recapitulação: criar Note de escopo WEEK/MONTH/YEAR. → `tasks/07-usecase-recapitulacao.md`
 
 ### Bloco C — Captura
 

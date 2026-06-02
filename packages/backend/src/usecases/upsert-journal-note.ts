@@ -17,6 +17,7 @@ export interface UpsertJournalNoteInput {
   title?: string;
   doc: unknown;
   mode?: 'create-or-get' | 'create-or-update';
+  weekStartsOn?: number; // 0=Sun, 1=Mon (default), ..., 6=Sat
 }
 
 export class UpsertJournalNote {
@@ -33,6 +34,7 @@ export class UpsertJournalNote {
 
     const scope = input.scope ?? 'DAY';
     const mode = input.mode ?? 'create-or-get';
+    const weekStartsOn = input.weekStartsOn ?? 1;
 
     const existing = await this.findNoteOfTheDay.execute({
       userId: input.userId,
@@ -40,10 +42,11 @@ export class UpsertJournalNote {
       scope,
       reference: input.reference,
       timezone: input.timezone,
+      weekStartsOn,
     });
 
     if (!existing) {
-      const { from } = dayRange(input.reference, input.timezone, scope);
+      const { from } = dayRange(input.reference, input.timezone, scope, weekStartsOn);
       const note = await this.createNote.execute({
         userId: input.userId,
         type: input.type,

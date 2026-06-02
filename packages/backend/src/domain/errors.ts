@@ -11,3 +11,10 @@ export class NotAJournalTypeError extends Error {
     this.name = 'NotAJournalTypeError';
   }
 }
+
+export class NotARecapScopeError extends Error {
+  constructor(scope: string) {
+    super(`Scope '${scope}' is not valid for recap. Use WEEK, MONTH, or YEAR.`);
+    this.name = 'NotARecapScopeError';
+  }
+}
