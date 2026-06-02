@@ -78,11 +78,12 @@ describe('FindNoteOfTheDay', () => {
   });
 
   it('returns the most recent note when multiple exist', async () => {
-    const { from, to } = dayRange(TODAY_REF, TZ, 'DAY');
-    const midRange = new Date((from.getTime() + to.getTime()) / 2);
+    const { from } = dayRange(TODAY_REF, TZ, 'DAY');
+    // Both dates are inside June 2nd SP (03:00–02:59:59 UTC); use two concrete instants
+    const laterInDay = new Date('2026-06-02T15:00:00.000Z'); // 12:00 SP, clearly inside day
 
-    await repo.save(makeNote({ id: 'older',  date: from,    createdAt: new Date('2026-06-02T09:00:00.000Z') }));
-    await repo.save(makeNote({ id: 'newer',  date: midRange, createdAt: new Date('2026-06-02T10:00:00.000Z') }));
+    await repo.save(makeNote({ id: 'older',  date: from,       createdAt: new Date('2026-06-02T09:00:00.000Z') }));
+    await repo.save(makeNote({ id: 'newer',  date: laterInDay, createdAt: new Date('2026-06-02T10:00:00.000Z') }));
 
     const result = await useCase.execute({
       userId: 'user-1',
