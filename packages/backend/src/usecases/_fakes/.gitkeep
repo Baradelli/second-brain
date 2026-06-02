@@ -1,0 +1,2 @@
+# usecases/_fakes/ — implementações fake em memória dos repositories, para os testes
+# de UseCase rodarem sem banco. Ex.: note-repository-fake.ts (Tarefa 02).

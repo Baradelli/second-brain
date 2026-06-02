@@ -1,0 +1,146 @@
+// Schema do MVP 1 — apenas as tabelas desta fase.
+// Resource, Goal, Event e Embedding entram nas fases seguintes (ver docs/BACKLOG.md),
+// para evitar migrações grandes e mortas.
+//
+// Regra de idioma: tudo em inglês. Datas em UTC; "o dia" é calculado no timezone de Settings.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GeneralStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum CaptureStatus {
+  PENDING
+  PROCESSED
+  ARCHIVED
+}
+
+enum NoteType {
+  DEVOTIONAL
+  REFLECTION
+  STUDY_NOTE
+  NOTE
+}
+
+enum NoteScope {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  settings    Settings?
+  captures    Capture[]
+  notes       Note[]
+  labels      Label[]
+  attachments Attachment[]
+}
+
+model Settings {
+  id             String @id @default(cuid())
+  userId         String @unique
+  user           User   @relation(fields: [userId], references: [id])
+  reviewWeekday  Int    @default(0) // 0=domingo ... 6=sábado
+  recapWeekday   Int    @default(0)
+  timezone       String @default("America/Sao_Paulo")
+  devotionalTime String @default("07:00") // HH:mm (validado na API)
+  reflectionTime String @default("21:00") // HH:mm (validado na API)
+}
+
+model Label {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  name      String
+  parentId  String?
+  parent    Label?        @relation("Tree", fields: [parentId], references: [id])
+  children  Label[]       @relation("Tree")
+  color     String?
+  status    GeneralStatus @default(ACTIVE)
+  archivedAt DateTime?
+  createdAt DateTime      @default(now())
+
+  captures  Capture[]       @relation("CaptureLabels")
+  notes     Note[]          @relation("NoteLabels")
+  questions GuideQuestion[]
+}
+
+model GuideQuestion {
+  id      String  @id @default(cuid())
+  labelId String
+  label   Label   @relation(fields: [labelId], references: [id])
+  text    String
+  order   Int     @default(0)
+  active  Boolean @default(true)
+}
+
+model Capture {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  text           String
+  url            String?
+  status         CaptureStatus @default(PENDING)
+  reviewAt       DateTime?
+  processedAt    DateTime?
+  promotedToType String? // "resource" | "goal" | "note"
+  promotedToId   String?
+  archivedAt     DateTime?
+  archiveReason  String?
+  createdAt      DateTime      @default(now())
+
+  labels      Label[]      @relation("CaptureLabels")
+  attachments Attachment[]
+}
+
+model Note {
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  type       NoteType
+  scope      NoteScope     @default(DAY)
+  date       DateTime
+  title      String?
+  doc        Json
+  plainText  String        @default("")
+  // goalId/resourceId/eventId entram quando Goal/Resource/Event existirem (MVP 2).
+  status     GeneralStatus @default(ACTIVE)
+  archivedAt DateTime?
+  createdAt  DateTime      @default(now())
+
+  labels      Label[]      @relation("NoteLabels")
+  attachments Attachment[]
+}
+
+model Attachment {
+  id            String  @id @default(cuid())
+  userId        String
+  user          User    @relation(fields: [userId], references: [id])
+  url           String
+  type          String // image | pdf | audio | video | other
+  mimeType      String?
+  name          String?
+  size          Int?
+  transcription String? // OCR (imagem manuscrita): saída crua da IA, antes da revisão
+  ocrStatus     String? // pending | transcribed | reviewed
+  noteId        String?
+  note          Note?    @relation(fields: [noteId], references: [id])
+  captureId     String?
+  capture       Capture? @relation(fields: [captureId], references: [id])
+  createdAt     DateTime @default(now())
+}

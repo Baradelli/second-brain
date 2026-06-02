@@ -1,0 +1,2 @@
+# repositories/ — implementações Prisma das interfaces de ports/.
+# Ex.: prisma-note-repository.ts (Tarefa 03). Testes de contrato: *.integration.test.ts.

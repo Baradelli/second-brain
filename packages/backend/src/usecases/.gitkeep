@@ -1,0 +1,2 @@
+# usecases/ — a regra de negócio (UseCases). NÃO importam Fastify nem Prisma.
+# Ex.: create-note.ts (Tarefa 01).

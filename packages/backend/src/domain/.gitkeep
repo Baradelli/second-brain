@@ -1,0 +1,3 @@
+# domain/ — entidades simples (DDD-lite) e funções puras de domínio.
+# Ex.: note.ts (entidade Note), doc-to-text.ts (deriva plainText do doc TipTap).
+# Tarefa 01 começa aqui.

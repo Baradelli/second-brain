@@ -1,0 +1,2 @@
+# routes/ — rotas Fastify. Validam com schemas Zod de @cerebro/shared e chamam UseCases.
+# Ex.: note-routes.ts (Tarefa 04).
