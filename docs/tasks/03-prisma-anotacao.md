@@ -75,8 +75,8 @@ Rodam contra o Postgres real (`pnpm test:integration`). Limpar a tabela antes de
 
 ## Definição de pronto
 
-- [ ] `PrismaNoteRepository` implementa a interface sem alterá-la.
-- [ ] 6 testes de integração passando (`pnpm test:integration`).
-- [ ] `doc` (JSON) preservado no round-trip.
-- [ ] Domínio continua sem importar Prisma (só o repositório conhece o Prisma).
-- [ ] Reporte ao dono: arquivos tocados + checklist marcado.
+- [x] `PrismaNoteRepository` implementa a interface sem alterá-la.
+- [x] 6 testes de integração passando (`pnpm test:integration`) — 7 no total (+ update lança erro).
+- [x] `doc` (JSON) preservado no round-trip.
+- [x] Domínio continua sem importar Prisma (só o repositório conhece o Prisma).
+- [x] Reporte ao dono: arquivos tocados + checklist marcado.

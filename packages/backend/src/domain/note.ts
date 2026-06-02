@@ -13,6 +13,7 @@ export interface Note {
   resourceId?: string;
   eventId?: string;
   labelIds?: string[];
-  status: 'ACTIVE';
+  status: 'ACTIVE' | 'ARCHIVED';
+  archivedAt?: Date;
   createdAt: Date;
 }
