@@ -32,3 +32,34 @@ export const createNoteSchema = z.object({
 });
 
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
+
+export const listNotesQuerySchema = z.object({
+  userId: z.string().min(1),
+  type: noteType.optional(),
+  scope: noteScope.optional(),
+  from: z.coerce.date().optional(),
+  to: z.coerce.date().optional(),
+  status: z.enum(['ACTIVE', 'ARCHIVED']).optional(),
+});
+
+export type ListNotesQuery = z.infer<typeof listNotesQuerySchema>;
+
+export const noteResponseSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  type: noteType,
+  scope: noteScope,
+  date: z.string().datetime(),
+  title: z.string().optional(),
+  doc: z.record(z.unknown()),
+  plainText: z.string(),
+  goalId: z.string().optional(),
+  resourceId: z.string().optional(),
+  eventId: z.string().optional(),
+  labelIds: z.array(z.string()).optional(),
+  status: z.enum(['ACTIVE', 'ARCHIVED']),
+  archivedAt: z.string().datetime().optional(),
+  createdAt: z.string().datetime(),
+});
+
+export type NoteResponse = z.infer<typeof noteResponseSchema>;

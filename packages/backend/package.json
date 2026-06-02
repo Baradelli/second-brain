@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/http/server.ts",
+    "dev": "tsx watch src/http/main.ts",
     "build": "tsc",
-    "start": "node dist/http/server.js",
+    "start": "node dist/http/main.js",
     "test": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "test:watch": "vitest",

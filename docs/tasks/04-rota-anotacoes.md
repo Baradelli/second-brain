@@ -75,8 +75,8 @@ GET /notes?type=&scope=&from=&to=&status=
 
 ## Definição de pronto
 
-- [ ] `POST /notes` e `GET /notes` funcionando, validados por Zod.
-- [ ] Swagger em `/docs` mostra as duas rotas com os schemas.
-- [ ] 4 testes de rota passando.
-- [ ] Rota não contém regra de negócio (só valida e chama o UseCase).
-- [ ] Reporte ao dono: arquivos tocados + checklist marcado.
+- [x] `POST /notes` e `GET /notes` funcionando, validados por Zod.
+- [x] Swagger em `/docs` mostra as duas rotas com os schemas.
+- [x] 4 testes de rota passando (5 no total, +1 para campos faltando).
+- [x] Rota não contém regra de negócio (só valida e chama o UseCase).
+- [x] Reporte ao dono: arquivos tocados + checklist marcado.
