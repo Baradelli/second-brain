@@ -25,3 +25,10 @@ export class CaptureNotFoundError extends Error {
     this.name = 'CaptureNotFoundError';
   }
 }
+
+export class CaptureAlreadyProcessedError extends Error {
+  constructor(id: string) {
+    super(`Capture '${id}' has already been processed or archived.`);
+    this.name = 'CaptureAlreadyProcessedError';
+  }
+}

@@ -38,7 +38,7 @@
 ### Bloco D — Revisão (triagem do MVP 1)
 
 - [x] **12** — UseCase `archiveCapture` (status + arquivadoEm + motivo). → `tasks/12-usecase-arquivar-captura.md`
-- [ ] **13** — UseCase `promoteCaptureToNote` (marca destino: promotedToType/Id). → `tasks/13-usecase-promover-captura.md`
+- [x] **13** — UseCase `promoteCaptureToNote` (marca destino: promotedToType/Id). → `tasks/13-usecase-promover-captura.md`
 
 ### Bloco E — Agenda do dia
 
