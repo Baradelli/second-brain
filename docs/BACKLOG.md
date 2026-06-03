@@ -42,7 +42,7 @@
 
 ### Bloco E — Agenda do dia
 
-- [ ] **14** — UseCase `buildTodayAgenda` (momentos de diário + capturas a revisar hoje). → `tasks/14-usecase-agenda-do-dia.md`
+- [x] **14** — UseCase `buildTodayAgenda` (momentos de diário + capturas a revisar hoje). → `tasks/14-usecase-agenda-do-dia.md`
 - [ ] **15** — Rota `GET /agenda?day=today`. → `tasks/15-rota-agenda.md`
 
 ### Bloco F — Labels + Anexos (suporte à escrita)
