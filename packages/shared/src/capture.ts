@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { noteScope, noteType } from './note.js';
+
 export const createCaptureSchema = z.object({
   userId: z.string().min(1),
   text: z.string().min(1),
@@ -34,3 +36,17 @@ export const captureResponseSchema = z.object({
 });
 
 export type CaptureResponse = z.infer<typeof captureResponseSchema>;
+
+export const archiveCaptureSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type ArchiveCaptureInput = z.infer<typeof archiveCaptureSchema>;
+
+export const promoteCaptureSchema = z.object({
+  type: noteType,
+  scope: noteScope.optional(),
+  title: z.string().optional(),
+});
+
+export type PromoteCaptureInput = z.infer<typeof promoteCaptureSchema>;

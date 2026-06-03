@@ -14,6 +14,7 @@ export default defineWorkspace([
       name: 'integration',
       include: ['src/**/*.integration.test.ts'],
       environment: 'node',
+      poolOptions: { forks: { singleFork: true } },
     },
   },
 ]);
