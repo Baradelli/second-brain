@@ -54,6 +54,7 @@
 ### Bloco G — Frontend (só depois do domínio pronto)
 
 - [x] **19** — Setup do React + **Vite** (PWA) com `web/` e `mobile/` + pacote `ui/` compartilhado + i18n (react-i18next, pt/en) + roteamento + cliente HTTP usando os schemas de `shared/`. → `tasks/19-frontend-base.md`
+- [ ] **19b** — Sistema de design + tema dark/light + componentes-base (em `@cerebro/ui`). → `tasks/19b-design-system.md`
 - [ ] **20** — Tela do editor (TipTap) sobre o layout do protótipo; salva doc + plainText. → `tasks/20-tela-editor.md`
 - [ ] **21** — Tela de captura (textarea) + lista de pendentes + ação arquivar/promover. → `tasks/21-tela-captura-revisao.md`
 - [ ] **22** — Tela "Agenda de hoje" juntando diário + capturas a revisar. → `tasks/22-tela-agenda.md`
