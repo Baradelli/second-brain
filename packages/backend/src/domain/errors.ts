@@ -69,3 +69,10 @@ export class LabelInUseError extends Error {
     this.name = 'LabelInUseError';
   }
 }
+
+export class GuideQuestionNotFoundError extends Error {
+  constructor(id: string) {
+    super(`GuideQuestion not found: ${id}`);
+    this.name = 'GuideQuestionNotFoundError';
+  }
+}
