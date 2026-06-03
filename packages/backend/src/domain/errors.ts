@@ -18,3 +18,10 @@ export class NotARecapScopeError extends Error {
     this.name = 'NotARecapScopeError';
   }
 }
+
+export class CaptureNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Capture not found: ${id}`);
+    this.name = 'CaptureNotFoundError';
+  }
+}
