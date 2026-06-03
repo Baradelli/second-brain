@@ -22,6 +22,11 @@ Uso pessoal (single-user) por enquanto, mas o banco já nasce multiusuário.
 - **ORM/Banco:** Prisma + PostgreSQL (pgvector só no MVP 4).
 - **Frontend:** React + **Vite** (PWA), NÃO Next. Editor de escrita: TipTap. Formulários:
   React Hook Form + `@hookform/resolvers/zod`. i18n: react-i18next (pt default, en).
+- **Estilização: Tailwind CSS** em web e mobile (sem CSS inline em telas reais — o protótipo
+  antigo usava inline só como rascunho). Tokens/config de Tailwind compartilhados via `ui/`.
+- **Ordem do frontend: mobile primeiro.** O caso crítico (capturar/escrever no celular) mora
+  no `mobile/`. Componentes e lógica vão para `ui/`/`shared/` à medida que surgem; o `web/`
+  fica como shell mais simples até o mobile estar de pé.
 - **Testes:** Vitest.
 
 ## Arquitetura — camadas (DDD-lite)
