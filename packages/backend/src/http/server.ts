@@ -10,6 +10,7 @@ import {
 
 import { agendaRoutes } from '../routes/agenda-routes.js';
 import { captureRoutes } from '../routes/capture-routes.js';
+import { labelRoutes } from '../routes/label-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
 
 export async function buildServer() {
@@ -30,6 +31,7 @@ export async function buildServer() {
 
   await app.register(noteRoutes, { prisma });
   await app.register(captureRoutes, { prisma });
+  await app.register(labelRoutes, { prisma });
   await app.register(agendaRoutes, { prisma });
 
   return app;

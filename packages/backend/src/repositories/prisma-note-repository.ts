@@ -1,4 +1,4 @@
-import type { Note as PrismaNote, PrismaClient } from '@prisma/client';
+import type { Label, Note as PrismaNote, PrismaClient } from '@prisma/client';
 
 import type { Note } from '../domain/note.js';
 import type {
@@ -6,7 +6,11 @@ import type {
   NoteRepository,
 } from '../usecases/ports/note-repository.js';
 
-function toDomain(record: PrismaNote): Note {
+type NoteWithLabels = PrismaNote & { labels: Pick<Label, 'id'>[] };
+
+const INCLUDE_LABELS = { labels: { select: { id: true } } } as const;
+
+function toDomain(record: NoteWithLabels): Note {
   return {
     id: record.id,
     userId: record.userId,
@@ -19,7 +23,7 @@ function toDomain(record: PrismaNote): Note {
     goalId: record.goalId ?? undefined,
     resourceId: record.resourceId ?? undefined,
     eventId: record.eventId ?? undefined,
-    labelIds: [],
+    labelIds: record.labels.map((label) => label.id),
     status: record.status as Note['status'],
     archivedAt: record.archivedAt ?? undefined,
     createdAt: record.createdAt,
@@ -47,13 +51,20 @@ export class PrismaNoteRepository implements NoteRepository {
         status: note.status,
         archivedAt: note.archivedAt,
         createdAt: note.createdAt,
+        ...(note.labelIds?.length
+          ? { labels: { connect: note.labelIds.map((id) => ({ id })) } }
+          : {}),
       },
+      include: INCLUDE_LABELS,
     });
     return toDomain(record);
   }
 
   async byId(id: string): Promise<Note | null> {
-    const record = await this.prisma.note.findUnique({ where: { id } });
+    const record = await this.prisma.note.findUnique({
+      where: { id },
+      include: INCLUDE_LABELS,
+    });
     return record ? toDomain(record) : null;
   }
 
@@ -73,6 +84,7 @@ export class PrismaNoteRepository implements NoteRepository {
             }
           : {}),
       },
+      include: INCLUDE_LABELS,
     });
     return records.map(toDomain);
   }
@@ -84,23 +96,27 @@ export class PrismaNoteRepository implements NoteRepository {
     });
     if (!exists) throw new Error(`Note not found: ${id}`);
 
+    const { labelIds, ...rest } = patch;
+
     const record = await this.prisma.note.update({
       where: { id },
       data: {
-        ...(patch.type !== undefined ? { type: patch.type } : {}),
-        ...(patch.scope !== undefined ? { scope: patch.scope } : {}),
-        ...(patch.date !== undefined ? { date: patch.date } : {}),
-        ...(patch.title !== undefined ? { title: patch.title } : {}),
+        ...(rest.type !== undefined ? { type: rest.type } : {}),
+        ...(rest.scope !== undefined ? { scope: rest.scope } : {}),
+        ...(rest.date !== undefined ? { date: rest.date } : {}),
+        ...(rest.title !== undefined ? { title: rest.title } : {}),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(patch.doc !== undefined ? { doc: patch.doc as any } : {}),
-        ...(patch.plainText !== undefined
-          ? { plainText: patch.plainText }
+        ...(rest.doc !== undefined ? { doc: rest.doc as any } : {}),
+        ...(rest.plainText !== undefined ? { plainText: rest.plainText } : {}),
+        ...(rest.status !== undefined ? { status: rest.status } : {}),
+        ...(rest.archivedAt !== undefined
+          ? { archivedAt: rest.archivedAt }
           : {}),
-        ...(patch.status !== undefined ? { status: patch.status } : {}),
-        ...(patch.archivedAt !== undefined
-          ? { archivedAt: patch.archivedAt }
+        ...(labelIds !== undefined
+          ? { labels: { set: labelIds.map((lid) => ({ id: lid })) } }
           : {}),
       },
+      include: INCLUDE_LABELS,
     });
     return toDomain(record);
   }

@@ -34,3 +34,38 @@ export class CaptureAlreadyProcessedError extends Error {
     this.name = 'CaptureAlreadyProcessedError';
   }
 }
+
+export class LabelNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Label not found: ${id}`);
+    this.name = 'LabelNotFoundError';
+  }
+}
+
+export class LabelParentInvalidError extends Error {
+  constructor(parentId: string) {
+    super(`Label parent is invalid or belongs to another user: ${parentId}`);
+    this.name = 'LabelParentInvalidError';
+  }
+}
+
+export class LabelCycleError extends Error {
+  constructor(id: string) {
+    super(`Label '${id}' cannot be its own ancestor.`);
+    this.name = 'LabelCycleError';
+  }
+}
+
+export class LabelInUseError extends Error {
+  constructor(
+    public readonly reason: 'items' | 'activeChildren',
+    public readonly count: number,
+  ) {
+    const detail =
+      reason === 'items'
+        ? `label is used by ${count} item(s)`
+        : `label has ${count} active child label(s)`;
+    super(`Cannot archive label: ${detail}.`);
+    this.name = 'LabelInUseError';
+  }
+}
