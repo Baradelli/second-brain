@@ -48,7 +48,9 @@ class UpsertJournalNote {
     private createNote: CreateNote,
     private editNote: EditNote,
   ) {}
-  async execute(input: UpsertJournalNoteInput): Promise<{ note: Note; created: boolean }>;
+  async execute(
+    input: UpsertJournalNoteInput,
+  ): Promise<{ note: Note; created: boolean }>;
 }
 ```
 

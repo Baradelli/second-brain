@@ -1,5 +1,5 @@
 import { createNoteSchema } from '@cerebro/shared';
-import { describe, expect,it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { CreateNote } from '../create-note.js';
@@ -8,7 +8,10 @@ const baseInput = {
   userId: 'user-1',
   type: 'NOTE' as const,
   date: new Date('2026-06-02T00:00:00.000Z'),
-  doc: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Oi' }] }] },
+  doc: {
+    type: 'doc',
+    content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Oi' }] }],
+  },
 };
 
 describe('CreateNote', () => {
@@ -30,7 +33,13 @@ describe('CreateNote', () => {
     const doc = {
       type: 'doc',
       content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Hello ', marks: [{ type: 'bold' }] }, { type: 'text', text: 'world' }] },
+        {
+          type: 'paragraph',
+          content: [
+            { type: 'text', text: 'Hello ', marks: [{ type: 'bold' }] },
+            { type: 'text', text: 'world' },
+          ],
+        },
         { type: 'paragraph', content: [{ type: 'text', text: 'Second line' }] },
       ],
     };
@@ -53,7 +62,10 @@ describe('CreateNote', () => {
     const repo = new NoteRepositoryFake();
     const useCase = new CreateNote(repo);
 
-    const note = await useCase.execute({ ...baseInput, doc: { type: 'doc', content: [] } });
+    const note = await useCase.execute({
+      ...baseInput,
+      doc: { type: 'doc', content: [] },
+    });
 
     expect(note.plainText).toBe('');
   });
@@ -72,12 +84,18 @@ describe('CreateNote', () => {
 
 describe('createNoteSchema (shared)', () => {
   it('rejects invalid type', () => {
-    const result = createNoteSchema.safeParse({ ...baseInput, type: 'INVALID' });
+    const result = createNoteSchema.safeParse({
+      ...baseInput,
+      type: 'INVALID',
+    });
     expect(result.success).toBe(false);
   });
 
   it('rejects invalid scope', () => {
-    const result = createNoteSchema.safeParse({ ...baseInput, scope: 'INVALID' });
+    const result = createNoteSchema.safeParse({
+      ...baseInput,
+      scope: 'INVALID',
+    });
     expect(result.success).toBe(false);
   });
 

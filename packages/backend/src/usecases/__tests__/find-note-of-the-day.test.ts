@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { dayRange } from '../../domain/day-range.js';
 import type { Note } from '../../domain/note.js';
@@ -35,7 +35,10 @@ describe('FindNoteOfTheDay', () => {
 
   it("finds today's devotional when it exists", async () => {
     // Note date is within today's range (June 2 03:00 UTC to June 3 02:59:59.999 UTC)
-    const todayNote = makeNote({ id: 'today', date: new Date('2026-06-02T15:00:00.000Z') });
+    const todayNote = makeNote({
+      id: 'today',
+      date: new Date('2026-06-02T15:00:00.000Z'),
+    });
     await repo.save(todayNote);
 
     const result = await useCase.execute({
@@ -63,7 +66,10 @@ describe('FindNoteOfTheDay', () => {
   it("does not return yesterday's note (timezone border)", async () => {
     // Note date = June 1st 22:00 São Paulo = June 2nd 01:00 UTC
     // This is INSIDE June 1st SP local day, NOT June 2nd
-    const yesterdayNote = makeNote({ id: 'yesterday', date: new Date('2026-06-02T01:00:00.000Z') });
+    const yesterdayNote = makeNote({
+      id: 'yesterday',
+      date: new Date('2026-06-02T01:00:00.000Z'),
+    });
     await repo.save(yesterdayNote);
 
     // Querying for June 2nd SP (reference = June 2 12:00 UTC = 09:00 SP)
@@ -83,8 +89,20 @@ describe('FindNoteOfTheDay', () => {
     // Both dates are inside June 2nd SP (03:00–02:59:59 UTC); use two concrete instants
     const laterInDay = new Date('2026-06-02T15:00:00.000Z'); // 12:00 SP, clearly inside day
 
-    await repo.save(makeNote({ id: 'older',  date: from,       createdAt: new Date('2026-06-02T09:00:00.000Z') }));
-    await repo.save(makeNote({ id: 'newer',  date: laterInDay, createdAt: new Date('2026-06-02T10:00:00.000Z') }));
+    await repo.save(
+      makeNote({
+        id: 'older',
+        date: from,
+        createdAt: new Date('2026-06-02T09:00:00.000Z'),
+      }),
+    );
+    await repo.save(
+      makeNote({
+        id: 'newer',
+        date: laterInDay,
+        createdAt: new Date('2026-06-02T10:00:00.000Z'),
+      }),
+    );
 
     const result = await useCase.execute({
       userId: 'user-1',

@@ -8,7 +8,11 @@ export async function setupTestUser() {
   await prisma.user.upsert({
     where: { id: TEST_USER_ID },
     update: {},
-    create: { id: TEST_USER_ID, email: 'repo-test@cerebro.local', name: 'Repo Test' },
+    create: {
+      id: TEST_USER_ID,
+      email: 'repo-test@cerebro.local',
+      name: 'Repo Test',
+    },
   });
 }
 

@@ -44,7 +44,9 @@ interface UpsertRecapInput {
 
 class UpsertRecap {
   constructor(private upsertJournalNote: UpsertJournalNote) {}
-  async execute(input: UpsertRecapInput): Promise<{ note: Note; created: boolean }>;
+  async execute(
+    input: UpsertRecapInput,
+  ): Promise<{ note: Note; created: boolean }>;
 }
 ```
 

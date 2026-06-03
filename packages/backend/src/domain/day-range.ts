@@ -28,7 +28,11 @@ export function dayRange(
     const weekStart = dt.minus({ days: daysBack }).startOf('day');
     return {
       from: weekStart.toUTC().toJSDate(),
-      to: weekStart.plus({ days: 7 }).minus({ milliseconds: 1 }).toUTC().toJSDate(),
+      to: weekStart
+        .plus({ days: 7 })
+        .minus({ milliseconds: 1 })
+        .toUTC()
+        .toJSDate(),
     };
   }
 

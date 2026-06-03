@@ -25,6 +25,7 @@ O fluxo:
 ## Anatomia de um arquivo de tarefa
 
 Todo arquivo em `docs/tasks/` tem:
+
 - **Objetivo** — uma frase do que a fatia entrega.
 - **Camada(s)** — onde o trabalho acontece (domínio? repo? rota? UI?).
 - **Contrato** — assinaturas/tipos/inputs e outputs esperados.

@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Capture } from '../../../domain/capture.js';
 import { CaptureRepositoryFake } from '../capture-repository-fake.js';
@@ -43,18 +43,24 @@ describe('CaptureRepositoryFake', () => {
     await repo.save(makeCapture({ id: 'c2', status: 'PROCESSED' }));
     await repo.save(makeCapture({ id: 'c3', status: 'ARCHIVED' }));
 
-    const pending  = await repo.find({ userId: 'user-1', status: 'PENDING' });
+    const pending = await repo.find({ userId: 'user-1', status: 'PENDING' });
     const archived = await repo.find({ userId: 'user-1', status: 'ARCHIVED' });
 
-    expect(pending.map(c => c.id)).toEqual(['c1']);
-    expect(archived.map(c => c.id)).toEqual(['c3']);
+    expect(pending.map((c) => c.id)).toEqual(['c1']);
+    expect(archived.map((c) => c.id)).toEqual(['c3']);
   });
 
   it('find with reviewUntil returns only captures where reviewAt <= reviewUntil', async () => {
     const d = (s: string) => new Date(s);
-    await repo.save(makeCapture({ id: 'due',    reviewAt: d('2026-06-07T03:00:00.000Z') }));
-    await repo.save(makeCapture({ id: 'today',  reviewAt: d('2026-06-09T03:00:00.000Z') }));
-    await repo.save(makeCapture({ id: 'future', reviewAt: d('2026-06-14T03:00:00.000Z') }));
+    await repo.save(
+      makeCapture({ id: 'due', reviewAt: d('2026-06-07T03:00:00.000Z') }),
+    );
+    await repo.save(
+      makeCapture({ id: 'today', reviewAt: d('2026-06-09T03:00:00.000Z') }),
+    );
+    await repo.save(
+      makeCapture({ id: 'future', reviewAt: d('2026-06-14T03:00:00.000Z') }),
+    );
     await repo.save(makeCapture({ id: 'no-date', reviewAt: null }));
 
     const result = await repo.find({
@@ -62,7 +68,7 @@ describe('CaptureRepositoryFake', () => {
       reviewUntil: d('2026-06-09T03:00:00.000Z'),
     });
 
-    const ids = result.map(c => c.id);
+    const ids = result.map((c) => c.id);
     expect(ids).toContain('due');
     expect(ids).toContain('today');
     expect(ids).not.toContain('future');
@@ -72,7 +78,10 @@ describe('CaptureRepositoryFake', () => {
   it('update applies patch and persists; unlisted fields unchanged', async () => {
     await repo.save(makeCapture({ id: 'c1', text: 'original' }));
 
-    const updated = await repo.update('c1', { text: 'updated', status: 'PROCESSED' });
+    const updated = await repo.update('c1', {
+      text: 'updated',
+      status: 'PROCESSED',
+    });
 
     expect(updated.text).toBe('updated');
     expect(updated.status).toBe('PROCESSED');

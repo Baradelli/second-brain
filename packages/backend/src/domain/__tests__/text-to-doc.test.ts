@@ -8,7 +8,12 @@ describe('textToDoc', () => {
     const doc = textToDoc('ideia simples');
     expect(doc).toEqual({
       type: 'doc',
-      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'ideia simples' }] }],
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'ideia simples' }],
+        },
+      ],
     });
   });
 

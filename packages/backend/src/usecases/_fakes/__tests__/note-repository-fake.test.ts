@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Note } from '../../../domain/note.js';
 import { NoteRepositoryFake } from '../note-repository-fake.js';
@@ -39,7 +39,9 @@ describe('NoteRepositoryFake', () => {
 
   it('find filters by userId and type', async () => {
     await repo.save(makeNote({ id: 'n1', userId: 'user-1', type: 'NOTE' }));
-    await repo.save(makeNote({ id: 'n2', userId: 'user-1', type: 'DEVOTIONAL' }));
+    await repo.save(
+      makeNote({ id: 'n2', userId: 'user-1', type: 'DEVOTIONAL' }),
+    );
     await repo.save(makeNote({ id: 'n3', userId: 'user-2', type: 'NOTE' }));
 
     const result = await repo.find({ userId: 'user-1', type: 'NOTE' });
@@ -50,16 +52,26 @@ describe('NoteRepositoryFake', () => {
 
   it('find filters by date range — includes borders, excludes outside', async () => {
     const d = (iso: string) => new Date(iso);
-    await repo.save(makeNote({ id: 'before', date: d('2026-06-01T00:00:00.000Z') }));
-    await repo.save(makeNote({ id: 'from',   date: d('2026-06-02T00:00:00.000Z') }));
-    await repo.save(makeNote({ id: 'mid',    date: d('2026-06-03T00:00:00.000Z') }));
-    await repo.save(makeNote({ id: 'to',     date: d('2026-06-04T00:00:00.000Z') }));
-    await repo.save(makeNote({ id: 'after',  date: d('2026-06-05T00:00:00.000Z') }));
+    await repo.save(
+      makeNote({ id: 'before', date: d('2026-06-01T00:00:00.000Z') }),
+    );
+    await repo.save(
+      makeNote({ id: 'from', date: d('2026-06-02T00:00:00.000Z') }),
+    );
+    await repo.save(
+      makeNote({ id: 'mid', date: d('2026-06-03T00:00:00.000Z') }),
+    );
+    await repo.save(
+      makeNote({ id: 'to', date: d('2026-06-04T00:00:00.000Z') }),
+    );
+    await repo.save(
+      makeNote({ id: 'after', date: d('2026-06-05T00:00:00.000Z') }),
+    );
 
     const result = await repo.find({
       userId: 'user-1',
       from: d('2026-06-02T00:00:00.000Z'),
-      to:   d('2026-06-04T00:00:00.000Z'),
+      to: d('2026-06-04T00:00:00.000Z'),
     });
 
     const ids = result.map((n) => n.id);
@@ -71,10 +83,10 @@ describe('NoteRepositoryFake', () => {
   });
 
   it('find filters by status', async () => {
-    await repo.save(makeNote({ id: 'active',   status: 'ACTIVE' }));
+    await repo.save(makeNote({ id: 'active', status: 'ACTIVE' }));
     await repo.save(makeNote({ id: 'archived', status: 'ARCHIVED' }));
 
-    const active   = await repo.find({ userId: 'user-1', status: 'ACTIVE' });
+    const active = await repo.find({ userId: 'user-1', status: 'ACTIVE' });
     const archived = await repo.find({ userId: 'user-1', status: 'ARCHIVED' });
 
     expect(active.map((n) => n.id)).toEqual(['active']);
@@ -84,7 +96,10 @@ describe('NoteRepositoryFake', () => {
   it('update applies patch and persists', async () => {
     await repo.save(makeNote({ id: 'n1', plainText: 'original' }));
 
-    const updated = await repo.update('n1', { plainText: 'patched', title: 'New title' });
+    const updated = await repo.update('n1', {
+      plainText: 'patched',
+      title: 'New title',
+    });
 
     expect(updated.plainText).toBe('patched');
     expect(updated.title).toBe('New title');

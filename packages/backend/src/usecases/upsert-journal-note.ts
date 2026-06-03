@@ -1,4 +1,4 @@
-import type { NoteScope,NoteType } from '@cerebro/shared';
+import type { NoteScope, NoteType } from '@cerebro/shared';
 
 import { dayRange } from '../domain/day-range.js';
 import { NotAJournalTypeError } from '../domain/errors.js';
@@ -28,7 +28,9 @@ export class UpsertJournalNote {
     private editNote: EditNote,
   ) {}
 
-  async execute(input: UpsertJournalNoteInput): Promise<{ note: Note; created: boolean }> {
+  async execute(
+    input: UpsertJournalNoteInput,
+  ): Promise<{ note: Note; created: boolean }> {
     if (!JOURNAL_TYPES.includes(input.type)) {
       throw new NotAJournalTypeError(input.type);
     }
@@ -47,7 +49,12 @@ export class UpsertJournalNote {
     });
 
     if (!existing) {
-      const { from } = dayRange(input.reference, input.timezone, scope, weekStartsOn);
+      const { from } = dayRange(
+        input.reference,
+        input.timezone,
+        scope,
+        weekStartsOn,
+      );
       const note = await this.createNote.execute({
         userId: input.userId,
         type: input.type,

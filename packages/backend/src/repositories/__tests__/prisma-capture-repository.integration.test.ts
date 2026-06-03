@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { afterAll,beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import type { Capture } from '../../domain/capture.js';
 import { PrismaCaptureRepository } from '../prisma-capture-repository.js';
@@ -31,7 +31,11 @@ beforeAll(async () => {
   await prisma.user.upsert({
     where: { id: USER_ID },
     update: {},
-    create: { id: USER_ID, email: 'capture-test@cerebro.local', name: 'Capture Test' },
+    create: {
+      id: USER_ID,
+      email: 'capture-test@cerebro.local',
+      name: 'Capture Test',
+    },
   });
   await prisma.label.upsert({
     where: { id: LABEL_ID },
@@ -71,26 +75,32 @@ describe('PrismaCaptureRepository', () => {
     await repo.save(makeCapture({ id: 'c1', status: 'PENDING' }));
     await repo.save(makeCapture({ id: 'c2', status: 'ARCHIVED' }));
 
-    const pending  = await repo.find({ userId: USER_ID, status: 'PENDING' });
+    const pending = await repo.find({ userId: USER_ID, status: 'PENDING' });
     const archived = await repo.find({ userId: USER_ID, status: 'ARCHIVED' });
 
-    expect(pending.map(c => c.id)).toContain('c1');
-    expect(pending.map(c => c.id)).not.toContain('c2');
-    expect(archived.map(c => c.id)).toContain('c2');
+    expect(pending.map((c) => c.id)).toContain('c1');
+    expect(pending.map((c) => c.id)).not.toContain('c2');
+    expect(archived.map((c) => c.id)).toContain('c2');
   });
 
   it('find with reviewUntil respects border (inclusive)', async () => {
     const d = (s: string) => new Date(s);
-    await repo.save(makeCapture({ id: 'due',    reviewAt: d('2026-06-07T03:00:00.000Z') }));
-    await repo.save(makeCapture({ id: 'border', reviewAt: d('2026-06-09T03:00:00.000Z') }));
-    await repo.save(makeCapture({ id: 'future', reviewAt: d('2026-06-14T03:00:00.000Z') }));
+    await repo.save(
+      makeCapture({ id: 'due', reviewAt: d('2026-06-07T03:00:00.000Z') }),
+    );
+    await repo.save(
+      makeCapture({ id: 'border', reviewAt: d('2026-06-09T03:00:00.000Z') }),
+    );
+    await repo.save(
+      makeCapture({ id: 'future', reviewAt: d('2026-06-14T03:00:00.000Z') }),
+    );
 
     const result = await repo.find({
       userId: USER_ID,
       reviewUntil: d('2026-06-09T03:00:00.000Z'),
     });
 
-    const ids = result.map(c => c.id);
+    const ids = result.map((c) => c.id);
     expect(ids).toContain('due');
     expect(ids).toContain('border');
     expect(ids).not.toContain('future');
@@ -99,7 +109,10 @@ describe('PrismaCaptureRepository', () => {
   it('update applies patch without overwriting other fields', async () => {
     await repo.save(makeCapture({ id: 'c1', text: 'original' }));
 
-    const updated = await repo.update('c1', { text: 'updated', status: 'PROCESSED' });
+    const updated = await repo.update('c1', {
+      text: 'updated',
+      status: 'PROCESSED',
+    });
 
     expect(updated.text).toBe('updated');
     expect(updated.status).toBe('PROCESSED');

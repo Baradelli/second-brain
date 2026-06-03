@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: cerebro
       POSTGRES_DB: cerebro
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - cerebro_pgdata:/var/lib/postgresql/data
 

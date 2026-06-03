@@ -33,7 +33,9 @@ function toResponse(c: Capture): CaptureResponse {
   };
 }
 
-export const captureRoutes: FastifyPluginAsyncZod<{ prisma: PrismaClient }> = async (app, options) => {
+export const captureRoutes: FastifyPluginAsyncZod<{
+  prisma: PrismaClient;
+}> = async (app, options) => {
   const repo = new PrismaCaptureRepository(options.prisma);
   const settingsReader = new PrismaSettingsReader(options.prisma);
   const createCapture = new CreateCapture(repo, settingsReader);

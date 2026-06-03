@@ -1,7 +1,10 @@
-import type { Note as PrismaNote,PrismaClient } from '@prisma/client';
+import type { Note as PrismaNote, PrismaClient } from '@prisma/client';
 
 import type { Note } from '../domain/note.js';
-import type { NoteFilter, NoteRepository } from '../usecases/ports/note-repository.js';
+import type {
+  NoteFilter,
+  NoteRepository,
+} from '../usecases/ports/note-repository.js';
 
 function toDomain(record: PrismaNote): Note {
   return {
@@ -58,14 +61,14 @@ export class PrismaNoteRepository implements NoteRepository {
     const records = await this.prisma.note.findMany({
       where: {
         userId: filter.userId,
-        ...(filter.type   ? { type: filter.type }    : {}),
-        ...(filter.scope  ? { scope: filter.scope }  : {}),
+        ...(filter.type ? { type: filter.type } : {}),
+        ...(filter.scope ? { scope: filter.scope } : {}),
         ...(filter.status ? { status: filter.status } : {}),
         ...(filter.from || filter.to
           ? {
               date: {
                 ...(filter.from ? { gte: filter.from } : {}),
-                ...(filter.to   ? { lte: filter.to }   : {}),
+                ...(filter.to ? { lte: filter.to } : {}),
               },
             }
           : {}),
@@ -75,21 +78,28 @@ export class PrismaNoteRepository implements NoteRepository {
   }
 
   async update(id: string, patch: Partial<Note>): Promise<Note> {
-    const exists = await this.prisma.note.findUnique({ where: { id }, select: { id: true } });
+    const exists = await this.prisma.note.findUnique({
+      where: { id },
+      select: { id: true },
+    });
     if (!exists) throw new Error(`Note not found: ${id}`);
 
     const record = await this.prisma.note.update({
       where: { id },
       data: {
-        ...(patch.type       !== undefined ? { type: patch.type }             : {}),
-        ...(patch.scope      !== undefined ? { scope: patch.scope }           : {}),
-        ...(patch.date       !== undefined ? { date: patch.date }             : {}),
-        ...(patch.title      !== undefined ? { title: patch.title }           : {}),
+        ...(patch.type !== undefined ? { type: patch.type } : {}),
+        ...(patch.scope !== undefined ? { scope: patch.scope } : {}),
+        ...(patch.date !== undefined ? { date: patch.date } : {}),
+        ...(patch.title !== undefined ? { title: patch.title } : {}),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(patch.doc        !== undefined ? { doc: patch.doc as any }        : {}),
-        ...(patch.plainText  !== undefined ? { plainText: patch.plainText }   : {}),
-        ...(patch.status     !== undefined ? { status: patch.status }         : {}),
-        ...(patch.archivedAt !== undefined ? { archivedAt: patch.archivedAt } : {}),
+        ...(patch.doc !== undefined ? { doc: patch.doc as any } : {}),
+        ...(patch.plainText !== undefined
+          ? { plainText: patch.plainText }
+          : {}),
+        ...(patch.status !== undefined ? { status: patch.status } : {}),
+        ...(patch.archivedAt !== undefined
+          ? { archivedAt: patch.archivedAt }
+          : {}),
       },
     });
     return toDomain(record);

@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { docToText } from '../../domain/doc-to-text.js';
-import { CaptureAlreadyProcessedError, CaptureNotFoundError } from '../../domain/errors.js';
+import {
+  CaptureAlreadyProcessedError,
+  CaptureNotFoundError,
+} from '../../domain/errors.js';
 import { CaptureRepositoryFake } from '../_fakes/capture-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { CreateNote } from '../create-note.js';
@@ -69,20 +72,24 @@ describe('PromoteCaptureToNote', () => {
   });
 
   it('lança CaptureNotFoundError para captureId inexistente', async () => {
-    await expect(usecase.execute({ ...INPUT_BASE, captureId: 'nao-existe' })).rejects.toThrow(
-      CaptureNotFoundError,
-    );
+    await expect(
+      usecase.execute({ ...INPUT_BASE, captureId: 'nao-existe' }),
+    ).rejects.toThrow(CaptureNotFoundError);
   });
 
   it('lança CaptureAlreadyProcessedError para captura já PROCESSED', async () => {
     await captureRepo.update('cap-1', { status: 'PROCESSED' });
 
-    await expect(usecase.execute(INPUT_BASE)).rejects.toThrow(CaptureAlreadyProcessedError);
+    await expect(usecase.execute(INPUT_BASE)).rejects.toThrow(
+      CaptureAlreadyProcessedError,
+    );
   });
 
   it('lança CaptureAlreadyProcessedError para captura já ARCHIVED', async () => {
     await captureRepo.update('cap-1', { status: 'ARCHIVED' });
 
-    await expect(usecase.execute(INPUT_BASE)).rejects.toThrow(CaptureAlreadyProcessedError);
+    await expect(usecase.execute(INPUT_BASE)).rejects.toThrow(
+      CaptureAlreadyProcessedError,
+    );
   });
 });

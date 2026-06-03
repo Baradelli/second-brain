@@ -71,7 +71,7 @@ em cima — em vez de três apps para integrar depois (que é onde projetos assi
   devocional, reflexão, fichamento e nota é só o `type`/`scope`, não a estrutura — então
   **não existe "modelo simples vs complexo"** (seria atrito sem ganho).
 - **O conteúdo escrito é guardado como documento do editor (JSON do TipTap) — a fonte da
-  verdade.** O texto puro (`plainText`) e os embeddings são *derivados* disso, só para
+  verdade.** O texto puro (`plainText`) e os embeddings são _derivados_ disso, só para
   busca e métricas.
 - **Captura ≠ escrita.** A captura é uma **textarea** simples (multilinha, texto puro, sem
   formatação) — rápida e sem cerimônia, dá pra anotar uma ideia inteira; o editor rico
@@ -83,7 +83,7 @@ em cima — em vez de três apps para integrar depois (que é onde projetos assi
   sob Livro), com **vários labels por item** (many-to-many) em Capture, Resource, Note e
   Goal. Substitui o antigo `type` do recurso e resolve forma vs tema — os dois viram
   labels. Sempre opcional (não trava a captura).
-  > *Nota de atenção (do review):* a árvore na UI pode adicionar carga mental ("onde isso se
+  > _Nota de atenção (do review):_ a árvore na UI pode adicionar carga mental ("onde isso se
   > encaixa?"). Optei por já fazer a UI de árvore; vale vigiar para que não atrapalhe a
   > captura rápida.
 - **Objetivo tem `type` explícito.** `HABIT | TARGET | PROJECT | UMBRELLA` diz como
@@ -159,21 +159,21 @@ em cima — em vez de três apps para integrar depois (que é onde projetos assi
 
 ## 4. Stack
 
-| Camada | Escolha | Por quê |
-|---|---|---|
-| Estrutura | Monorepo: `shared/`, `backend/`, `web/`, `mobile/`, `ui/` | Schemas Zod e componentes UI reusados; web e mobile com bases próprias mas compartilhando o núcleo |
-| Backend | Node.js + TypeScript + Fastify | Terreno que eu já domino; agrega para o front via endpoints (faz o papel de BFF, sem camada extra) |
-| Validação + Docs | Zod + `fastify-type-provider-zod` + Swagger | Um schema valida em runtime, infere os tipos TS e gera o OpenAPI — doc sempre atual |
-| ORM / Banco | Prisma + PostgreSQL | pgvector no MVP 4; evita migrar depois |
-| Editor de escrita | TipTap (headless, ProseMirror) | Tela própria; JSON estruturado; extensões de link/menção depois |
-| Frontend | React + Vite (PWA) | SPA offline-first; Vite PWA plugin sem brigar com build (Next traria SSR ocioso e conflito Turbopack/Webpack) |
-| Formulários | React Hook Form + `@hookform/resolvers/zod` | Mesmo schema Zod do backend valida o form |
-| i18n | react-i18next | PT default + EN; chaves semânticas em inglês |
-| Offline | Service Worker + fila local (Nível 1) | Capturar/escrever sem sinal; sincroniza ao voltar |
-| Busca semântica | pgvector (embeddings) | "Pesquisar no meu cérebro" |
-| Repetição espaçada | SM-2 / FSRS | Algoritmo de agendamento de revisões |
-| Agente | Anthropic SDK | Cobrança, triagem, perguntas, a "voz" |
-| Cobrança (futuro) | Bot WhatsApp/Telegram | Push confiável e atrito quase zero |
+| Camada             | Escolha                                                   | Por quê                                                                                                       |
+| ------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Estrutura          | Monorepo: `shared/`, `backend/`, `web/`, `mobile/`, `ui/` | Schemas Zod e componentes UI reusados; web e mobile com bases próprias mas compartilhando o núcleo            |
+| Backend            | Node.js + TypeScript + Fastify                            | Terreno que eu já domino; agrega para o front via endpoints (faz o papel de BFF, sem camada extra)            |
+| Validação + Docs   | Zod + `fastify-type-provider-zod` + Swagger               | Um schema valida em runtime, infere os tipos TS e gera o OpenAPI — doc sempre atual                           |
+| ORM / Banco        | Prisma + PostgreSQL                                       | pgvector no MVP 4; evita migrar depois                                                                        |
+| Editor de escrita  | TipTap (headless, ProseMirror)                            | Tela própria; JSON estruturado; extensões de link/menção depois                                               |
+| Frontend           | React + Vite (PWA)                                        | SPA offline-first; Vite PWA plugin sem brigar com build (Next traria SSR ocioso e conflito Turbopack/Webpack) |
+| Formulários        | React Hook Form + `@hookform/resolvers/zod`               | Mesmo schema Zod do backend valida o form                                                                     |
+| i18n               | react-i18next                                             | PT default + EN; chaves semânticas em inglês                                                                  |
+| Offline            | Service Worker + fila local (Nível 1)                     | Capturar/escrever sem sinal; sincroniza ao voltar                                                             |
+| Busca semântica    | pgvector (embeddings)                                     | "Pesquisar no meu cérebro"                                                                                    |
+| Repetição espaçada | SM-2 / FSRS                                               | Algoritmo de agendamento de revisões                                                                          |
+| Agente             | Anthropic SDK                                             | Cobrança, triagem, perguntas, a "voz"                                                                         |
+| Cobrança (futuro)  | Bot WhatsApp/Telegram                                     | Push confiável e atrito quase zero                                                                            |
 
 > Como o MVP 4 vai exigir pgvector, recomendo já subir Postgres em Docker desde o MVP 1 e
 > evitar a migração.
@@ -240,7 +240,7 @@ blindado por baixo. Profundidade por camada:
 - **UI/telas** → teste só nos fluxos que quebram em silêncio. O resto valido usando — é um app
   pessoal, eu sou o QA.
 
-> Calibragem mudaria se o objetivo fosse *praticar TDD a fundo* (aí testar as bordas
+> Calibragem mudaria se o objetivo fosse _praticar TDD a fundo_ (aí testar as bordas
 > agressivamente seria proposital). Aqui o objetivo é entregar o app; o TDD serve a isso.
 
 ---
@@ -270,7 +270,7 @@ campos nuláveis.
 - **GuideQuestion** — perguntas opcionais ligadas a um Label (andaime para pensar).
 - **Attachment** — imagens/PDF/áudio ligados a Note, Capture ou Resource. Foto manuscrita +
   OCR moram aqui.
-- **Embedding** *(MVP 4)* — chunks vetoriais para busca semântica, desacoplados.
+- **Embedding** _(MVP 4)_ — chunks vetoriais para busca semântica, desacoplados.
 
 > **Capture, Resource, Goal e Event são dados estruturados.** Só **Note** tem corpo de
 > editor — `doc` (JSON do TipTap) + `plainText` derivado.
@@ -489,24 +489,24 @@ model Embedding {
 
 ### Como os casos reais caem nesse modelo
 
-| Eu quero... | Como vira dado |
-|---|---|
-| Finalizar o livro X (10 págs/dia) | Resource `{ unit: page, total: 320 }` + Goal `{ type: PROJECT, period: day, quantity: 10 }` |
-| Finalizar o curso Y | Resource `{ unit: lesson }` + Goal `{ type: PROJECT, total: nº de aulas }` |
-| Um livro de história | Resource com labels `{ Book, History }` |
-| Ir à academia 3x/semana | Goal `{ type: HABIT, period: week, quantity: 3 }` + labels `{ Health }` |
-| Academia seg/qua/sex | Goal `{ type: HABIT, period: week, weekdays: [1,3,5] }` |
-| Entrar em forma (vago) | Goal `{ type: UMBRELLA }`; os hábitos acima entram como `children` |
-| Li 12 páginas hoje | Event `{ type: progress, value: 12, resourceId }` |
-| O que aprendi nessa leitura | Note `{ type: STUDY_NOTE, eventId, resourceId }` |
-| Fiz algo fora da agenda | Event sem goal nem resource (log avulso) |
-| Devocional da manhã | Note `{ type: DEVOTIONAL, scope: DAY }` |
-| Super reflexão de domingo | Note `{ type: REFLECTION, scope: WEEK }` |
-| Foto da página manuscrita | Attachment `{ type: image, noteId }` (+ transcription depois) |
-| Perguntas ao anotar um livro religioso | painel junta `GuideQuestion` de `Book` ("foi fácil?") e `Religion` ("foi edificante?") |
+| Eu quero...                            | Como vira dado                                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Finalizar o livro X (10 págs/dia)      | Resource `{ unit: page, total: 320 }` + Goal `{ type: PROJECT, period: day, quantity: 10 }` |
+| Finalizar o curso Y                    | Resource `{ unit: lesson }` + Goal `{ type: PROJECT, total: nº de aulas }`                  |
+| Um livro de história                   | Resource com labels `{ Book, History }`                                                     |
+| Ir à academia 3x/semana                | Goal `{ type: HABIT, period: week, quantity: 3 }` + labels `{ Health }`                     |
+| Academia seg/qua/sex                   | Goal `{ type: HABIT, period: week, weekdays: [1,3,5] }`                                     |
+| Entrar em forma (vago)                 | Goal `{ type: UMBRELLA }`; os hábitos acima entram como `children`                          |
+| Li 12 páginas hoje                     | Event `{ type: progress, value: 12, resourceId }`                                           |
+| O que aprendi nessa leitura            | Note `{ type: STUDY_NOTE, eventId, resourceId }`                                            |
+| Fiz algo fora da agenda                | Event sem goal nem resource (log avulso)                                                    |
+| Devocional da manhã                    | Note `{ type: DEVOTIONAL, scope: DAY }`                                                     |
+| Super reflexão de domingo              | Note `{ type: REFLECTION, scope: WEEK }`                                                    |
+| Foto da página manuscrita              | Attachment `{ type: image, noteId }` (+ transcription depois)                               |
+| Perguntas ao anotar um livro religioso | painel junta `GuideQuestion` de `Book` ("foi fácil?") e `Religion` ("foi edificante?")      |
 
 > Goals `UMBRELLA` **não se concluem sozinhos** — fecho na mão, ou servem só de
-> guarda-chuva para os children mensuráveis. *(Decisão a confirmar.)*
+> guarda-chuva para os children mensuráveis. _(Decisão a confirmar.)_
 
 ## 7. Fluxos principais
 
@@ -522,7 +522,7 @@ model Embedding {
   Quando quiser, peço a transcrição: a IA lê a imagem e preenche um rascunho que eu
   **reviso**. A foto original fica guardada de qualquer jeito.
 - **Agenda do dia.** Objetivos/tarefas do dia + os momentos de diário (devocional, reflexão)
-  + capturas com `reviewAt <= hoje`.
+  - capturas com `reviewAt <= hoje`.
 - **Revisão.** Em cada captura decido: **promover** (vira Resource/Goal/Note) ou
   **arquivar**. O destino fica registrado (`promovidaParaTipo`/`promovidaParaId`). Nunca
   exclui.
@@ -564,7 +564,7 @@ construímos o que cada MVP precisa.
   Tabelas: `User`, `Settings`, `Capture`, `Note` (+ `Label` simples e `Attachment` conforme a
   escrita precisar). Editor TipTap; criar devocional e reflexão; captura rápida (textarea);
   lista de capturas pendentes; revisão manual (promover para anotação ou arquivar);
-  consultar histórico/arquivo. PWA, sem IA. *Se eu abrir isso todo dia, o sistema nasce vivo.*
+  consultar histórico/arquivo. PWA, sem IA. _Se eu abrir isso todo dia, o sistema nasce vivo._
 - **MVP 2 — Biblioteca + objetivos.**
   `Resource`, `Goal` (com `type` e labels), `Event`. Promover captura para resource/goal,
   **check de objetivo** (cria Evento `done`), **fechar o dia** (resolve pendentes: fiz /
@@ -572,8 +572,8 @@ construímos o que cada MVP precisa.
   Decidir aqui o comportamento de **desfazer check**.
 - **MVP 3 — Métricas & evolução.**
   Streaks, aderência, progresso, comparação período-a-período; alimenta as recapitulações.
-  Tudo agregação derivada, sem IA. *(O enquadramento dos números — conquista vs neutro —
-  é decisão desta fase, guiado pelo princípio anti-culpa.)*
+  Tudo agregação derivada, sem IA. _(O enquadramento dos números — conquista vs neutro —
+  é decisão desta fase, guiado pelo princípio anti-culpa.)_
 - **MVP 4 — Busca semântica.**
   `Embedding` + pgvector, com chunking ("pesquisar no meu cérebro").
 - **MVP 5 — Agente "EU".**
@@ -663,5 +663,6 @@ referência.
 
 ---
 
-*Próximo passo: construir o Passo 1 — a tela de escrita com TipTap, salvando `doc` (JSON)
-+ `plainText`, sobre o layout do protótipo.*
+\*Próximo passo: construir o Passo 1 — a tela de escrita com TipTap, salvando `doc` (JSON)
+
+- `plainText`, sobre o layout do protótipo.\*

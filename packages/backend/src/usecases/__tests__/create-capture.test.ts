@@ -1,5 +1,5 @@
 import { createCaptureSchema } from '@cerebro/shared';
-import { beforeEach,describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { CaptureRepositoryFake } from '../_fakes/capture-repository-fake.js';
 import { SettingsReaderFake } from '../_fakes/settings-reader-fake.js';
@@ -23,7 +23,10 @@ describe('CreateCapture', () => {
   });
 
   it('1 — cria captura com campos mínimos: status PENDING, id, createdAt', async () => {
-    const capture = await useCase.execute({ userId: USER, text: 'ideia rápida' }, NOW);
+    const capture = await useCase.execute(
+      { userId: USER, text: 'ideia rápida' },
+      NOW,
+    );
 
     expect(capture.id).toBeTruthy();
     expect(capture.status).toBe('PENDING');
@@ -35,7 +38,10 @@ describe('CreateCapture', () => {
 
   it('2 — reviewAt ausente → calculado para o próximo reviewWeekday no fuso correto', async () => {
     // NOW = Tuesday June 2; reviewWeekday = 0 (Sunday) → next Sunday = June 7
-    const capture = await useCase.execute({ userId: USER, text: 'captura' }, NOW);
+    const capture = await useCase.execute(
+      { userId: USER, text: 'captura' },
+      NOW,
+    );
 
     // June 7 00:00 SP = June 7 03:00 UTC
     expect(capture.reviewAt).toEqual(new Date('2026-06-07T03:00:00.000Z'));
@@ -61,7 +67,10 @@ describe('CreateCapture', () => {
     settings.set(USER, { timezone: TZ, reviewWeekday: 1 });
     const mondayNow = new Date('2026-06-01T12:00:00.000Z');
 
-    const capture = await useCase.execute({ userId: USER, text: 'captura' }, mondayNow);
+    const capture = await useCase.execute(
+      { userId: USER, text: 'captura' },
+      mondayNow,
+    );
 
     // June 1 00:00 SP = June 1 03:00 UTC
     expect(capture.reviewAt).toEqual(new Date('2026-06-01T03:00:00.000Z'));

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { afterAll,beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { buildServer } from '../../http/server.js';
 
@@ -75,7 +75,11 @@ describe('GET /captures', () => {
     await app.inject({
       method: 'POST',
       url: '/captures',
-      payload: { userId: USER_ID, text: 'vencida', reviewAt: '2020-01-01T00:00:00.000Z' },
+      payload: {
+        userId: USER_ID,
+        text: 'vencida',
+        reviewAt: '2020-01-01T00:00:00.000Z',
+      },
     });
     // Capture with reviewAt=null created directly via Prisma (CreateCapture always sets a date)
     await prisma.capture.create({
@@ -114,7 +118,11 @@ describe('GET /captures', () => {
 
     expect(res.statusCode).toBe(200);
     const body = res.json();
-    expect(body.every((c: { status: string }) => c.status === 'ARCHIVED')).toBe(true);
-    expect(body.some((c: { text: string }) => c.text === 'arquivada')).toBe(true);
+    expect(body.every((c: { status: string }) => c.status === 'ARCHIVED')).toBe(
+      true,
+    );
+    expect(body.some((c: { text: string }) => c.text === 'arquivada')).toBe(
+      true,
+    );
   });
 });

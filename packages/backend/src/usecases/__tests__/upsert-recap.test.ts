@@ -1,5 +1,5 @@
 import type { NoteScope } from '@cerebro/shared';
-import { beforeEach,describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { dayRange } from '../../domain/day-range.js';
 import { NotARecapScopeError } from '../../domain/errors.js';
@@ -12,7 +12,10 @@ import { UpsertRecap } from '../upsert-recap.js';
 
 const TZ = 'America/Sao_Paulo';
 const REF = new Date('2026-06-02T12:00:00.000Z'); // Tuesday June 2nd, 09:00 SP
-const doc = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'recap' }] }] };
+const doc = {
+  type: 'doc',
+  content: [{ type: 'paragraph', content: [{ type: 'text', text: 'recap' }] }],
+};
 
 describe('UpsertRecap', () => {
   let repo: NoteRepositoryFake;
@@ -30,8 +33,13 @@ describe('UpsertRecap', () => {
 
   it('1 — cria recap da semana com date=início da semana local (recapWeekday=1, segunda)', async () => {
     const { note, created } = await useCase.execute({
-      userId: 'user-1', type: 'REFLECTION', scope: 'WEEK',
-      reference: REF, timezone: TZ, recapWeekday: 1, doc,
+      userId: 'user-1',
+      type: 'REFLECTION',
+      scope: 'WEEK',
+      reference: REF,
+      timezone: TZ,
+      recapWeekday: 1,
+      doc,
     });
 
     expect(created).toBe(true);
@@ -42,10 +50,24 @@ describe('UpsertRecap', () => {
   it('2 — segunda chamada na mesma semana (create-or-get) → retorna existente, sem duplicata', async () => {
     const WED = new Date('2026-06-03T12:00:00.000Z'); // Wednesday, same week
 
-    await useCase.execute({ userId: 'user-1', type: 'REFLECTION', scope: 'WEEK', reference: REF, timezone: TZ, recapWeekday: 1, doc });
+    await useCase.execute({
+      userId: 'user-1',
+      type: 'REFLECTION',
+      scope: 'WEEK',
+      reference: REF,
+      timezone: TZ,
+      recapWeekday: 1,
+      doc,
+    });
     const { note, created } = await useCase.execute({
-      userId: 'user-1', type: 'REFLECTION', scope: 'WEEK',
-      reference: WED, timezone: TZ, recapWeekday: 1, doc, mode: 'create-or-get',
+      userId: 'user-1',
+      type: 'REFLECTION',
+      scope: 'WEEK',
+      reference: WED,
+      timezone: TZ,
+      recapWeekday: 1,
+      doc,
+      mode: 'create-or-get',
     });
 
     expect(created).toBe(false);
@@ -55,8 +77,12 @@ describe('UpsertRecap', () => {
 
   it('3 — recap de MONTH usa o dia 1 do mês local como date', async () => {
     const { note, created } = await useCase.execute({
-      userId: 'user-1', type: 'DEVOTIONAL', scope: 'MONTH',
-      reference: REF, timezone: TZ, doc,
+      userId: 'user-1',
+      type: 'DEVOTIONAL',
+      scope: 'MONTH',
+      reference: REF,
+      timezone: TZ,
+      doc,
     });
 
     expect(created).toBe(true);
@@ -66,8 +92,12 @@ describe('UpsertRecap', () => {
 
   it('4 — recap de YEAR usa 1º de janeiro local como date', async () => {
     const { note, created } = await useCase.execute({
-      userId: 'user-1', type: 'DEVOTIONAL', scope: 'YEAR',
-      reference: REF, timezone: TZ, doc,
+      userId: 'user-1',
+      type: 'DEVOTIONAL',
+      scope: 'YEAR',
+      reference: REF,
+      timezone: TZ,
+      doc,
     });
 
     expect(created).toBe(true);
@@ -78,8 +108,24 @@ describe('UpsertRecap', () => {
   it('5 — duas semanas diferentes geram duas notas distintas', async () => {
     const WEEK2 = new Date('2026-06-09T12:00:00.000Z'); // next week Tuesday
 
-    const first = await useCase.execute({ userId: 'user-1', type: 'REFLECTION', scope: 'WEEK', reference: REF,   timezone: TZ, recapWeekday: 1, doc });
-    const second = await useCase.execute({ userId: 'user-1', type: 'REFLECTION', scope: 'WEEK', reference: WEEK2, timezone: TZ, recapWeekday: 1, doc });
+    const first = await useCase.execute({
+      userId: 'user-1',
+      type: 'REFLECTION',
+      scope: 'WEEK',
+      reference: REF,
+      timezone: TZ,
+      recapWeekday: 1,
+      doc,
+    });
+    const second = await useCase.execute({
+      userId: 'user-1',
+      type: 'REFLECTION',
+      scope: 'WEEK',
+      reference: WEEK2,
+      timezone: TZ,
+      recapWeekday: 1,
+      doc,
+    });
 
     expect(first.created).toBe(true);
     expect(second.created).toBe(true);
@@ -90,8 +136,12 @@ describe('UpsertRecap', () => {
   it('6 — scope DAY lança NotARecapScopeError', async () => {
     await expect(
       useCase.execute({
-        userId: 'user-1', type: 'REFLECTION', scope: 'DAY' as NoteScope,
-        reference: REF, timezone: TZ, doc,
+        userId: 'user-1',
+        type: 'REFLECTION',
+        scope: 'DAY' as NoteScope,
+        reference: REF,
+        timezone: TZ,
+        doc,
       }),
     ).rejects.toThrow(NotARecapScopeError);
   });
@@ -99,8 +149,13 @@ describe('UpsertRecap', () => {
   it('7 — recapWeekday=0 (domingo) muda o início da semana para o domingo anterior', async () => {
     // June 2 (Tuesday) with Sunday start → weekStart = May 31 (Sunday)
     const { note } = await useCase.execute({
-      userId: 'user-1', type: 'REFLECTION', scope: 'WEEK',
-      reference: REF, timezone: TZ, recapWeekday: 0, doc,
+      userId: 'user-1',
+      type: 'REFLECTION',
+      scope: 'WEEK',
+      reference: REF,
+      timezone: TZ,
+      recapWeekday: 0,
+      doc,
     });
 
     expect(note.date).toEqual(dayRange(REF, TZ, 'WEEK', 0).from);

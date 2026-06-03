@@ -1,4 +1,4 @@
-import type { NoteScope,NoteType } from '@cerebro/shared';
+import type { NoteScope, NoteType } from '@cerebro/shared';
 
 import { dayRange } from '../domain/day-range.js';
 import type { Note } from '../domain/note.js';
@@ -18,7 +18,12 @@ export class FindNoteOfTheDay {
 
   async execute(input: FindNoteOfTheDayInput): Promise<Note | null> {
     const scope = input.scope ?? 'DAY';
-    const { from, to } = dayRange(input.reference, input.timezone, scope, input.weekStartsOn ?? 1);
+    const { from, to } = dayRange(
+      input.reference,
+      input.timezone,
+      scope,
+      input.weekStartsOn ?? 1,
+    );
 
     const notes = await this.repo.find({
       userId: input.userId,
@@ -31,6 +36,8 @@ export class FindNoteOfTheDay {
 
     if (notes.length === 0) return null;
 
-    return notes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+    return notes.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    )[0];
   }
 }

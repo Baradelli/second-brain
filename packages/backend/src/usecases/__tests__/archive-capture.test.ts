@@ -38,14 +38,19 @@ describe('ArchiveCapture', () => {
   });
 
   it('grava archiveReason quando enviado', async () => {
-    const result = await usecase.execute({ id: 'cap-1', reason: 'já fiz isso' });
+    const result = await usecase.execute({
+      id: 'cap-1',
+      reason: 'já fiz isso',
+    });
 
     expect(result.status).toBe('ARCHIVED');
     expect(result.archiveReason).toBe('já fiz isso');
   });
 
   it('lança CaptureNotFoundError para id inexistente', async () => {
-    await expect(usecase.execute({ id: 'nao-existe' })).rejects.toThrow(CaptureNotFoundError);
+    await expect(usecase.execute({ id: 'nao-existe' })).rejects.toThrow(
+      CaptureNotFoundError,
+    );
   });
 
   it('não aparece em listPendingCaptures após arquivar; aparece em listArchived', async () => {

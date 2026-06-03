@@ -5,11 +5,13 @@
 > final passar, abra `docs/BACKLOG.md` e comece a Tarefa 01.
 
 ## 0. Pré-requisitos
+
 - Node.js 20+.
 - Docker + Docker Compose.
 - pnpm: `npm i -g pnpm`.
 
 ## 1. O que já vem pronto
+
 - Monorepo pnpm com `packages/shared`, `ui`, `backend`, `web`, `mobile`.
 - TypeScript estrito (`tsconfig.base.json`), ESLint, Prettier.
 - `docker-compose.yml` com Postgres.
@@ -21,12 +23,14 @@
 - `web` e `mobile` como apps Vite + PWA (placeholder), `ui` para componentes compartilhados.
 
 ## 2. Instalar
+
 ```bash
 pnpm install
 cp .env.example packages/backend/.env   # ajuste se necessário
 ```
 
 ## 3. Subir o banco e migrar
+
 ```bash
 pnpm db:up              # sobe o Postgres via Docker
 pnpm prisma:migrate     # cria as tabelas do MVP 1 (nome sugerido: init_mvp1)
@@ -34,6 +38,7 @@ pnpm prisma:seed        # cria o usuário fixo "owner"
 ```
 
 ## 4. Validar
+
 ```bash
 pnpm test               # roda os testes unit (ainda vazios — só valida a config)
 pnpm dev:backend        # sobe o Fastify; abra http://localhost:3333/docs
@@ -42,11 +47,13 @@ pnpm dev:mobile         # abre o mobile em http://localhost:5174
 ```
 
 ## 5. Notas
+
 - `Resource`, `Goal`, `Event`, `Embedding` **não** estão no schema ainda — entram nas
   fases seguintes (ver `docs/BACKLOG.md`), para evitar migrações grandes e mortas.
 - Datas em UTC; "o dia" se calcula no `timezone` de Settings (regra no `CLAUDE.md`).
 
 ## Definição de pronto do setup
+
 - [ ] `pnpm install` sem erros.
 - [ ] `pnpm db:up` sobe o Postgres.
 - [ ] `pnpm prisma:migrate` cria as tabelas do MVP 1.

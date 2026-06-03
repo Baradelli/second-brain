@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { afterAll,beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { buildServer } from '../../http/server.js';
 
@@ -14,7 +14,12 @@ const baseBody = {
   userId: USER_ID,
   type: 'NOTE',
   date: '2026-06-02T00:00:00.000Z',
-  doc: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'hello' }] }] },
+  doc: {
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] },
+    ],
+  },
 };
 
 let app: Awaited<ReturnType<typeof buildServer>>;
@@ -74,8 +79,16 @@ describe('POST /notes', () => {
 
 describe('GET /notes', () => {
   it('returns only notes matching type filter', async () => {
-    await app.inject({ method: 'POST', url: '/notes', payload: { ...baseBody, type: 'NOTE' } });
-    await app.inject({ method: 'POST', url: '/notes', payload: { ...baseBody, type: 'DEVOTIONAL' } });
+    await app.inject({
+      method: 'POST',
+      url: '/notes',
+      payload: { ...baseBody, type: 'NOTE' },
+    });
+    await app.inject({
+      method: 'POST',
+      url: '/notes',
+      payload: { ...baseBody, type: 'DEVOTIONAL' },
+    });
 
     const res = await app.inject({
       method: 'GET',
@@ -89,9 +102,21 @@ describe('GET /notes', () => {
   });
 
   it('respects from/to date range filter', async () => {
-    await app.inject({ method: 'POST', url: '/notes', payload: { ...baseBody, date: '2026-06-01T00:00:00.000Z' } });
-    await app.inject({ method: 'POST', url: '/notes', payload: { ...baseBody, date: '2026-06-03T00:00:00.000Z' } });
-    await app.inject({ method: 'POST', url: '/notes', payload: { ...baseBody, date: '2026-06-05T00:00:00.000Z' } });
+    await app.inject({
+      method: 'POST',
+      url: '/notes',
+      payload: { ...baseBody, date: '2026-06-01T00:00:00.000Z' },
+    });
+    await app.inject({
+      method: 'POST',
+      url: '/notes',
+      payload: { ...baseBody, date: '2026-06-03T00:00:00.000Z' },
+    });
+    await app.inject({
+      method: 'POST',
+      url: '/notes',
+      payload: { ...baseBody, date: '2026-06-05T00:00:00.000Z' },
+    });
 
     const res = await app.inject({
       method: 'GET',

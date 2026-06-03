@@ -1,4 +1,4 @@
-import type { NoteScope,NoteType } from '@cerebro/shared';
+import type { NoteScope, NoteType } from '@cerebro/shared';
 
 import { NotARecapScopeError } from '../domain/errors.js';
 import type { Note } from '../domain/note.js';
@@ -21,7 +21,9 @@ export interface UpsertRecapInput {
 export class UpsertRecap {
   constructor(private upsertJournalNote: UpsertJournalNote) {}
 
-  async execute(input: UpsertRecapInput): Promise<{ note: Note; created: boolean }> {
+  async execute(
+    input: UpsertRecapInput,
+  ): Promise<{ note: Note; created: boolean }> {
     if (!RECAP_SCOPES.includes(input.scope)) {
       throw new NotARecapScopeError(input.scope);
     }

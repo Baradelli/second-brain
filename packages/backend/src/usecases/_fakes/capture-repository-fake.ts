@@ -1,5 +1,8 @@
 import type { Capture } from '../../domain/capture.js';
-import type { CaptureFilter, CaptureRepository } from '../ports/capture-repository.js';
+import type {
+  CaptureFilter,
+  CaptureRepository,
+} from '../ports/capture-repository.js';
 
 export class CaptureRepositoryFake implements CaptureRepository {
   private store = new Map<string, Capture>();

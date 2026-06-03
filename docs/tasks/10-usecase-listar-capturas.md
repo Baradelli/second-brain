@@ -23,7 +23,11 @@ Código/identificadores em **inglês**.
 class ListPendingCaptures {
   constructor(private repo: CaptureRepository) {}
   // "a revisar hoje": status PENDING e reviewAt <= agora (no fuso do usuário)
-  async execute(input: { userId: string; reference: Date; timezone: string }): Promise<Capture[]>;
+  async execute(input: {
+    userId: string;
+    reference: Date;
+    timezone: string;
+  }): Promise<Capture[]>;
 }
 
 class ListArchived {

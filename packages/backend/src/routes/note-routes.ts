@@ -1,5 +1,9 @@
 import type { NoteResponse } from '@cerebro/shared';
-import { createNoteSchema, listNotesQuerySchema, noteResponseSchema } from '@cerebro/shared';
+import {
+  createNoteSchema,
+  listNotesQuerySchema,
+  noteResponseSchema,
+} from '@cerebro/shared';
 import type { PrismaClient } from '@prisma/client';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
@@ -28,7 +32,9 @@ function toResponse(note: Note): NoteResponse {
   };
 }
 
-export const noteRoutes: FastifyPluginAsyncZod<{ prisma: PrismaClient }> = async (app, options) => {
+export const noteRoutes: FastifyPluginAsyncZod<{
+  prisma: PrismaClient;
+}> = async (app, options) => {
   const repo = new PrismaNoteRepository(options.prisma);
   const createNote = new CreateNote(repo);
 

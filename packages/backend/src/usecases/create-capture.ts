@@ -21,7 +21,11 @@ export class CreateCapture {
     if (reviewAt === null) {
       const userSettings = await this.settings.getByUserId(input.userId);
       if (userSettings) {
-        reviewAt = nextWeekday(now, userSettings.timezone, userSettings.reviewWeekday);
+        reviewAt = nextWeekday(
+          now,
+          userSettings.timezone,
+          userSettings.reviewWeekday,
+        );
       }
     }
 

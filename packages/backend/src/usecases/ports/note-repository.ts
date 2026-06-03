@@ -1,4 +1,4 @@
-import type { NoteScope,NoteType } from '@cerebro/shared';
+import type { NoteScope, NoteType } from '@cerebro/shared';
 
 import type { Note } from '../../domain/note.js';
 

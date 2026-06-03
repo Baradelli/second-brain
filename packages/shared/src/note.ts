@@ -7,7 +7,12 @@ import { z } from 'zod';
  * NOTA: `Event.type` e `Goal.type` ficarão como string validada por z.enum (ainda evoluem);
  * aqui, NoteType e NoteScope são fechados, então viram enum no Prisma.
  */
-export const noteType = z.enum(['DEVOTIONAL', 'REFLECTION', 'STUDY_NOTE', 'NOTE']);
+export const noteType = z.enum([
+  'DEVOTIONAL',
+  'REFLECTION',
+  'STUDY_NOTE',
+  'NOTE',
+]);
 export type NoteType = z.infer<typeof noteType>;
 
 export const noteScope = z.enum(['DAY', 'WEEK', 'MONTH', 'YEAR']);

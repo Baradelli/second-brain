@@ -4,7 +4,12 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export default [
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/*.config.*', '**/prisma/**'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/*.config.*',
+      '**/prisma/**',
+    ],
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
@@ -21,7 +26,10 @@ export default [
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
     },

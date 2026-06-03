@@ -1,7 +1,14 @@
-import type { Capture as PrismaCapture, Label,PrismaClient } from '@prisma/client';
+import type {
+  Capture as PrismaCapture,
+  Label,
+  PrismaClient,
+} from '@prisma/client';
 
 import type { Capture } from '../domain/capture.js';
-import type { CaptureFilter, CaptureRepository } from '../usecases/ports/capture-repository.js';
+import type {
+  CaptureFilter,
+  CaptureRepository,
+} from '../usecases/ports/capture-repository.js';
 
 type CaptureWithLabels = PrismaCapture & { labels: Pick<Label, 'id'>[] };
 
@@ -75,7 +82,10 @@ export class PrismaCaptureRepository implements CaptureRepository {
   }
 
   async update(id: string, patch: Partial<Capture>): Promise<Capture> {
-    const exists = await this.prisma.capture.findUnique({ where: { id }, select: { id: true } });
+    const exists = await this.prisma.capture.findUnique({
+      where: { id },
+      select: { id: true },
+    });
     if (!exists) throw new Error(`Capture not found: ${id}`);
 
     const { labelIds, ...rest } = patch;
@@ -83,15 +93,25 @@ export class PrismaCaptureRepository implements CaptureRepository {
     const record = await this.prisma.capture.update({
       where: { id },
       data: {
-        ...(rest.text        !== undefined ? { text: rest.text }               : {}),
-        ...(rest.url         !== undefined ? { url: rest.url }                 : {}),
-        ...(rest.status      !== undefined ? { status: rest.status }           : {}),
-        ...(rest.reviewAt    !== undefined ? { reviewAt: rest.reviewAt }       : {}),
-        ...(rest.processedAt !== undefined ? { processedAt: rest.processedAt } : {}),
-        ...(rest.promotedToType !== undefined ? { promotedToType: rest.promotedToType } : {}),
-        ...(rest.promotedToId   !== undefined ? { promotedToId: rest.promotedToId }     : {}),
-        ...(rest.archivedAt  !== undefined ? { archivedAt: rest.archivedAt }   : {}),
-        ...(rest.archiveReason !== undefined ? { archiveReason: rest.archiveReason } : {}),
+        ...(rest.text !== undefined ? { text: rest.text } : {}),
+        ...(rest.url !== undefined ? { url: rest.url } : {}),
+        ...(rest.status !== undefined ? { status: rest.status } : {}),
+        ...(rest.reviewAt !== undefined ? { reviewAt: rest.reviewAt } : {}),
+        ...(rest.processedAt !== undefined
+          ? { processedAt: rest.processedAt }
+          : {}),
+        ...(rest.promotedToType !== undefined
+          ? { promotedToType: rest.promotedToType }
+          : {}),
+        ...(rest.promotedToId !== undefined
+          ? { promotedToId: rest.promotedToId }
+          : {}),
+        ...(rest.archivedAt !== undefined
+          ? { archivedAt: rest.archivedAt }
+          : {}),
+        ...(rest.archiveReason !== undefined
+          ? { archiveReason: rest.archiveReason }
+          : {}),
         ...(labelIds !== undefined
           ? { labels: { set: labelIds.map((lid) => ({ id: lid })) } }
           : {}),

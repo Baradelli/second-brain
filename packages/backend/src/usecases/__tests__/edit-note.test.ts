@@ -1,4 +1,4 @@
-import { beforeEach,describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { NoteNotFoundError } from '../../domain/errors.js';
 import type { Note } from '../../domain/note.js';
@@ -12,7 +12,12 @@ function makeNote(overrides?: Partial<Note>): Note {
     type: 'NOTE',
     scope: 'DAY',
     date: new Date('2026-06-02T00:00:00.000Z'),
-    doc: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'original' }] }] },
+    doc: {
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'original' }] },
+      ],
+    },
     plainText: 'original',
     status: 'ACTIVE',
     createdAt: new Date('2026-06-02T10:00:00.000Z'),
@@ -46,7 +51,13 @@ describe('EditNote', () => {
     const newDoc = {
       type: 'doc',
       content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Updated ', marks: [{ type: 'bold' }] }, { type: 'text', text: 'text' }] },
+        {
+          type: 'paragraph',
+          content: [
+            { type: 'text', text: 'Updated ', marks: [{ type: 'bold' }] },
+            { type: 'text', text: 'text' },
+          ],
+        },
       ],
     };
 
@@ -57,6 +68,8 @@ describe('EditNote', () => {
   });
 
   it('throws NoteNotFoundError for unknown id', async () => {
-    await expect(useCase.execute({ id: 'ghost' })).rejects.toThrow(NoteNotFoundError);
+    await expect(useCase.execute({ id: 'ghost' })).rejects.toThrow(
+      NoteNotFoundError,
+    );
   });
 });
