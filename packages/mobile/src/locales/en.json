@@ -1,0 +1,21 @@
+{
+  "app.name": "Second Brain",
+  "nav.home": "Today",
+  "nav.capture": "Capture",
+  "nav.review": "Review",
+  "nav.editor": "Editor",
+  "lang.switch": "Português",
+  "agenda.todayTitle": "Today's agenda",
+  "agenda.loading": "Loading...",
+  "agenda.empty": "Nothing for today.",
+  "capture.placeholder": "What's on your mind?",
+  "capture.submit": "Capture",
+  "editor.placeholder": "Start writing...",
+  "review.title": "Review",
+  "review.empty": "No pending captures.",
+  "common.error": "Something went wrong. Please try again.",
+  "common.save": "Save",
+  "common.cancel": "Cancel",
+  "common.archive": "Archive",
+  "common.promote": "Promote to note"
+}

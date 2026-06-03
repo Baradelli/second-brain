@@ -1,11 +1,11 @@
-import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Mobile (mobile-first). Mesma base do web, shell/layout próprios para telas pequenas.
-// Offline Nível 1 (captura/escrita) é especialmente importante aqui (Tarefa 24).
 export default defineConfig({
   plugins: [
+    tailwindcss(),
     react(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -14,8 +14,15 @@ export default defineConfig({
         short_name: 'Cérebro',
         start_url: '/',
         display: 'standalone',
+        theme_color: '#0f172a',
+        background_color: '#0f172a',
       },
     }),
   ],
   server: { port: 5174 },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test-setup.ts'],
+  },
 });

@@ -1,0 +1,21 @@
+{
+  "app.name": "Segundo Cérebro",
+  "nav.home": "Hoje",
+  "nav.capture": "Capturar",
+  "nav.review": "Revisar",
+  "nav.editor": "Editor",
+  "lang.switch": "English",
+  "agenda.todayTitle": "Agenda de hoje",
+  "agenda.loading": "Carregando...",
+  "agenda.empty": "Nenhum item para hoje.",
+  "capture.placeholder": "O que está na sua mente?",
+  "capture.submit": "Capturar",
+  "editor.placeholder": "Comece a escrever...",
+  "review.title": "Revisão",
+  "review.empty": "Nenhuma captura pendente.",
+  "common.error": "Algo deu errado. Tente novamente.",
+  "common.save": "Salvar",
+  "common.cancel": "Cancelar",
+  "common.archive": "Arquivar",
+  "common.promote": "Transformar em nota"
+}
