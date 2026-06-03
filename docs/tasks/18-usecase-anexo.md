@@ -96,10 +96,10 @@ class AttachFile {
 
 ## Definição de pronto
 
-- [ ] `attachFile` registra anexo (URL + metadados) numa Note validada.
-- [ ] `transcription`/`ocrStatus` nulos; estrutura pronta para OCR futuro.
-- [ ] `listByNote` funcional; rotas validadas por Zod.
-- [ ] Testes verdes (unit + integração + rota).
-- [ ] **Com isso o Bloco F encerra e o backend do MVP 1 está completo** (faltam só os
+- [x] `attachFile` registra anexo (URL + metadados) numa Note validada.
+- [x] `transcription`/`ocrStatus` nulos; estrutura pronta para OCR futuro.
+- [x] `listByNote` funcional; rotas validadas por Zod.
+- [x] Testes verdes (unit + integração + rota).
+- [x] **Com isso o Bloco F encerra e o backend do MVP 1 está completo** (faltam só os
       Blocos G — frontend — e H — offline).
-- [ ] Reporte ao dono: arquivos tocados + checklist marcado.
+- [x] Reporte ao dono: arquivos tocados + checklist marcado.

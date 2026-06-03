@@ -1,3 +1,4 @@
+export * from './attachment.js';
 export * from './capture.js';
 export * from './common.js';
 export * from './guide-question.js';

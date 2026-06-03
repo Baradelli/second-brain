@@ -9,6 +9,7 @@ import {
 } from 'fastify-type-provider-zod';
 
 import { agendaRoutes } from '../routes/agenda-routes.js';
+import { attachmentRoutes } from '../routes/attachment-routes.js';
 import { captureRoutes } from '../routes/capture-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
@@ -31,6 +32,7 @@ export async function buildServer() {
   app.get('/health', async () => ({ status: 'ok' }));
 
   await app.register(noteRoutes, { prisma });
+  await app.register(attachmentRoutes, { prisma });
   await app.register(captureRoutes, { prisma });
   await app.register(labelRoutes, { prisma });
   await app.register(guideQuestionRoutes, { prisma });
