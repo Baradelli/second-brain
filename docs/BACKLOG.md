@@ -48,7 +48,7 @@
 ### Bloco F — Labels + Anexos (suporte à escrita)
 
 - [x] **16** — Domínio + UseCases de Label (criar, listar em árvore, vincular a item). → `tasks/16-usecase-labels.md`
-- [ ] **17** — PerguntaGuia por label + UseCase `suggestedQuestionsForNote` (agrupadas por label). → `tasks/17-usecase-perguntas-guia.md`
+- [x] **17** — PerguntaGuia por label + UseCase `suggestedQuestionsForNote` (agrupadas por label). → `tasks/17-usecase-perguntas-guia.md`
 - [ ] **18** — Attachment: UseCase `attachFile` a uma Note (só guardar URL/metadados; OCR fica pro MVP 5). → `tasks/18-usecase-anexo.md`
 
 ### Bloco G — Frontend (só depois do domínio pronto)
