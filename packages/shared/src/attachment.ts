@@ -37,3 +37,11 @@ export const attachmentResponseSchema = z.object({
 });
 
 export type AttachmentResponse = z.infer<typeof attachmentResponseSchema>;
+
+// Resposta do upload de arquivo (disco do servidor): devolve só a URL pública.
+// A URL volta para POST /notes/:id/attachments como `url` do Attachment.
+export const uploadResponseSchema = z.object({
+  url: z.string().url(),
+});
+
+export type UploadResponse = z.infer<typeof uploadResponseSchema>;

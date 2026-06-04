@@ -90,6 +90,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
   getTodayNote: vi.fn(),
   getNoteById: vi.fn(),
   getSuggestedQuestions: vi.fn(),
+  uploadAttachmentFile: vi.fn(),
   attachFileToNote: vi.fn(),
   getNoteAttachments: vi.fn(),
 }));
@@ -122,6 +123,9 @@ beforeEach(() => {
   );
   vi.mocked(endpoints.getSuggestedQuestions).mockResolvedValue([]);
   vi.mocked(endpoints.getNoteAttachments).mockResolvedValue([]);
+  vi.mocked(endpoints.uploadAttachmentFile).mockResolvedValue(
+    'http://test.local/uploads/abc.png',
+  );
   vi.mocked(endpoints.attachFileToNote).mockResolvedValue(STUB_ATTACHMENT());
 });
 
@@ -304,27 +308,15 @@ describe('EditorPage — painel de anexos', () => {
     expect(img).toBeInTheDocument();
   });
 
-  it('chama attachFileToNote ao selecionar arquivo e exibe novo anexo', async () => {
-    const NEW_ATTACHMENT = STUB_ATTACHMENT({ id: 'att-2', name: 'nova.png' });
+  it('faz upload do arquivo e grava o anexo com a URL devolvida', async () => {
+    const UPLOADED_URL = 'http://test.local/uploads/nova.png';
+    const NEW_ATTACHMENT = STUB_ATTACHMENT({
+      id: 'att-2',
+      name: 'nova.png',
+      url: UPLOADED_URL,
+    });
+    vi.mocked(endpoints.uploadAttachmentFile).mockResolvedValue(UPLOADED_URL);
     vi.mocked(endpoints.attachFileToNote).mockResolvedValue(NEW_ATTACHMENT);
-
-    // Mock FileReader
-    const mockResult = 'data:image/png;base64,xyz';
-    const mockReadAsDataURL = vi.fn();
-    let capturedOnLoad: (() => void) | null = null;
-
-    vi.spyOn(globalThis, 'FileReader').mockImplementation(
-      () =>
-        ({
-          readAsDataURL: mockReadAsDataURL,
-          set onload(fn: () => void) {
-            capturedOnLoad = fn;
-          },
-          get result() {
-            return mockResult;
-          },
-        }) as unknown as FileReader,
-    );
 
     renderEditor('/editor/note-1');
     await waitFor(() => screen.getByTestId('rich-editor'));
@@ -336,17 +328,22 @@ describe('EditorPage — painel de anexos', () => {
     const file = new File(['content'], 'nova.png', { type: 'image/png' });
     await userEvent.upload(fileInput, file);
 
-    // Dispara o onload do FileReader dentro de act para cobrir o setState
-    await act(async () => {
-      capturedOnLoad?.();
-      await Promise.resolve();
-    });
+    // 1) o arquivo sobe pro servidor
+    await waitFor(() =>
+      expect(endpoints.uploadAttachmentFile).toHaveBeenCalledWith(file),
+    );
 
+    // 2) o anexo é gravado com a URL devolvida pelo upload
     await waitFor(() =>
       expect(endpoints.attachFileToNote).toHaveBeenCalledWith(
         'note-1',
-        expect.objectContaining({ url: mockResult, type: 'image' }),
+        expect.objectContaining({ url: UPLOADED_URL, type: 'image' }),
       ),
+    );
+
+    // 3) o novo anexo aparece na lista
+    await waitFor(() =>
+      expect(screen.getByRole('img', { name: /nova\.png/i })).toBeInTheDocument(),
     );
   });
 });

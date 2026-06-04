@@ -1,3 +1,6 @@
+import path from 'node:path';
+
+import fastifyStatic from '@fastify/static';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import { PrismaClient } from '@prisma/client';
@@ -14,6 +17,7 @@ import { captureRoutes } from '../routes/capture-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
+import { uploadRoutes } from '../routes/upload-routes.js';
 
 export async function buildServer() {
   const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
@@ -30,6 +34,15 @@ export async function buildServer() {
   await app.register(swaggerUi, { routePrefix: '/docs' });
 
   app.get('/health', async () => ({ status: 'ok' }));
+
+  // Anexos vivem em disco; servimos o diretório de uploads em /uploads/*.
+  const uploadDir =
+    process.env['UPLOAD_DIR'] ?? path.resolve(process.cwd(), 'uploads');
+  await app.register(fastifyStatic, {
+    root: uploadDir,
+    prefix: '/uploads/',
+  });
+  await app.register(uploadRoutes, { uploadDir });
 
   await app.register(noteRoutes, { prisma });
   await app.register(attachmentRoutes, { prisma });

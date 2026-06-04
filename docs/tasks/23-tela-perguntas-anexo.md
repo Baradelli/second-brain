@@ -44,9 +44,9 @@ As perguntas são andaime para pensar — apresentar como ajuda, opcional. A not
 
 ## Definição de pronto
 
-- [ ] Botão "perguntas sugeridas" abre painel agrupado por label, só com labels que têm pergunta.
-- [ ] Anexar imagem à nota e listar anexos funciona.
-- [ ] Mecanismo de upload definido (ou pergunta feita ao dono) — sem storage inventado.
-- [ ] Testes mínimos dos dois fluxos.
-- [ ] **Com isso o Bloco G encerra** — falta só o Bloco H (offline Nível 1).
-- [ ] Reporte ao dono: arquivos tocados + checklist marcado.
+- [x] Botão "perguntas sugeridas" abre painel agrupado por label, só com labels que têm pergunta.
+- [x] Anexar imagem à nota e listar anexos funciona.
+- [x] Mecanismo de upload definido (decisão do dono: disco do servidor — `POST /uploads`) — sem storage inventado.
+- [x] Testes mínimos dos dois fluxos.
+- [x] **Com isso o Bloco G encerra** — falta só o Bloco H (offline Nível 1).
+- [x] Reporte ao dono: arquivos tocados + checklist marcado.

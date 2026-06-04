@@ -1,4 +1,4 @@
-import { type NoteType, noteType, type AttachmentResponse, type SuggestedQuestionsGroupResponse } from '@cerebro/shared';
+import { type AttachmentResponse, type NoteType, noteType, type SuggestedQuestionsGroupResponse } from '@cerebro/shared';
 import { BottomSheet, RichEditor } from '@cerebro/ui';
 import { ArrowLeft, Camera, HelpCircle, ImagePlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -13,6 +13,7 @@ import {
   getNoteById,
   getSuggestedQuestions,
   getTodayNote,
+  uploadAttachmentFile,
 } from '../lib/api/endpoints.js';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -375,29 +376,28 @@ function AttachmentsPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !noteId) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const url = reader.result as string;
-      setUploading(true);
-      attachFileToNote(noteId, {
+    setUploading(true);
+    try {
+      // 1) sobe o arquivo pro disco do servidor → URL; 2) grava o Attachment.
+      const url = await uploadAttachmentFile(file);
+      const attachment = await attachFileToNote(noteId, {
         url,
         type: 'image',
         mimeType: file.type || undefined,
         name: file.name,
         size: file.size,
-      })
-        .then(onAttached)
-        .catch(() => {})
-        .finally(() => {
-          setUploading(false);
-          if (fileInputRef.current) fileInputRef.current.value = '';
-        });
-    };
-    reader.readAsDataURL(file);
+      });
+      onAttached(attachment);
+    } catch {
+      // falha de upload é não-crítica — o usuário pode tentar de novo
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   }
 
   return (

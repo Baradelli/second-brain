@@ -58,7 +58,7 @@
 - [x] **20** — Tela do editor (TipTap) sobre o layout do protótipo; salva doc + plainText. → `tasks/20-tela-editor.md`
 - [x] **21** — Tela de captura (textarea) + lista de pendentes + ação arquivar/promover. → `tasks/21-tela-captura-revisao.md`
 - [x] **22** — Tela "Agenda de hoje" juntando diário + capturas a revisar. → `tasks/22-tela-agenda.md`
-- [ ] **23** — Painel "perguntas sugeridas" + anexar foto na tela do editor. → `tasks/23-tela-perguntas-anexo.md`
+- [x] **23** — Painel "perguntas sugeridas" + anexar foto na tela do editor. → `tasks/23-tela-perguntas-anexo.md`
 
 ### Bloco H — Offline Nível 1
 

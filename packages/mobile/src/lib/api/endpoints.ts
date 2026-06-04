@@ -1,17 +1,18 @@
 import {
-  attachmentResponseSchema,
-  captureResponseSchema,
-  noteResponseSchema,
-  suggestedQuestionsGroupResponseSchema,
   type AttachmentResponse,
+  attachmentResponseSchema,
   type CaptureResponse,
+  captureResponseSchema,
   type NoteResponse,
+  noteResponseSchema,
   type NoteType,
   type SuggestedQuestionsGroupResponse,
+  suggestedQuestionsGroupResponseSchema,
+  uploadResponseSchema,
 } from '@cerebro/shared';
 import { z } from 'zod';
 
-import { get, patch, post, CURRENT_USER_ID } from './client.js';
+import { CURRENT_USER_ID,get, patch, post, postFile } from './client.js';
 
 // ── Agenda ────────────────────────────────────────────────────────────────────
 
@@ -115,6 +116,14 @@ export function getSuggestedQuestions(
 }
 
 // ── Attachments ───────────────────────────────────────────────────────────────
+
+/**
+ * Faz upload do arquivo para o disco do servidor e devolve a URL pública.
+ * Essa URL é então gravada no Attachment via {@link attachFileToNote}.
+ */
+export function uploadAttachmentFile(file: File): Promise<string> {
+  return postFile('/uploads', file, uploadResponseSchema).then((r) => r.url);
+}
 
 export function attachFileToNote(
   noteId: string,

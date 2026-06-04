@@ -10,4 +10,5 @@ coverage/
 packages/*/dist/
 packages/*/node_modules/
 packages/backend/prisma/*.db
+packages/backend/uploads/
 .turbo/
