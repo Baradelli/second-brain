@@ -1,6 +1,6 @@
-// Schema do MVP 1 — apenas as tabelas desta fase.
-// Resource, Goal, Event e Embedding entram nas fases seguintes (ver docs/BACKLOG.md),
-// para evitar migrações grandes e mortas.
+// Schema do MVP 1 + MVP 2.
+// MVP 2 adiciona Biblioteca + Objetivos: Resource, Goal, Event (Tarefa 25).
+// Embedding entra no MVP 4 (ver docs/BACKLOG.md), para evitar migrações grandes e mortas.
 //
 // Regra de idioma: tudo em inglês. Datas em UTC; "o dia" é calculado no timezone de Settings.
 
@@ -49,6 +49,9 @@ model User {
   notes       Note[]
   labels      Label[]
   attachments Attachment[]
+  resources   Resource[]
+  goals       Goal[]
+  events      Event[]
 }
 
 model Settings {
@@ -78,6 +81,8 @@ model Label {
   captures  Capture[]       @relation("CaptureLabels")
   notes     Note[]          @relation("NoteLabels")
   questions GuideQuestion[]
+  resources Resource[]      @relation("ResourceLabels")
+  goals     Goal[]          @relation("GoalLabels")
 }
 
 model GuideQuestion {
@@ -118,7 +123,10 @@ model Note {
   title      String?
   doc        Json
   plainText  String        @default("")
-  // goalId/resourceId/eventId entram quando Goal/Resource/Event existirem (MVP 2).
+  goalId     String?
+  goal       Goal?         @relation(fields: [goalId], references: [id])
+  resourceId String?
+  resource   Resource?     @relation(fields: [resourceId], references: [id])
   status     GeneralStatus @default(ACTIVE)
   archivedAt DateTime?
   createdAt  DateTime      @default(now())
@@ -143,4 +151,65 @@ model Attachment {
   captureId     String?
   capture       Capture? @relation(fields: [captureId], references: [id])
   createdAt     DateTime @default(now())
+}
+
+// MVP 2 — Biblioteca + Objetivos. type/stage como String+z.enum (ainda evoluem).
+
+model Resource {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  title       String
+  type        String // "book"|"course"|"video"|"article"|"podcast"|"other" (z.enum)
+  url         String?
+  author      String?
+  description String?
+  stage       String        @default("backlog") // "backlog"|"in_progress"|"done" (z.enum)
+  status      GeneralStatus @default(ACTIVE)
+  archivedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  labels Label[] @relation("ResourceLabels")
+  notes  Note[]
+}
+
+model Goal {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  title          String
+  description    String?
+  type           String // "HABIT"|"TARGET"|"PROJECT"|"UMBRELLA" (z.enum)
+  parentId       String?
+  parent         Goal?         @relation("GoalTree", fields: [parentId], references: [id])
+  children       Goal[]        @relation("GoalTree")
+  targetValue    Float? // TARGET/PROJECT
+  unit           String?
+  period         String? // "day"|"week"|"month" (z.enum) — cadência "Nx por período"
+  timesPerPeriod Int?
+  weekdays       Int[]         @default([]) // 0=domingo..6=sábado (mesma convenção de Settings)
+  startAt        DateTime?
+  dueAt          DateTime?
+  completedAt    DateTime? // UMBRELLA: preenchido na mão
+  status         GeneralStatus @default(ACTIVE)
+  archivedAt     DateTime?
+  createdAt      DateTime      @default(now())
+
+  events Event[]
+  labels Label[] @relation("GoalLabels")
+  notes  Note[]
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  goalId     String
+  goal       Goal     @relation(fields: [goalId], references: [id])
+  type       String // "done"|"skip" (z.enum; skip exige reason na aplicação)
+  value      Float? // TARGET/PROJECT: quanto somou neste check
+  reason     String? // obrigatório quando type=skip (regra de aplicação)
+  occurredAt DateTime // instante UTC; "o dia" é calculado no timezone do Settings
+  createdAt  DateTime @default(now())
+  // log imutável: sem status/archivedAt. Hard delete SÓ no desfazer-check (Tarefa 32).
 }

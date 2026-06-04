@@ -1,78 +1,76 @@
-# BACKLOG.md — MVP 1 fatiado
+# BACKLOG-MVP2.md — MVP 2 fatiado
 
-> O MVP 1 é o **núcleo vivo**: ritual diário (devocional + reflexão) + captura + revisão
-> manual. Tabelas: User, Settings, Capture, Note, Label, Attachment, GuideQuestion.
-> Cada linha abaixo é uma tarefa pequena, na ordem de execução. Marque o status conforme
-> aprova. Detalhe de cada uma em `docs/tasks/`.
+> O MVP 2 introduz **Biblioteca + Objetivos**: as tabelas `Resource`, `Goal` e `Event`.
+> Cada objetivo vira útil sozinho — check de objetivo = criar um `Event`; progresso é
+> **sempre calculado** dos eventos, nunca guardado. O ritual "fechar o dia" é
+> recapitulação, nunca auditoria (princípio anti-culpa). Detalhe de cada tarefa em
+> `docs/tasks/`.
 
 ## Legenda de status
 
 `[ ]` a fazer · `[~]` em revisão · `[x]` feito
 
-## Sequência do MVP 1
+## Decisões fechadas do MVP 2 (não reabrir sem decisão do dono)
 
-> A ordem é deliberada: domínio primeiro (testável sem nada), depois persistência, depois
-> rota, depois tela. Cada tarefa nasce com testes conforme a política do `CLAUDE.md`.
+- **Desfazer check = hard delete do `Event`** — única exceção documentada ao "Event é log
+  imutável". `Event` não tem `status`/`archivedAt`.
+- **"Deixa pra lá" grava nada.** Eventos possíveis: só `done` e `skip`. `skip` sempre tem
+  `reason` (regra de aplicação).
+- **Goal UMBRELLA fecha na mão** (`completedAt` manual); não recebe check direto.
+- **Cadência de HABIT**: `weekdays` (dias fixos) **ou** `period` + `timesPerPeriod`
+  (Nx por período) — mutuamente exclusivas, validado na aplicação.
+- **FKs `Note → Goal` e `Note → Resource`** entram já na migração 25 (nullable).
 
-### Bloco A — Anotação (o coração da escrita)
+## Sequência do MVP 2
 
-- [x] **01** — Domínio + UseCase `createNote` (deriva `plainText` do doc; valida type/scope). → `tasks/01-usecase-criar-anotacao.md`
-- [x] **02** — Repository de Note: interface + fake em memória (usado pelos testes). → `tasks/02-repository-anotacao.md`
-- [x] **03** — Implementação Prisma do Repository de Note + teste de contrato. → `tasks/03-prisma-anotacao.md`
-- [x] **04** — Schema Zod em `shared/` + rota `POST /notes` + `GET /notes` (Swagger sai de graça). → `tasks/04-rota-anotacoes.md`
-- [x] **05** — UseCase `editNote` + `findNoteOfTheDay` (devocional/reflexão de hoje). → `tasks/05-usecase-editar-buscar-anotacao.md`
-- [x] **05b** — Migrar de `new Date` para **Luxon** (datas/fuso) + centralizar em helpers. → `tasks/05b-migrar-para-luxon.md`
+> Mesma lógica do MVP 1: domínio primeiro (testável com fake repo), depois persistência,
+> depois rota, depois tela. TDD estrito no domínio/UseCases; bordas (repo/rota) só no
+> essencial; UI só fluxos que quebram em silêncio. A 25 é exceção (migração pura, sem TDD).
 
-### Bloco B — Diário (devocional + reflexão)
+### Bloco I — Fundação (schema + Resource)
 
-- [x] **06** — Regra "um devocional/uma reflexão por dia" na aplicação (com timezone da Config). → `tasks/06-regra-diario-por-dia.md`
-- [x] **07** — UseCase de recapitulação: criar Note de escopo WEEK/MONTH/YEAR. → `tasks/07-usecase-recapitulacao.md`
+- [x] **25** — Migração Prisma: `Resource`, `Goal`, `Event` + FKs opcionais em `Note` + relações de `Label`/`User`. (Migração pura, sem TDD.) → `tasks/25-migracao-mvp2.md`
+- [ ] **26** — Domínio + UseCase `createResource` / `editResource` (valida `type`/`stage`, vincula labels). → `tasks/26-usecase-resource.md`
+- [ ] **27** — Repository de Resource (interface + fake + Prisma + contrato). → `tasks/27-repository-resource.md`
+- [ ] **28** — UseCase `listResources` (filtro por stage/label) + Schema Zod em `shared/` + rotas `/resources`. → `tasks/28-rota-resources.md`
 
-### Bloco C — Captura
+### Bloco J — Goal
 
-- [x] **08** — Domínio + UseCase `createCapture` (texto livre + revisarEm padrão pela Config). → `tasks/08-usecase-criar-captura.md`
-- [x] **09** — Repository de Capture (interface + fake + Prisma + contrato). → `tasks/09-repository-captura.md`
-- [x] **10** — UseCase `listPendingCaptures` e `listArchived`. → `tasks/10-usecase-listar-capturas.md`
-- [x] **11** — Rota de Capture (`POST /captures`, `GET /captures?status=`). → `tasks/11-rota-capturas.md`
+- [ ] **29** — Domínio + UseCase `createGoal` (valida `type`; cadência exclusiva; `parent` só para filho de UMBRELLA). → `tasks/29-usecase-criar-goal.md`
+- [ ] **30** — Repository de Goal (interface + fake + Prisma + contrato) + Schema Zod + rotas `/goals` (criar, listar ativos, editar). → `tasks/30-repository-rota-goal.md`
+- [ ] **31** — UseCase `completeGoal` (manual, inclusive UMBRELLA) + `archiveGoal` (soft delete + bloqueio se tiver filhos ativos). → `tasks/31-usecase-completar-arquivar-goal.md`
 
-### Bloco D — Revisão (triagem do MVP 1)
+### Bloco K — Event + progresso
 
-- [x] **12** — UseCase `archiveCapture` (status + arquivadoEm + motivo). → `tasks/12-usecase-arquivar-captura.md`
-- [x] **13** — UseCase `promoteCaptureToNote` (marca destino: promotedToType/Id). → `tasks/13-usecase-promover-captura.md`
+- [ ] **32** — Domínio + UseCase `checkGoal` (cria `Event done`; `value` para TARGET/PROJECT; **rejeita UMBRELLA**) + `undoCheck` (**hard delete** — a exceção). → `tasks/32-usecase-check-undo.md`
+- [ ] **33** — UseCase `skipGoal` (cria `Event skip` com `reason` **obrigatório**). → `tasks/33-usecase-skip.md`
+- [ ] **34** — UseCase `computeGoalProgress` (HABIT conta eventos no período; TARGET/PROJECT somam `value`; UMBRELLA agrega filhos) — puro, só leitura, **TDD pesado aqui**. → `tasks/34-usecase-progresso.md`
+- [ ] **35** — Repository de Event (interface + fake + Prisma + contrato) + rotas de check/skip/undo. → `tasks/35-repository-rota-event.md`
 
-### Bloco E — Agenda do dia
+### Bloco L — Fechar o dia + integrações
 
-- [x] **14** — UseCase `buildTodayAgenda` (momentos de diário + capturas a revisar hoje). → `tasks/14-usecase-agenda-do-dia.md`
-- [x] **15** — Rota `GET /agenda?day=today`. → `tasks/15-rota-agenda.md`
+- [ ] **36** — UseCase `buildDayClosing` (pendentes de hoje: `weekdays` fixos + convites de período aberto) + rota `GET /day-closing?day=today`. → `tasks/36-usecase-fechar-o-dia.md`
+- [ ] **37** — Estender `promoteCapture` para destino `resource` e `goal` (hoje só `note`). → `tasks/37-promover-captura-resource-goal.md`
+- [ ] **38** — Estender `buildTodayAgenda` com os objetivos do dia (sem quebrar o contrato atual da agenda). → `tasks/38-agenda-com-objetivos.md`
 
-### Bloco F — Labels + Anexos (suporte à escrita)
+### Bloco M — Frontend (só depois do domínio pronto)
 
-- [x] **16** — Domínio + UseCases de Label (criar, listar em árvore, vincular a item). → `tasks/16-usecase-labels.md`
-- [x] **17** — PerguntaGuia por label + UseCase `suggestedQuestionsForNote` (agrupadas por label). → `tasks/17-usecase-perguntas-guia.md`
-- [x] **18** — Attachment: UseCase `attachFile` a uma Note (só guardar URL/metadados; OCR fica pro MVP 5). → `tasks/18-usecase-anexo.md`
+- [ ] **39** — Tela Biblioteca: listar/criar `Resource`, filtros por stage/label (design system da 19b). → `tasks/39-tela-biblioteca.md`
+- [ ] **40** — Tela de Goals + painel "X objetivos ativos". → `tasks/40-tela-goals.md`
+- [ ] **41** — Tela "Fechar o dia" (**fiz** / **não fiz porque…** / **deixa pra lá**) — o tom anti-culpa mora aqui. → `tasks/41-tela-fechar-o-dia.md`
+- [ ] **42** — Promoção na tela de revisão de captura (note | resource | goal). → `tasks/42-tela-promover-captura.md`
 
-### Bloco G — Frontend (só depois do domínio pronto)
+## Definição de "MVP 2 pronto"
 
-- [x] **19** — Setup do React + **Vite** (PWA) com `web/` e `mobile/` + pacote `ui/` compartilhado + i18n (react-i18next, pt/en) + roteamento + cliente HTTP usando os schemas de `shared/`. → `tasks/19-frontend-base.md`
-- [x] **19b** — Sistema de design + tema dark/light + componentes-base (em `@cerebro/ui`). → `tasks/19b-design-system.md`
-- [x] **20** — Tela do editor (TipTap) sobre o layout do protótipo; salva doc + plainText. → `tasks/20-tela-editor.md`
-- [x] **21** — Tela de captura (textarea) + lista de pendentes + ação arquivar/promover. → `tasks/21-tela-captura-revisao.md`
-- [x] **22** — Tela "Agenda de hoje" juntando diário + capturas a revisar. → `tasks/22-tela-agenda.md`
-- [x] **23** — Painel "perguntas sugeridas" + anexar foto na tela do editor. → `tasks/23-tela-perguntas-anexo.md`
-
-### Bloco H — Offline Nível 1
-
-- [x] **24** — Service Worker + fila local para captura/escrita offline (sync ao voltar). → `tasks/24-offline-nivel-1.md`
-
-## Definição de "MVP 1 pronto"
-
-Eu consigo, todo dia, no celular e no PC: escrever meu devocional e minha reflexão num
-editor decente; capturar uma ideia sem atrito (mesmo offline); ver a agenda do dia; e
-revisar capturas pendentes (promover para anotação ou arquivar). Tudo com o domínio
-coberto por testes. Sem IA, sem objetivos/biblioteca (isso é MVP 2).
+Eu consigo gerenciar minha **biblioteca** (livros/cursos/vídeos com labels e estágio) e meus
+**objetivos** (hábito, meta, projeto, guarda-chuva). Marco um objetivo como feito (vira um
+`Event`) e vejo o **progresso calculado** dos eventos. No fim do dia, "fecho o dia" num ritmo
+de recapitulação — cada pendente resolve como fiz / não fiz porque… / deixa pra lá, sem culpa.
+Promovo uma captura direto para recurso ou objetivo. Tudo com o domínio coberto por testes.
+Sem IA, sem métricas/streaks (isso é MVP 3), sem busca semântica (MVP 4).
 
 ---
 
-> Os arquivos detalhados em `docs/tasks/` estão criados a partir da Tarefa 01. As demais
-> serão detalhadas conforme avançamos (para não gerar 24 specs que envelhecem antes do uso).
+> As specs em `docs/tasks/` são detalhadas **uma de cada vez**, conforme a tarefa se aproxima
+> (para não gerar 18 specs que envelhecem antes do uso). A da Tarefa 25 já está criada.
 > Quando chegar perto de uma tarefa ainda não detalhada, peça para detalhá-la.
