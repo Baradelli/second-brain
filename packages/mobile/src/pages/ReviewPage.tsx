@@ -1,11 +1,10 @@
-import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function ReviewPage() {
-  const { t } = useTranslation();
-  return (
-    <main className="p-4">
-      <h1 className="text-xl font-semibold">{t('review.title')}</h1>
-      <p className="mt-2 text-sm text-gray-500">{t('review.empty')}</p>
-    </main>
-  );
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate('/capture', { replace: true });
+  }, [navigate]);
+  return null;
 }

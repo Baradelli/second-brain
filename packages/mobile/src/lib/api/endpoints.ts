@@ -1,6 +1,7 @@
 import {
   captureResponseSchema,
   noteResponseSchema,
+  type CaptureResponse,
   type NoteResponse,
   type NoteType,
 } from '@cerebro/shared';
@@ -28,6 +29,40 @@ export type TodayAgenda = z.infer<typeof todayAgendaSchema>;
 
 export function getAgenda(): Promise<TodayAgenda> {
   return get(`/agenda?userId=${CURRENT_USER_ID}&day=today`, todayAgendaSchema);
+}
+
+// ── Captures ──────────────────────────────────────────────────────────────────
+
+const promoteCaptureResponseSchema = z.object({
+  note: noteResponseSchema,
+  capture: captureResponseSchema,
+});
+
+export function createCapture(text: string): Promise<CaptureResponse> {
+  return post('/captures', { text, userId: CURRENT_USER_ID }, captureResponseSchema);
+}
+
+export function listCaptures(
+  status: 'PENDING' | 'ARCHIVED',
+): Promise<CaptureResponse[]> {
+  return get(
+    `/captures?userId=${CURRENT_USER_ID}&status=${status}`,
+    z.array(captureResponseSchema),
+  );
+}
+
+export function archiveCapture(
+  id: string,
+  reason?: string,
+): Promise<CaptureResponse> {
+  return post(`/captures/${id}/archive`, { reason }, captureResponseSchema);
+}
+
+export function promoteCaptureToNote(
+  id: string,
+  type: NoteType,
+): Promise<{ note: NoteResponse; capture: CaptureResponse }> {
+  return post(`/captures/${id}/promote`, { type }, promoteCaptureResponseSchema);
 }
 
 // ── Notes ─────────────────────────────────────────────────────────────────────
