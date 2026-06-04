@@ -1,1 +1,26 @@
 @import "tailwindcss";
+@import "@cerebro/ui/theme.css";
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+@theme inline {
+  --color-bg: var(--cerebro-bg);
+  --color-fg: var(--cerebro-fg);
+  --color-card: var(--cerebro-card);
+  --color-subtle: var(--cerebro-border);
+  --color-muted: var(--cerebro-muted);
+  --color-accent: var(--cerebro-accent);
+
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: Georgia, ui-serif, 'Times New Roman', serif;
+
+  --radius-card: 1rem;
+  --radius-card-lg: 1.375rem;
+}
+
+body {
+  background-color: var(--cerebro-bg);
+  color: var(--cerebro-fg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

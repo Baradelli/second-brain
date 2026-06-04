@@ -1,6 +1,16 @@
-// @cerebro/ui — componentes React compartilhados por web e mobile.
-// O editor TipTap, botões, campos de formulário etc. moram aqui a partir da Tarefa 20+,
-// para não duplicar UI entre os pacotes web/ e mobile/.
-// Cada app (web/mobile) cuida só do seu shell/layout e importa estes componentes.
+export { useTheme } from './theme/ThemeContext.js';
+export type { Theme } from './theme/ThemeContext.js';
+export { ThemeProvider } from './theme/ThemeProvider.js';
+export { ThemeToggle } from './theme/ThemeToggle.js';
 
-export {};
+export { Button } from './components/Button.js';
+export { BottomSheet } from './components/BottomSheet.js';
+export { BottomTabBar } from './components/BottomTabBar.js';
+export type { Tab } from './components/BottomTabBar.js';
+export { Card } from './components/Card.js';
+export { Chip, LabelChip } from './components/Chip.js';
+export { EmptyState } from './components/EmptyState.js';
+export { Input } from './components/Input.js';
+export { ProgressRing } from './components/ProgressRing.js';
+export { SectionHeader } from './components/SectionHeader.js';
+export { Textarea } from './components/Textarea.js';
