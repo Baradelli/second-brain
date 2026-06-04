@@ -67,5 +67,8 @@
   "common.cancel": "Cancelar",
   "common.archive": "Arquivar",
   "common.promote": "Transformar em nota",
-  "common.back": "Voltar"
+  "common.back": "Voltar",
+  "common.comingSoon": "Em breve",
+  "library.comingSoonBody": "Seus fichamentos, anotações e referências vão morar aqui.",
+  "assistant.comingSoonBody": "Um ajudante para revisar e conectar suas ideias chega num próximo capítulo."
 }

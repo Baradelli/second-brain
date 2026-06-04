@@ -1,4 +1,5 @@
 import { Card, EmptyState, SectionHeader } from '@cerebro/ui';
+import { ArrowRight, Check, Inbox, Moon, Sunrise } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -23,8 +24,16 @@ function formatDate(dateStr: string): string {
 }
 
 const JOURNAL_CONFIG = {
-  DEVOTIONAL: { color: '#C17D41', labelKey: 'editor.type.devotional' },
-  REFLECTION: { color: '#6D5DFC', labelKey: 'editor.type.reflection' },
+  DEVOTIONAL: {
+    color: 'var(--cerebro-devotional)',
+    labelKey: 'editor.type.devotional',
+    Icon: Sunrise,
+  },
+  REFLECTION: {
+    color: 'var(--cerebro-reflection)',
+    labelKey: 'editor.type.reflection',
+    Icon: Moon,
+  },
 } as const;
 
 export function AgendaPage() {
@@ -45,33 +54,26 @@ export function AgendaPage() {
   }, []);
 
   return (
-    <main
-      className="min-h-dvh pb-24"
-      style={{ backgroundColor: 'var(--cerebro-bg)' }}
-    >
+    <main className="mx-auto min-h-dvh max-w-lg pb-24">
       {/* ── Greeting header ──────────────────────────────────────────── */}
-      <header className="px-5 pt-6 pb-5">
-        <h1
-          className="text-2xl font-bold tracking-tight"
-          style={{ color: 'var(--cerebro-fg)', letterSpacing: '-0.025em' }}
-        >
-          {t(getGreetingKey())}
-        </h1>
+      <header className="px-5 pt-8 pb-6">
         {agenda && (
           <p
-            className="mt-0.5 text-sm capitalize"
-            style={{ color: 'var(--cerebro-muted)' }}
+            className="mb-1.5 text-xs font-semibold uppercase capitalize tracking-[0.14em]"
+            style={{ color: 'var(--cerebro-accent)' }}
           >
             {formatDate(agenda.date)}
           </p>
         )}
+        <h1
+          className="font-display text-[2.1rem] font-semibold leading-[1.05]"
+          style={{ color: 'var(--cerebro-fg)' }}
+        >
+          {t(getGreetingKey())}
+        </h1>
         <p
-          className="mt-2 text-sm leading-relaxed"
-          style={{
-            fontFamily: 'Georgia, ui-serif, serif',
-            fontStyle: 'italic',
-            color: 'var(--cerebro-muted)',
-          }}
+          className="mt-2.5 text-[0.95rem] italic leading-relaxed"
+          style={{ fontFamily: 'Fraunces, serif', color: 'var(--cerebro-muted)' }}
         >
           {t('agenda.greeting.subtitle')}
         </p>
@@ -94,7 +96,7 @@ export function AgendaPage() {
       {agenda && !loading && (
         <>
           {/* ── Journal section ────────────────────────────────────────── */}
-          <section className="px-4 mb-6">
+          <section className="px-5 mb-7">
             <SectionHeader label={t('agenda.section.journal')} className="mb-3" />
             <div className="grid grid-cols-2 gap-3">
               <JournalCard
@@ -111,30 +113,30 @@ export function AgendaPage() {
           </section>
 
           {/* ── Captures to review ─────────────────────────────────────── */}
-          <section className="px-4 mb-6">
+          <section className="px-5 mb-7">
             <div className="mb-3 flex items-center justify-between">
               <SectionHeader label={t('agenda.section.captures')} />
               {agenda.capturesToReview.length > 0 && (
-                <CapturesLink count={agenda.capturesToReview.length} />
+                <CapturesLink count={agenda.capturesToReview.length} showAll />
               )}
             </div>
 
             {agenda.capturesToReview.length === 0 ? (
-              <EmptyState title={t('agenda.captures.empty')} />
+              <EmptyState
+                icon={<Inbox size={20} strokeWidth={1.75} />}
+                title={t('agenda.captures.empty')}
+              />
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {agenda.capturesToReview.slice(0, 3).map((c) => (
                   <CapturePreviewCard key={c.id} text={c.text} />
                 ))}
-                {agenda.capturesToReview.length > 3 && (
-                  <CapturesLink count={agenda.capturesToReview.length} showAll />
-                )}
               </div>
             )}
           </section>
 
           {/* ── Quick capture ───────────────────────────────────────────── */}
-          <section className="px-4">
+          <section className="px-5">
             <SectionHeader label={t('capture.section.input')} className="mb-3" />
             <QuickCaptureForm />
           </section>
@@ -158,63 +160,93 @@ function JournalCard({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const cfg = JOURNAL_CONFIG[type];
+  const { Icon } = cfg;
   const href = noteId ? `/editor/${noteId}` : `/editor?type=${type}`;
 
   return (
     <button
       type="button"
       onClick={() => navigate(href)}
-      className="flex flex-col items-start gap-2 rounded-2xl p-4 text-left transition-all duration-150 active:scale-[0.97] w-full"
+      className="group relative flex aspect-[5/6] flex-col justify-between overflow-hidden rounded-[var(--radius-card-lg)] p-4 text-left transition-all duration-200 active:scale-[0.97]"
       style={{
         backgroundColor: done
-          ? `color-mix(in srgb, ${cfg.color} 10%, var(--cerebro-card))`
+          ? `color-mix(in srgb, ${cfg.color} 12%, var(--cerebro-card))`
           : 'var(--cerebro-card)',
-        border: `1px solid ${done ? cfg.color + '40' : 'var(--cerebro-border)'}`,
+        border: `1px solid ${done ? `color-mix(in srgb, ${cfg.color} 38%, transparent)` : 'var(--cerebro-border)'}`,
+        boxShadow: 'var(--cerebro-shadow-sm)',
       }}
       data-testid={`journal-card-${type.toLowerCase()}`}
       aria-label={`${t(cfg.labelKey)} — ${done ? t('agenda.journal.done') : t('agenda.journal.todo')}`}
     >
-      <div className="flex items-center gap-1.5">
-        <div
-          className="h-2 w-2 rounded-full"
-          style={{ backgroundColor: cfg.color }}
-          aria-hidden
-        />
-        <span
-          className="text-[0.6rem] font-bold uppercase tracking-[0.12em]"
-          style={{ color: cfg.color }}
+      <span
+        className="flex h-10 w-10 items-center justify-center rounded-full"
+        style={{
+          backgroundColor: `color-mix(in srgb, ${cfg.color} 16%, transparent)`,
+          color: cfg.color,
+        }}
+      >
+        <Icon size={20} strokeWidth={1.75} />
+      </span>
+
+      <div>
+        <p
+          className="font-display text-lg font-semibold leading-tight"
+          style={{ color: 'var(--cerebro-fg)' }}
         >
           {t(cfg.labelKey)}
-        </span>
+        </p>
+        {done ? (
+          <span
+            className="mt-1 inline-flex items-center gap-1 text-xs font-medium"
+            style={{ color: cfg.color }}
+          >
+            <Check size={13} strokeWidth={3} />
+            {t('agenda.journal.done')}
+          </span>
+        ) : (
+          <span
+            className="mt-1 inline-flex items-center gap-1 text-xs font-medium"
+            style={{ color: 'var(--cerebro-muted)' }}
+          >
+            {t('agenda.journal.todo')}
+            <ArrowRight
+              size={13}
+              strokeWidth={2.25}
+              className="transition-transform duration-200 group-hover:translate-x-0.5"
+            />
+          </span>
+        )}
       </div>
-      {done ? (
-        <span
-          className="text-xs font-medium"
-          style={{ color: 'var(--cerebro-fg)', opacity: 0.65 }}
-        >
-          ✓ {t('agenda.journal.done')}
-        </span>
-      ) : (
-        <span className="text-xs" style={{ color: 'var(--cerebro-muted)' }}>
-          {t('agenda.journal.todo')}
-        </span>
-      )}
     </button>
   );
 }
 
 function CapturePreviewCard({ text }: { text: string }) {
+  const navigate = useNavigate();
   const firstLine = text.split('\n')[0] ?? text;
   const preview = firstLine.length > 80 ? `${firstLine.slice(0, 80)}…` : firstLine;
   return (
-    <Card padding="sm">
-      <p
-        className="text-sm leading-snug line-clamp-2"
-        style={{ color: 'var(--cerebro-fg)', opacity: 0.8 }}
-      >
-        {preview}
-      </p>
-    </Card>
+    <button
+      type="button"
+      onClick={() => navigate('/capture')}
+      className="w-full text-left transition-transform duration-150 active:scale-[0.99]"
+    >
+      <Card padding="sm">
+        <div className="flex items-start gap-3">
+          <span
+            className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ backgroundColor: 'var(--cerebro-accent)' }}
+            aria-hidden
+          />
+          <p
+            className="text-sm leading-snug line-clamp-2"
+            style={{ color: 'var(--cerebro-fg)' }}
+          >
+            {preview}
+          </p>
+        </div>
+      </Card>
+    </button>
   );
 }
 
@@ -231,12 +263,11 @@ function CapturesLink({
     <button
       type="button"
       onClick={() => navigate('/capture')}
-      className="text-xs font-medium transition-opacity hover:opacity-70"
+      className="inline-flex items-center gap-1 text-xs font-semibold transition-opacity hover:opacity-70"
       style={{ color: 'var(--cerebro-accent)' }}
     >
-      {showAll
-        ? t('agenda.captures.viewAll', { count })
-        : `${count}`}
+      {showAll ? t('agenda.captures.viewAll', { count }) : `${count}`}
+      <ArrowRight size={13} strokeWidth={2.25} />
     </button>
   );
 }

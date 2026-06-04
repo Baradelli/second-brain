@@ -23,8 +23,9 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
         onClick={onClose}
         className="fixed inset-0 z-40 transition-opacity duration-200"
         style={{
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(24, 20, 15, 0.40)',
+          backdropFilter: 'blur(3px)',
+          WebkitBackdropFilter: 'blur(3px)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
         }}
@@ -32,22 +33,28 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
       <div
         role="dialog"
         aria-modal="true"
-        className="fixed inset-x-0 bottom-0 z-50 shadow-2xl"
+        className="fixed inset-x-0 bottom-0 z-50 px-2 pb-2"
         style={{
-          backgroundColor: 'var(--cerebro-card)',
-          borderTopLeftRadius: '1.375rem',
-          borderTopRightRadius: '1.375rem',
-          padding: '1.5rem',
-          transform: open ? 'translateY(0)' : 'translateY(100%)',
-          transition: 'transform 250ms ease-out',
+          transform: open ? 'translateY(0)' : 'translateY(110%)',
+          transition: 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       >
         <div
-          className="mx-auto mb-4 h-1 w-10 rounded-full"
-          style={{ backgroundColor: 'var(--cerebro-border)' }}
-          aria-hidden
-        />
-        {children}
+          className="mx-auto max-w-lg px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3"
+          style={{
+            backgroundColor: 'var(--cerebro-card)',
+            border: '1px solid var(--cerebro-border)',
+            borderRadius: 'var(--radius-card-lg)',
+            boxShadow: 'var(--cerebro-shadow-lg)',
+          }}
+        >
+          <div
+            className="mx-auto mb-4 h-1 w-9 rounded-full"
+            style={{ backgroundColor: 'var(--cerebro-border-strong)' }}
+            aria-hidden
+          />
+          {children}
+        </div>
       </div>
     </>
   );

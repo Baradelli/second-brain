@@ -7,7 +7,7 @@ interface CardProps {
 }
 
 const paddingMap = {
-  sm: 'p-3',
+  sm: 'p-3.5',
   md: 'p-4',
   lg: 'p-6',
 };
@@ -15,8 +15,12 @@ const paddingMap = {
 export function Card({ children, className = '', padding = 'md' }: CardProps) {
   return (
     <div
-      className={`rounded-[1rem] border bg-[--cerebro-card] ${paddingMap[padding]} ${className}`}
-      style={{ borderColor: 'var(--cerebro-border)' }}
+      className={`rounded-[var(--radius-card)] ${paddingMap[padding]} ${className}`}
+      style={{
+        backgroundColor: 'var(--cerebro-card)',
+        border: '1px solid var(--cerebro-border)',
+        boxShadow: 'var(--cerebro-shadow-sm)',
+      }}
     >
       {children}
     </div>

@@ -15,12 +15,12 @@ interface BottomTabBarProps {
 export function BottomTabBar({ tabs }: BottomTabBarProps) {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex h-16 items-end justify-around pb-2"
+      className="fixed inset-x-0 bottom-0 z-50 flex h-[4.75rem] items-stretch justify-around px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
       style={{
-        backgroundColor: 'var(--cerebro-bg)',
+        backgroundColor: 'color-mix(in srgb, var(--cerebro-bg) 82%, transparent)',
         borderTop: '1px solid var(--cerebro-border)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
       }}
     >
       {tabs.map((tab) => {
@@ -30,14 +30,18 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
               key={tab.to}
               to={tab.to}
               aria-label={tab.label}
-              className="mb-3 flex -translate-y-3 items-center justify-center rounded-full bg-[--cerebro-accent] shadow-lg transition-transform duration-150 active:scale-95"
-              style={{
-                width: '3.25rem',
-                height: '3.25rem',
-                boxShadow: '0 4px 16px rgba(109,93,252,0.35)',
-              }}
+              className="group relative flex flex-1 items-center justify-center"
             >
-              <span className="text-white">{tab.icon}</span>
+              <span
+                className="flex h-14 w-14 -translate-y-4 items-center justify-center rounded-full transition-transform duration-150 group-active:scale-95"
+                style={{
+                  backgroundColor: 'var(--cerebro-accent)',
+                  color: 'var(--cerebro-on-accent)',
+                  boxShadow: 'var(--cerebro-shadow-lg)',
+                }}
+              >
+                {tab.icon}
+              </span>
             </NavLink>
           );
         }
@@ -45,16 +49,30 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
           <NavLink
             key={tab.to}
             to={tab.to}
-            className={({ isActive }) =>
-              `flex flex-1 flex-col items-center gap-0.5 pb-1 text-[0.625rem] font-medium transition-colors duration-150 ${
-                isActive
-                  ? 'text-[--cerebro-accent]'
-                  : 'text-[--cerebro-muted]'
-              }`
-            }
+            end={tab.to === '/'}
+            className="group flex flex-1 flex-col items-center justify-center gap-1 pt-1"
           >
-            {tab.icon}
-            <span>{tab.label}</span>
+            {({ isActive }) => (
+              <>
+                <span
+                  className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
+                  style={{
+                    color: isActive ? 'var(--cerebro-accent)' : 'var(--cerebro-muted)',
+                    backgroundColor: isActive ? 'var(--cerebro-accent-soft)' : 'transparent',
+                  }}
+                >
+                  {tab.icon}
+                </span>
+                <span
+                  className="text-[0.625rem] font-medium tracking-tight transition-colors duration-200"
+                  style={{
+                    color: isActive ? 'var(--cerebro-accent)' : 'var(--cerebro-muted)',
+                  }}
+                >
+                  {tab.label}
+                </span>
+              </>
+            )}
           </NavLink>
         );
       })}

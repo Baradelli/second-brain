@@ -1,38 +1,80 @@
 @import "tailwindcss";
 @import "@cerebro/ui/theme.css";
 
+/* Tailwind precisa escanear os componentes compartilhados de @cerebro/ui,
+   senão classes usadas só lá (ex.: a tab bar fixa) não entram no CSS. */
+@source "../../ui/src";
+
 @custom-variant dark (&:is(.dark, .dark *));
 
 @theme inline {
   --color-bg: var(--cerebro-bg);
-  --color-fg: var(--cerebro-fg);
   --color-card: var(--cerebro-card);
-  --color-subtle: var(--cerebro-border);
+  --color-raised: var(--cerebro-raised);
+  --color-fg: var(--cerebro-fg);
   --color-muted: var(--cerebro-muted);
+  --color-faint: var(--cerebro-faint);
+  --color-subtle: var(--cerebro-border);
   --color-accent: var(--cerebro-accent);
 
-  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-serif: Georgia, ui-serif, 'Times New Roman', serif;
+  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: Fraunces, ui-serif, Georgia, "Times New Roman", serif;
 
-  --radius-card: 1rem;
-  --radius-card-lg: 1.375rem;
+  --radius-card: 1.125rem;
+  --radius-card-lg: 1.5rem;
+}
+
+html {
+  /* Fundo papel também atrás do safe-area / overscroll */
+  background-color: var(--cerebro-bg);
 }
 
 body {
   background-color: var(--cerebro-bg);
   color: var(--cerebro-fg);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv01";
 }
 
-/* ── TipTap / ProseMirror ─────────────────────────────────────────────────── */
+/* Sutil grão de papel — quase imperceptível, dá vida ao fundo chapado */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(
+    rgba(120, 100, 70, 0.035) 1px,
+    transparent 1px
+  );
+  background-size: 4px 4px;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Serifa display com optical sizing alto fica elegante em títulos grandes */
+.font-display {
+  font-family: Fraunces, ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+
+/* ── TipTap / ProseMirror — superfície de leitura, serifada ───────────────── */
 
 .ProseMirror {
   outline: none;
   min-height: 60vh;
-  padding: 1.25rem 1.25rem 6rem;
-  line-height: 1.75;
-  font-size: 1rem;
+  padding: 1.5rem 1.5rem 7rem;
+  line-height: 1.8;
+  font-size: 1.0625rem;
+  font-family: Fraunces, ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
   color: var(--cerebro-fg);
   caret-color: var(--cerebro-accent);
   word-break: break-word;
@@ -40,24 +82,25 @@ body {
 
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: var(--cerebro-muted);
-  opacity: 0.45;
+  color: var(--cerebro-faint);
+  font-style: italic;
   float: left;
   pointer-events: none;
   height: 0;
 }
 
 .ProseMirror > * + * {
-  margin-top: 0.5rem;
+  margin-top: 0.6rem;
 }
 
 .ProseMirror h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin-top: 1.5rem;
+  font-family: Fraunces, ui-serif, Georgia, serif;
+  font-size: 1.85rem;
+  font-weight: 600;
+  line-height: 1.18;
+  margin-top: 1.6rem;
   margin-bottom: 0.4rem;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
   color: var(--cerebro-fg);
 }
 
@@ -66,12 +109,13 @@ body {
 }
 
 .ProseMirror h2 {
-  font-size: 1.2rem;
+  font-family: Fraunces, ui-serif, Georgia, serif;
+  font-size: 1.3rem;
   font-weight: 600;
   line-height: 1.3;
-  margin-top: 1.25rem;
+  margin-top: 1.3rem;
   margin-bottom: 0.3rem;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.012em;
   color: var(--cerebro-fg);
 }
 
@@ -93,20 +137,23 @@ body {
   margin-bottom: 0;
 }
 
+.ProseMirror ul li::marker {
+  color: var(--cerebro-accent);
+}
+
 .ProseMirror blockquote {
-  border-left: 3px solid var(--cerebro-accent);
-  padding-left: 1rem;
-  margin: 1rem 0;
+  border-left: 2px solid var(--cerebro-accent);
+  padding-left: 1.1rem;
+  margin: 1.1rem 0;
   font-style: italic;
-  font-family: Georgia, ui-serif, serif;
-  opacity: 0.85;
-  color: var(--cerebro-fg);
+  color: var(--cerebro-muted);
 }
 
 .ProseMirror a {
   color: var(--cerebro-accent);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .ProseMirror strong {
@@ -118,9 +165,17 @@ body {
 }
 
 .ProseMirror code {
-  background-color: rgba(128, 128, 128, 0.12);
+  background-color: var(--cerebro-accent-soft);
   padding: 0.1em 0.35em;
   border-radius: 4px;
   font-family: ui-monospace, monospace;
-  font-size: 0.875em;
+  font-size: 0.85em;
+}
+
+/* Esconde a barra de rolagem da toolbar do editor */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
 }

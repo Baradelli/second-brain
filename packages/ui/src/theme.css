@@ -1,18 +1,77 @@
-/* Semantic color variables — imported by each app's main CSS */
+/* ── Design tokens — "Caderno editorial" ────────────────────────────────────
+ * Paleta papel quente + tinta + acento terracota. Tom calmo, de caderno fino.
+ * Importado por cada app via @cerebro/ui/theme.css.
+ */
 
 :root {
-  --cerebro-bg: #FAFAF8;
-  --cerebro-fg: #1A1A22;
-  --cerebro-card: #FFFFFF;
-  --cerebro-border: rgba(0, 0, 0, 0.07);
-  --cerebro-muted: #6B7280;
-  --cerebro-accent: #6D5DFC;
+  /* Surfaces */
+  --cerebro-bg: #F4F1EA;        /* papel */
+  --cerebro-card: #FBF8F1;      /* página, levemente mais clara */
+  --cerebro-raised: #FFFFFF;    /* elementos elevados / inputs em foco */
+
+  /* Ink */
+  --cerebro-fg: #211D17;        /* tinta */
+  --cerebro-muted: #857C6E;     /* tinta esmaecida (datas, legendas) */
+  --cerebro-faint: #B7AE9F;     /* tinta bem clara (placeholders) */
+
+  /* Lines */
+  --cerebro-border: rgba(33, 29, 23, 0.10);
+  --cerebro-border-strong: rgba(33, 29, 23, 0.16);
+
+  /* Accent — terracota / argila */
+  --cerebro-accent: #B4583A;
+  --cerebro-accent-strong: #9C462C;
+  --cerebro-accent-soft: rgba(180, 88, 58, 0.10);
+  --cerebro-on-accent: #FBF8F1;
+
+  /* Tipos de nota (tons de terra harmônicos) */
+  --cerebro-devotional: #B4583A; /* terracota */
+  --cerebro-reflection: #4E6E63; /* sálvia-tinta */
+  --cerebro-study: #9A6A33;      /* ocre */
+  --cerebro-note: #8A8175;       /* cinza quente */
+
+  /* Status */
+  --cerebro-success: #4E6E63;
+  --cerebro-error: #B23B2E;
+
+  /* Sombras quentes (papel sobre papel, não preto puro) */
+  --cerebro-shadow-sm: 0 1px 2px rgba(60, 46, 30, 0.05);
+  --cerebro-shadow: 0 4px 18px rgba(60, 46, 30, 0.08);
+  --cerebro-shadow-lg: 0 12px 40px rgba(60, 46, 30, 0.14);
 }
 
 html.dark {
-  --cerebro-bg: #0F1115;
-  --cerebro-fg: #F5F5F2;
-  --cerebro-card: #181B21;
-  --cerebro-border: rgba(255, 255, 255, 0.07);
-  --cerebro-muted: #8A8A95;
+  /* Surfaces — couro/tinta quente, nunca cinza-azulado */
+  --cerebro-bg: #18140F;
+  --cerebro-card: #211C16;
+  --cerebro-raised: #2A241D;
+
+  /* Ink */
+  --cerebro-fg: #EFE8DA;
+  --cerebro-muted: #9F9484;
+  --cerebro-faint: #6B6253;
+
+  /* Lines */
+  --cerebro-border: rgba(239, 232, 218, 0.10);
+  --cerebro-border-strong: rgba(239, 232, 218, 0.18);
+
+  /* Accent */
+  --cerebro-accent: #D2734F;
+  --cerebro-accent-strong: #E08560;
+  --cerebro-accent-soft: rgba(210, 115, 79, 0.14);
+  --cerebro-on-accent: #1B1610;
+
+  /* Tipos de nota */
+  --cerebro-devotional: #D2734F;
+  --cerebro-reflection: #7FA293;
+  --cerebro-study: #C79A5A;
+  --cerebro-note: #A89C8A;
+
+  /* Status */
+  --cerebro-success: #7FA293;
+  --cerebro-error: #D9695A;
+
+  --cerebro-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --cerebro-shadow: 0 6px 22px rgba(0, 0, 0, 0.40);
+  --cerebro-shadow-lg: 0 14px 44px rgba(0, 0, 0, 0.55);
 }

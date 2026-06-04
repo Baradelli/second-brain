@@ -18,7 +18,8 @@
     "@tiptap/extension-placeholder": "^2.10.0",
     "@tiptap/extension-text-style": "^2.10.0",
     "@tiptap/react": "^2.10.0",
-    "@tiptap/starter-kit": "^2.10.0"
+    "@tiptap/starter-kit": "^2.10.0",
+    "lucide-react": "^1.17.0"
   },
   "peerDependencies": {
     "react": "^18.3.0",

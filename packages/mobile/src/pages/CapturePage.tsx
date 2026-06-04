@@ -6,6 +6,7 @@ import {
   EmptyState,
   SectionHeader,
 } from '@cerebro/ui';
+import { Archive, ChevronDown, Inbox } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -18,10 +19,10 @@ import {
 import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
 
 const PROMOTE_TYPES: Array<{ type: NoteType; labelKey: string; color: string }> = [
-  { type: 'DEVOTIONAL', labelKey: 'editor.type.devotional', color: '#C17D41' },
-  { type: 'REFLECTION', labelKey: 'editor.type.reflection', color: '#6D5DFC' },
-  { type: 'STUDY_NOTE', labelKey: 'editor.type.study', color: '#0EA5A0' },
-  { type: 'NOTE', labelKey: 'editor.type.note', color: '#8A8A95' },
+  { type: 'DEVOTIONAL', labelKey: 'editor.type.devotional', color: 'var(--cerebro-devotional)' },
+  { type: 'REFLECTION', labelKey: 'editor.type.reflection', color: 'var(--cerebro-reflection)' },
+  { type: 'STUDY_NOTE', labelKey: 'editor.type.study', color: 'var(--cerebro-study)' },
+  { type: 'NOTE', labelKey: 'editor.type.note', color: 'var(--cerebro-note)' },
 ];
 
 function relativeTime(isoDate: string): string {
@@ -95,25 +96,27 @@ export function CapturePage() {
   }
 
   return (
-    <main
-      className="min-h-dvh pb-24"
-      style={{ backgroundColor: 'var(--cerebro-bg)' }}
-    >
+    <main className="mx-auto min-h-dvh max-w-lg pb-24">
       {/* ── Capture input ──────────────────────────────────────────────── */}
-      <section className="px-4 pt-5 pb-4" style={{ borderBottom: '1px solid var(--cerebro-border)' }}>
-        <SectionHeader label={t('capture.section.input')} className="mb-3" />
+      <section className="px-5 pt-7 pb-6">
+        <h1
+          className="mb-4 font-display text-[1.75rem] font-semibold leading-tight"
+          style={{ color: 'var(--cerebro-fg)' }}
+        >
+          {t('capture.section.input')}
+        </h1>
         <QuickCaptureForm onCaptured={() => void loadPending()} rows={4} />
       </section>
 
       {/* ── Pending queue ──────────────────────────────────────────────── */}
-      <section className="px-4 pt-5">
+      <section className="px-5 pt-1">
         <div className="mb-3 flex items-center gap-2">
           <SectionHeader label={t('capture.section.review')} />
           {pending.length > 0 && (
             <span
               className="rounded-full px-2 py-0.5 text-[0.625rem] font-bold"
               style={{
-                backgroundColor: 'rgba(109,93,252,0.12)',
+                backgroundColor: 'var(--cerebro-accent-soft)',
                 color: 'var(--cerebro-accent)',
               }}
             >
@@ -125,7 +128,10 @@ export function CapturePage() {
         {loadingPending ? (
           <LoadingDots />
         ) : pending.length === 0 ? (
-          <EmptyState title={t('capture.queue.empty')} />
+          <EmptyState
+            icon={<Inbox size={20} strokeWidth={1.75} />}
+            title={t('capture.queue.empty')}
+          />
         ) : (
           <div className="space-y-3">
             {pending.map((capture) => (
@@ -143,10 +149,16 @@ export function CapturePage() {
         <button
           type="button"
           onClick={() => void handleShowArchived()}
-          className="mt-6 mb-2 text-xs transition-opacity duration-150 hover:opacity-60"
+          className="mt-6 mb-2 inline-flex items-center gap-1 text-xs font-medium transition-opacity duration-150 hover:opacity-60"
           style={{ color: 'var(--cerebro-muted)' }}
         >
-          {showArchived ? t('capture.archived.hide') : t('capture.archived.show')} ↓
+          {showArchived ? t('capture.archived.hide') : t('capture.archived.show')}
+          <ChevronDown
+            size={14}
+            strokeWidth={2}
+            className="transition-transform duration-200"
+            style={{ transform: showArchived ? 'rotate(180deg)' : 'none' }}
+          />
         </button>
 
         {showArchived && (
@@ -205,23 +217,24 @@ function CaptureCard({
   return (
     <Card>
       <p
-        className="text-sm leading-relaxed"
+        className="text-[0.95rem] leading-relaxed"
         style={{ color: 'var(--cerebro-fg)' }}
       >
         {capture.text}
       </p>
-      <p className="mt-1 text-[0.625rem]" style={{ color: 'var(--cerebro-muted)' }}>
+      <p className="mt-2 text-[0.6875rem] font-medium uppercase tracking-wide" style={{ color: 'var(--cerebro-faint)' }}>
         {relativeTime(capture.createdAt)}
       </p>
 
       {!archived && (
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3.5 flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => void handleArchive()}
             disabled={archiving}
           >
+            <Archive size={14} strokeWidth={2} />
             {t('common.archive')}
           </Button>
           <Button
@@ -237,7 +250,7 @@ function CaptureCard({
 
       {archived && capture.archiveReason && (
         <p
-          className="mt-1.5 text-[0.625rem] italic"
+          className="mt-2 text-[0.6875rem] italic"
           style={{ color: 'var(--cerebro-muted)' }}
         >
           {capture.archiveReason}
@@ -258,7 +271,7 @@ function PromoteSheetContent({
   return (
     <div>
       <p
-        className="mb-4 text-sm font-semibold"
+        className="mb-4 font-display text-lg font-semibold"
         style={{ color: 'var(--cerebro-fg)' }}
       >
         {t('capture.promote.chooseType')}
@@ -270,19 +283,19 @@ function PromoteSheetContent({
             type="button"
             disabled={promoting}
             onClick={() => onSelect(type)}
-            className="flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors duration-150 active:scale-[0.98]"
+            className="flex items-center gap-3 rounded-[var(--radius-card)] px-4 py-3.5 transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
             style={{
-              backgroundColor: 'var(--cerebro-card)',
+              backgroundColor: 'var(--cerebro-raised)',
               border: '1px solid var(--cerebro-border)',
             }}
           >
-            <div
-              className="h-2.5 w-2.5 rounded-full"
+            <span
+              className="h-7 w-1 rounded-full"
               style={{ backgroundColor: color }}
               aria-hidden
             />
             <span
-              className="text-sm font-medium"
+              className="text-sm font-semibold"
               style={{ color: 'var(--cerebro-fg)' }}
             >
               {t(labelKey)}

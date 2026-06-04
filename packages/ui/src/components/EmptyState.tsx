@@ -10,12 +10,23 @@ interface EmptyStateProps {
 export function EmptyState({ icon, title, body, className = '' }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-3 py-12 text-center ${className}`}
+      className={`flex flex-col items-center justify-center gap-3 px-6 py-10 text-center ${className}`}
     >
       {icon && (
-        <span className="text-4xl opacity-30">{icon}</span>
+        <span
+          className="flex h-12 w-12 items-center justify-center rounded-full"
+          style={{
+            color: 'var(--cerebro-muted)',
+            backgroundColor: 'var(--cerebro-accent-soft)',
+          }}
+        >
+          {icon}
+        </span>
       )}
-      <p className="text-sm font-medium" style={{ color: 'var(--cerebro-fg)', opacity: 0.7 }}>
+      <p
+        className="font-display text-[0.95rem]"
+        style={{ color: 'var(--cerebro-fg)' }}
+      >
         {title}
       </p>
       {body && (

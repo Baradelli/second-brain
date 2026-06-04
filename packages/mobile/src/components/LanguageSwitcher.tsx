@@ -10,7 +10,8 @@ export function LanguageSwitcher() {
   return (
     <button
       onClick={toggle}
-      className="rounded px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 active:bg-gray-200"
+      className="rounded-full px-3 py-1.5 text-xs font-semibold tracking-tight transition-colors duration-150 hover:bg-[var(--cerebro-accent-soft)]"
+      style={{ color: 'var(--cerebro-muted)' }}
     >
       {t('lang.switch')}
     </button>

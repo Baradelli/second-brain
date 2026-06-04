@@ -4,6 +4,15 @@ import Placeholder from '@tiptap/extension-placeholder';
 import TextStyle from '@tiptap/extension-text-style';
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import {
+  Bold,
+  Heading1,
+  Heading2,
+  Italic,
+  List,
+  ListOrdered,
+  Quote,
+} from 'lucide-react';
 import { type ReactNode, useEffect } from 'react';
 
 export interface RichEditorProps {
@@ -68,13 +77,16 @@ export function RichEditor({
 function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
   if (!editor) return null;
 
+  const iconProps = { size: 17, strokeWidth: 1.85 } as const;
+
   return (
     <div
-      className="flex shrink-0 items-center gap-0.5 overflow-x-auto px-3 py-1"
+      className="no-scrollbar flex shrink-0 items-center gap-0.5 overflow-x-auto px-3 py-1.5"
       style={{
-        backgroundColor: 'var(--cerebro-card)',
+        backgroundColor: 'color-mix(in srgb, var(--cerebro-bg) 80%, transparent)',
         borderBottom: '1px solid var(--cerebro-border)',
-        scrollbarWidth: 'none',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         position: 'sticky',
         top: 0,
         zIndex: 10,
@@ -85,7 +97,7 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         title="Negrito"
         onPress={() => editor.chain().focus().toggleBold().run()}
       >
-        <span style={{ fontWeight: 800, fontSize: '0.875rem', fontFamily: 'Georgia, serif' }}>B</span>
+        <Bold {...iconProps} />
       </ToolBtn>
 
       <ToolBtn
@@ -93,7 +105,7 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         title="Itálico"
         onPress={() => editor.chain().focus().toggleItalic().run()}
       >
-        <span style={{ fontStyle: 'italic', fontWeight: 600, fontSize: '0.9rem', fontFamily: 'Georgia, serif' }}>I</span>
+        <Italic {...iconProps} />
       </ToolBtn>
 
       <Divider />
@@ -103,7 +115,7 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         title="Título 1"
         onPress={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
       >
-        <span style={{ fontWeight: 700, fontSize: '0.75rem', letterSpacing: '-0.01em' }}>H1</span>
+        <Heading1 {...iconProps} />
       </ToolBtn>
 
       <ToolBtn
@@ -111,7 +123,7 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         title="Título 2"
         onPress={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
-        <span style={{ fontWeight: 700, fontSize: '0.75rem', letterSpacing: '-0.01em' }}>H2</span>
+        <Heading2 {...iconProps} />
       </ToolBtn>
 
       <Divider />
@@ -121,7 +133,7 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         title="Citação"
         onPress={() => editor.chain().focus().toggleBlockquote().run()}
       >
-        <QuoteIcon />
+        <Quote {...iconProps} />
       </ToolBtn>
 
       <ToolBtn
@@ -129,7 +141,7 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         title="Lista"
         onPress={() => editor.chain().focus().toggleBulletList().run()}
       >
-        <BulletListIcon />
+        <List {...iconProps} />
       </ToolBtn>
 
       <ToolBtn
@@ -137,7 +149,7 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         title="Lista numerada"
         onPress={() => editor.chain().focus().toggleOrderedList().run()}
       >
-        <OrderedListIcon />
+        <ListOrdered {...iconProps} />
       </ToolBtn>
     </div>
   );
@@ -168,12 +180,12 @@ function ToolBtn({
         e.preventDefault();
         onPress();
       }}
-      className="flex shrink-0 items-center justify-center rounded-xl transition-all duration-100"
+      className="flex shrink-0 items-center justify-center rounded-lg transition-all duration-100 active:scale-90"
       style={{
-        width: '2.5rem',
-        height: '2.5rem',
-        backgroundColor: active ? 'var(--cerebro-accent)' : 'transparent',
-        color: active ? '#fff' : 'var(--cerebro-muted)',
+        width: '2.25rem',
+        height: '2.25rem',
+        backgroundColor: active ? 'var(--cerebro-accent-soft)' : 'transparent',
+        color: active ? 'var(--cerebro-accent)' : 'var(--cerebro-muted)',
       }}
     >
       {children}
@@ -188,39 +200,5 @@ function Divider() {
       style={{ backgroundColor: 'var(--cerebro-border)' }}
       aria-hidden
     />
-  );
-}
-
-function QuoteIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="currentColor" className="size-4">
-      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-    </svg>
-  );
-}
-
-function BulletListIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" className="size-4">
-      <circle cx="4" cy="6" r="1" fill="currentColor" stroke="none" />
-      <line x1="7" y1="6" x2="17" y2="6" />
-      <circle cx="4" cy="10" r="1" fill="currentColor" stroke="none" />
-      <line x1="7" y1="10" x2="17" y2="10" />
-      <circle cx="4" cy="14" r="1" fill="currentColor" stroke="none" />
-      <line x1="7" y1="14" x2="17" y2="14" />
-    </svg>
-  );
-}
-
-function OrderedListIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" className="size-4">
-      <text x="2" y="8" fontSize="6" fill="currentColor" stroke="none" fontWeight="700">1.</text>
-      <line x1="7" y1="6" x2="17" y2="6" />
-      <text x="2" y="12" fontSize="6" fill="currentColor" stroke="none" fontWeight="700">2.</text>
-      <line x1="7" y1="10" x2="17" y2="10" />
-      <text x="2" y="16" fontSize="6" fill="currentColor" stroke="none" fontWeight="700">3.</text>
-      <line x1="7" y1="14" x2="17" y2="14" />
-    </svg>
   );
 }

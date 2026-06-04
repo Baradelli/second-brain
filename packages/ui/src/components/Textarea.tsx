@@ -22,18 +22,18 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           id={textareaId}
-          className={`w-full resize-none rounded-2xl px-3 py-2.5 text-sm leading-relaxed outline-none transition-shadow duration-150 placeholder:opacity-40 focus:ring-2 ${className}`}
+          className={`w-full resize-none rounded-[var(--radius-card)] px-4 py-3 text-sm leading-relaxed outline-none transition-all duration-150 placeholder:text-[var(--cerebro-faint)] focus:ring-2 ${className}`}
           style={{
-            backgroundColor: 'var(--cerebro-card)',
+            backgroundColor: 'var(--cerebro-raised)',
             color: 'var(--cerebro-fg)',
-            border: error ? '1px solid #ef4444' : '1px solid var(--cerebro-border)',
+            border: error ? '1px solid var(--cerebro-error)' : '1px solid var(--cerebro-border)',
             // @ts-expect-error custom property
-            '--tw-ring-color': 'rgba(109,93,252,0.35)',
+            '--tw-ring-color': 'var(--cerebro-accent-soft)',
           }}
           {...props}
         />
         {error && (
-          <p className="text-xs" style={{ color: '#ef4444' }}>
+          <p className="text-xs" style={{ color: 'var(--cerebro-error)' }}>
             {error}
           </p>
         )}

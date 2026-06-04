@@ -67,5 +67,8 @@
   "common.cancel": "Cancel",
   "common.archive": "Archive",
   "common.promote": "Promote to note",
-  "common.back": "Back"
+  "common.back": "Back",
+  "common.comingSoon": "Coming soon",
+  "library.comingSoonBody": "Your study notes, annotations and references will live here.",
+  "assistant.comingSoonBody": "A helper to review and connect your ideas arrives in a later chapter."
 }

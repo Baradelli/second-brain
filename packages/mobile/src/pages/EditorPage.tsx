@@ -1,5 +1,6 @@
 import { type NoteType, noteType, type AttachmentResponse, type SuggestedQuestionsGroupResponse } from '@cerebro/shared';
 import { BottomSheet, RichEditor } from '@cerebro/ui';
+import { ArrowLeft, Camera, HelpCircle, ImagePlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -25,25 +26,25 @@ interface RitualConfig {
 
 const RITUAL: Record<NoteType, RitualConfig> = {
   DEVOTIONAL: {
-    color: '#C17D41',
+    color: 'var(--cerebro-devotional)',
     labelKey: 'editor.type.devotional',
     subtitleKey: 'editor.subtitle.devotional',
     placeholderKey: 'editor.placeholder.devotional',
   },
   REFLECTION: {
-    color: '#6D5DFC',
+    color: 'var(--cerebro-reflection)',
     labelKey: 'editor.type.reflection',
     subtitleKey: 'editor.subtitle.reflection',
     placeholderKey: 'editor.placeholder.reflection',
   },
   STUDY_NOTE: {
-    color: '#0EA5A0',
+    color: 'var(--cerebro-study)',
     labelKey: 'editor.type.study',
     subtitleKey: 'editor.subtitle.study',
     placeholderKey: 'editor.placeholder.study',
   },
   NOTE: {
-    color: '#8A8A95',
+    color: 'var(--cerebro-note)',
     labelKey: 'editor.type.note',
     subtitleKey: 'editor.subtitle.note',
     placeholderKey: 'editor.placeholder.note',
@@ -171,36 +172,41 @@ export function EditorPage() {
 
   return (
     <div
-      className="flex min-h-dvh flex-col"
+      className="mx-auto flex min-h-dvh max-w-2xl flex-col"
       style={{ backgroundColor: 'var(--cerebro-bg)' }}
     >
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <div
-        className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid var(--cerebro-border)' }}
+        className="sticky top-0 z-20 flex items-center justify-between px-3 py-2.5"
+        style={{
+          backgroundColor: 'color-mix(in srgb, var(--cerebro-bg) 82%, transparent)',
+          borderBottom: '1px solid var(--cerebro-border)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+        }}
       >
         <button
           type="button"
           aria-label={t('common.back')}
           onClick={() => navigate(-1)}
-          className="flex h-9 w-9 items-center justify-center rounded-full transition-opacity duration-150 hover:opacity-70 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150 hover:bg-[var(--cerebro-accent-soft)] active:scale-90"
           style={{ color: 'var(--cerebro-fg)' }}
         >
-          <ChevronLeftIcon />
+          <ArrowLeft size={20} strokeWidth={1.75} />
         </button>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             aria-label={t('editor.questions.button')}
             onClick={() => setQuestionsOpen(true)}
-            className="flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-opacity duration-150 hover:opacity-70 active:scale-95"
+            className="flex h-9 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-all duration-150 hover:bg-[var(--cerebro-accent-soft)] active:scale-95"
             style={{
               color: 'var(--cerebro-muted)',
               border: '1px solid var(--cerebro-border)',
             }}
           >
-            <QuestionMarkIcon />
+            <HelpCircle size={15} strokeWidth={1.85} />
             {t('editor.questions.button')}
           </button>
 
@@ -208,13 +214,13 @@ export function EditorPage() {
             type="button"
             aria-label={t('editor.attach.button')}
             onClick={() => setAttachOpen(true)}
-            className="flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-opacity duration-150 hover:opacity-70 active:scale-95"
+            className="flex h-9 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-all duration-150 hover:bg-[var(--cerebro-accent-soft)] active:scale-95"
             style={{
               color: 'var(--cerebro-muted)',
               border: '1px solid var(--cerebro-border)',
             }}
           >
-            <CameraIcon />
+            <Camera size={15} strokeWidth={1.85} />
             {attachments.length > 0 ? attachments.length : t('editor.attach.button')}
           </button>
         </div>
@@ -223,25 +229,24 @@ export function EditorPage() {
       </div>
 
       {/* ── Ritual header ───────────────────────────────────────────────── */}
-      <div className="px-5 pt-5 pb-4">
-        <div className="mb-1.5 flex items-center gap-2">
-          <div
-            className="h-2 w-2 rounded-full"
+      <div className="px-6 pt-6 pb-3">
+        <div className="mb-2 flex items-center gap-2">
+          <span
+            className="h-4 w-1 rounded-full"
             style={{ backgroundColor: ritual.color }}
             aria-hidden
           />
           <span
-            className="text-[0.625rem] font-bold uppercase tracking-[0.14em]"
+            className="text-[0.6875rem] font-bold uppercase tracking-[0.16em]"
             style={{ color: ritual.color }}
           >
             {t(ritual.labelKey)}
           </span>
         </div>
         <p
-          className="text-sm leading-relaxed"
+          className="text-base italic leading-relaxed"
           style={{
-            fontFamily: 'Georgia, ui-serif, serif',
-            fontStyle: 'italic',
+            fontFamily: 'Fraunces, serif',
             color: 'var(--cerebro-muted)',
           }}
         >
@@ -303,7 +308,7 @@ function QuestionsPanel({
   return (
     <BottomSheet open={open} onClose={onClose}>
       <h2
-        className="mb-4 text-base font-semibold"
+        className="mb-4 font-display text-lg font-semibold"
         style={{ color: 'var(--cerebro-fg)' }}
       >
         {t('editor.questions.title')}
@@ -322,21 +327,21 @@ function QuestionsPanel({
           {groups.map((group) => (
             <div key={group.label.id}>
               <p
-                className="mb-2 text-[0.625rem] font-bold uppercase tracking-[0.14em]"
+                className="mb-2 text-[0.625rem] font-bold uppercase tracking-[0.16em]"
                 style={{ color: 'var(--cerebro-accent)' }}
               >
                 {group.label.name}
               </p>
-              <ul className="flex flex-col gap-2">
+              <ul className="flex flex-col gap-2.5">
                 {group.questions.map((q) => (
                   <li
                     key={q.id}
-                    className="flex items-start gap-2 text-sm leading-relaxed"
-                    style={{ color: 'var(--cerebro-fg)' }}
+                    className="flex items-start gap-2.5 text-[0.95rem] leading-relaxed"
+                    style={{ fontFamily: 'Fraunces, serif', color: 'var(--cerebro-fg)' }}
                   >
                     <span
-                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: 'var(--cerebro-muted)' }}
+                      className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: 'var(--cerebro-accent)' }}
                       aria-hidden
                     />
                     {q.text}
@@ -398,7 +403,7 @@ function AttachmentsPanel({
   return (
     <BottomSheet open={open} onClose={onClose}>
       <h2
-        className="mb-4 text-base font-semibold"
+        className="mb-4 font-display text-lg font-semibold"
         style={{ color: 'var(--cerebro-fg)' }}
       >
         {t('editor.attach.title')}
@@ -420,13 +425,13 @@ function AttachmentsPanel({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-opacity duration-150 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-card)] py-3.5 text-sm font-semibold transition-all duration-150 hover:bg-[var(--cerebro-accent-soft)] disabled:opacity-50"
             style={{
-              border: '1px dashed var(--cerebro-border)',
-              color: 'var(--cerebro-muted)',
+              border: '1.5px dashed var(--cerebro-border-strong)',
+              color: 'var(--cerebro-accent)',
             }}
           >
-            <CameraIcon />
+            <ImagePlus size={17} strokeWidth={1.85} />
             {uploading ? '…' : t('editor.attach.add')}
           </button>
 
@@ -437,7 +442,7 @@ function AttachmentsPanel({
                   key={att.id}
                   src={att.url}
                   alt={att.name ?? 'Anexo'}
-                  className="aspect-square w-full rounded-lg object-cover"
+                  className="aspect-square w-full rounded-xl object-cover"
                   style={{ border: '1px solid var(--cerebro-border)' }}
                 />
               ))}
@@ -472,16 +477,16 @@ function SaveIndicator({
   if (status === 'idle') return <div className="h-5 w-20" aria-hidden />;
 
   const configs = {
-    saving: { dotClass: 'animate-pulse', dotColor: '#C17D41', textKey: 'editor.status.saving' },
-    saved: { dotClass: '', dotColor: '#22c55e', textKey: 'editor.status.saved' },
-    error: { dotClass: '', dotColor: '#ef4444', textKey: 'editor.status.error' },
+    saving: { dotClass: 'animate-pulse', dotColor: 'var(--cerebro-accent)', textKey: 'editor.status.saving' },
+    saved: { dotClass: '', dotColor: 'var(--cerebro-success)', textKey: 'editor.status.saved' },
+    error: { dotClass: '', dotColor: 'var(--cerebro-error)', textKey: 'editor.status.error' },
   } as const;
 
   const cfg = configs[status];
 
   return (
     <div
-      className="flex items-center gap-1.5 text-[0.6875rem] transition-opacity duration-200"
+      className="flex items-center gap-1.5 pr-1 text-[0.6875rem] font-medium transition-opacity duration-200"
       style={{ color: 'var(--cerebro-muted)' }}
     >
       <div
@@ -509,56 +514,5 @@ function LoadingDots() {
         />
       ))}
     </div>
-  );
-}
-
-function ChevronLeftIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-5"
-    >
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}
-
-function QuestionMarkIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-3.5"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-      <line x1="12" y1="17" x2="12.01" y2="17" />
-    </svg>
-  );
-}
-
-function CameraIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="size-3.5"
-    >
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
-    </svg>
   );
 }
