@@ -14,9 +14,14 @@ function getGreetingKey(): string {
   return 'agenda.greeting.evening';
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('pt-BR', {
+// O backend manda o dia local como YYYY-MM-DD. `new Date('2026-06-04')` seria
+// interpretado como meia-noite UTC e, exibido em fuso negativo (ex.: UTC-3),
+// "voltaria" para o dia anterior. Por isso montamos a data com os componentes
+// locais. O locale segue o idioma ativo do i18n (pt/en).
+function formatDate(dateStr: string, locale: string): string {
+  const [year, month, day] = dateStr.slice(0, 10).split('-').map(Number);
+  const date = new Date(year ?? 0, (month ?? 1) - 1, day ?? 1);
+  return date.toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -37,7 +42,7 @@ const JOURNAL_CONFIG = {
 } as const;
 
 export function AgendaPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [agenda, setAgenda] = useState<TodayAgenda | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -62,7 +67,7 @@ export function AgendaPage() {
             className="mb-1.5 text-xs font-semibold uppercase capitalize tracking-[0.14em]"
             style={{ color: 'var(--cerebro-accent)' }}
           >
-            {formatDate(agenda.date)}
+            {formatDate(agenda.date, i18n.language)}
           </p>
         )}
         <h1

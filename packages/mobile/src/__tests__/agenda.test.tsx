@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import i18n from '../lib/i18n/index.js';
 import { AgendaPage } from '../pages/AgendaPage.js';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -79,8 +80,9 @@ beforeEach(() => {
   vi.mocked(endpoints.getAgenda).mockResolvedValue(stubAgenda());
 });
 
-afterEach(() => {
+afterEach(async () => {
   vi.useRealTimers();
+  await i18n.changeLanguage('pt');
 });
 
 // ── Renderização base ─────────────────────────────────────────────────────────
@@ -97,6 +99,34 @@ describe('AgendaPage — renderização', () => {
       screen.getByTestId('journal-card-devotional'),
     );
     expect(screen.getByTestId('journal-card-reflection')).toBeInTheDocument();
+  });
+});
+
+// ── Data do cabeçalho ──────────────────────────────────────────────────────────
+
+describe('AgendaPage — data do cabeçalho', () => {
+  it('mostra o dia correto a partir de uma data YYYY-MM-DD (sem voltar um dia por UTC)', async () => {
+    // 2026-06-04 é uma quinta-feira. Em fuso negativo, `new Date('2026-06-04')`
+    // exibiria quarta-feira 03 — este teste trava a regressão.
+    vi.mocked(endpoints.getAgenda).mockResolvedValue(
+      stubAgenda({ date: '2026-06-04' }),
+    );
+    renderAgendaPage();
+
+    await waitFor(() => screen.getByText(/quinta-feira/i));
+    expect(screen.getByText(/quinta-feira/i).textContent).toContain('4');
+    expect(screen.queryByText(/quarta-feira/i)).toBeNull();
+  });
+
+  it('troca o dia da semana ao mudar o idioma para inglês', async () => {
+    await i18n.changeLanguage('en');
+    vi.mocked(endpoints.getAgenda).mockResolvedValue(
+      stubAgenda({ date: '2026-06-04' }),
+    );
+    renderAgendaPage();
+
+    await waitFor(() => screen.getByText(/Thursday/i));
+    expect(screen.queryByText(/quinta-feira/i)).toBeNull();
   });
 });
 
