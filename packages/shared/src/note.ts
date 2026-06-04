@@ -68,3 +68,10 @@ export const noteResponseSchema = z.object({
 });
 
 export type NoteResponse = z.infer<typeof noteResponseSchema>;
+
+export const editNoteBodySchema = z.object({
+  title: z.string().optional(),
+  doc: z.unknown().optional(),
+  labelIds: z.array(z.string()).optional(),
+});
+export type EditNoteBody = z.infer<typeof editNoteBodySchema>;

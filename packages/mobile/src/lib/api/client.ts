@@ -2,13 +2,9 @@ import { z } from 'zod';
 
 const BASE_URL = import.meta.env['VITE_API_URL'] ?? 'http://localhost:3333';
 
-// userId fixo enquanto não há auth
 export const CURRENT_USER_ID = 'owner';
 
-async function request<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: { 'Content-Type': 'application/json', ...init?.headers },
     ...init,
@@ -36,6 +32,17 @@ export function post<S extends z.ZodTypeAny>(
 ): Promise<z.infer<S>> {
   return request<z.infer<S>>(path, {
     method: 'POST',
+    body: JSON.stringify(body),
+  }).then((data) => schema.parse(data));
+}
+
+export function patch<S extends z.ZodTypeAny>(
+  path: string,
+  body: unknown,
+  schema: S,
+): Promise<z.infer<S>> {
+  return request<z.infer<S>>(path, {
+    method: 'PATCH',
     body: JSON.stringify(body),
   }).then((data) => schema.parse(data));
 }

@@ -14,3 +14,5 @@ export { Input } from './components/Input.js';
 export { ProgressRing } from './components/ProgressRing.js';
 export { SectionHeader } from './components/SectionHeader.js';
 export { Textarea } from './components/Textarea.js';
+export { RichEditor } from './components/RichEditor.js';
+export type { RichEditorProps } from './components/RichEditor.js';
