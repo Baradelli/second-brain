@@ -6,16 +6,16 @@ import {
   EmptyState,
   SectionHeader,
 } from '@cerebro/ui';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import {
   archiveCapture,
-  createCapture,
   listCaptures,
   promoteCaptureToNote,
 } from '../lib/api/endpoints.js';
+import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
 
 const PROMOTE_TYPES: Array<{ type: NoteType; labelKey: string; color: string }> = [
   { type: 'DEVOTIONAL', labelKey: 'editor.type.devotional', color: '#C17D41' },
@@ -37,11 +37,6 @@ function relativeTime(isoDate: string): string {
 export function CapturePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const [text, setText] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [justCaptured, setJustCaptured] = useState(false);
 
   const [pending, setPending] = useState<CaptureResponse[]>([]);
   const [archived, setArchived] = useState<CaptureResponse[]>([]);
@@ -51,8 +46,6 @@ export function CapturePage() {
 
   const [promoteTarget, setPromoteTarget] = useState<CaptureResponse | null>(null);
   const [promoting, setPromoting] = useState(false);
-
-  const justCapturedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadPending = useCallback(async () => {
     setLoadingPending(true);
@@ -67,30 +60,6 @@ export function CapturePage() {
   useEffect(() => {
     void loadPending();
   }, [loadPending]);
-
-  useEffect(
-    () => () => {
-      if (justCapturedTimerRef.current) clearTimeout(justCapturedTimerRef.current);
-    },
-    [],
-  );
-
-  async function handleSubmit() {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    setSubmitting(true);
-    try {
-      await createCapture(trimmed);
-      setText('');
-      setJustCaptured(true);
-      if (justCapturedTimerRef.current) clearTimeout(justCapturedTimerRef.current);
-      justCapturedTimerRef.current = setTimeout(() => setJustCaptured(false), 2000);
-      await loadPending();
-      textareaRef.current?.focus();
-    } finally {
-      setSubmitting(false);
-    }
-  }
 
   async function handleArchive(id: string) {
     await archiveCapture(id);
@@ -133,49 +102,7 @@ export function CapturePage() {
       {/* ── Capture input ──────────────────────────────────────────────── */}
       <section className="px-4 pt-5 pb-4" style={{ borderBottom: '1px solid var(--cerebro-border)' }}>
         <SectionHeader label={t('capture.section.input')} className="mb-3" />
-
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={t('capture.placeholder')}
-          rows={4}
-          aria-label={t('capture.placeholder')}
-          className="w-full resize-none rounded-2xl px-4 py-3 text-sm leading-relaxed focus:outline-none transition-shadow duration-150 focus:ring-2"
-          style={{
-            backgroundColor: 'var(--cerebro-card)',
-            color: 'var(--cerebro-fg)',
-            border: '1px solid var(--cerebro-border)',
-            // @ts-expect-error custom property
-            '--tw-ring-color': 'rgba(109,93,252,0.35)',
-          }}
-          onKeyDown={(e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-              void handleSubmit();
-            }
-          }}
-        />
-
-        <div className="mt-3 flex items-center justify-between">
-          <span
-            className="text-xs transition-opacity duration-200"
-            style={{
-              color: '#22c55e',
-              opacity: justCaptured ? 1 : 0,
-            }}
-            aria-live="polite"
-          >
-            ✓ {t('capture.success')}
-          </span>
-
-          <Button
-            onClick={() => void handleSubmit()}
-            disabled={!text.trim() || submitting}
-            size="md"
-          >
-            {submitting ? t('capture.submitting') : t('capture.submit')}
-          </Button>
-        </div>
+        <QuickCaptureForm onCaptured={() => void loadPending()} rows={4} />
       </section>
 
       {/* ── Pending queue ──────────────────────────────────────────────── */}
