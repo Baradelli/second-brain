@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { createCapture } from '../lib/api/endpoints.js';
+import { submitCapture } from '../lib/offline/index.js';
 
 interface QuickCaptureFormProps {
   onCaptured?: () => void;
@@ -15,6 +15,7 @@ export function QuickCaptureForm({ onCaptured, rows = 3 }: QuickCaptureFormProps
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [justCaptured, setJustCaptured] = useState(false);
+  const [queued, setQueued] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(
@@ -29,8 +30,9 @@ export function QuickCaptureForm({ onCaptured, rows = 3 }: QuickCaptureFormProps
     if (!trimmed) return;
     setSubmitting(true);
     try {
-      await createCapture(trimmed);
+      const { queued: wasQueued } = await submitCapture(trimmed);
       setText('');
+      setQueued(wasQueued);
       setJustCaptured(true);
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setJustCaptured(false), 2000);
@@ -71,7 +73,7 @@ export function QuickCaptureForm({ onCaptured, rows = 3 }: QuickCaptureFormProps
           aria-live="polite"
         >
           <Check size={14} strokeWidth={2.5} />
-          {t('capture.success')}
+          {queued ? t('capture.queued') : t('capture.success')}
         </span>
         <Button
           onClick={() => void handleSubmit()}

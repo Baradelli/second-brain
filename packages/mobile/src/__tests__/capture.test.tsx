@@ -51,6 +51,8 @@ vi.mock('@cerebro/ui', () => ({
 
 vi.mock('../lib/api/endpoints.js', () => ({
   createCapture: vi.fn(),
+  createNote: vi.fn(),
+  editNote: vi.fn(),
   listCaptures: vi.fn(),
   archiveCapture: vi.fn(),
   promoteCaptureToNote: vi.fn(),

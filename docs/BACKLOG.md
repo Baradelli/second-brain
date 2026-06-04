@@ -62,7 +62,7 @@
 
 ### Bloco H — Offline Nível 1
 
-- [ ] **24** — Service Worker + fila local para captura/escrita offline (sync ao voltar). → `tasks/24-offline-nivel-1.md`
+- [x] **24** — Service Worker + fila local para captura/escrita offline (sync ao voltar). → `tasks/24-offline-nivel-1.md`
 
 ## Definição de "MVP 1 pronto"
 

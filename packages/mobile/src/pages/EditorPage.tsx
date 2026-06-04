@@ -7,16 +7,25 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import {
   attachFileToNote,
-  createNote,
-  editNote,
   getNoteAttachments,
   getNoteById,
   getSuggestedQuestions,
   getTodayNote,
   uploadAttachmentFile,
 } from '../lib/api/endpoints.js';
+import {
+  persistNoteCreate,
+  persistNoteEdit,
+  resolveNoteRef,
+} from '../lib/offline/index.js';
+import {
+  clearDraft,
+  draftKey,
+  loadDraft,
+  saveDraft,
+} from '../lib/offline/note-draft.js';
 
-type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'queued' | 'error';
 
 interface RitualConfig {
   color: string;
@@ -83,13 +92,18 @@ export function EditorPage() {
 
     async function load() {
       setLoading(true);
+      let resolvedNoteId: string | null = null;
       try {
         if (routeNoteId) {
-          const note = await getNoteById(routeNoteId);
+          // Se a rota traz um id temporário (nota criada offline já sincronizada),
+          // traduz para o id real antes de buscar.
+          const realId = await resolveNoteRef(routeNoteId);
+          const note = await getNoteById(realId);
           if (!cancelled) {
             setDoc(note.doc);
             setNoteId(note.id);
             setLabelIds(note.labelIds ?? []);
+            resolvedNoteId = note.id;
           }
         } else if (
           noteTypeParam === 'DEVOTIONAL' ||
@@ -100,11 +114,15 @@ export function EditorPage() {
             setDoc(existing.doc);
             setNoteId(existing.id);
             setLabelIds(existing.labelIds ?? []);
+            resolvedNoteId = existing.id;
           }
         }
       } catch {
-        // non-critical — editor starts empty
+        // non-critical — editor starts empty (ou cai no rascunho abaixo)
       } finally {
+        // Rascunho local tem precedência: se há texto não sincronizado, restaura.
+        const draft = loadDraft(draftKey(resolvedNoteId, noteTypeParam));
+        if (!cancelled && draft) setDoc(draft);
         if (!cancelled) setLoading(false);
       }
     }
@@ -132,18 +150,29 @@ export function EditorPage() {
       setSaveStatus('saving');
 
       debounceRef.current = setTimeout(async () => {
+        // Rede de segurança: grava o rascunho local antes de tentar a rede.
+        const key = draftKey(noteId, noteTypeParam);
+        saveDraft(key, newDoc);
         try {
+          let queued: boolean;
           if (noteId) {
-            await editNote(noteId, { doc: newDoc });
+            ({ queued } = await persistNoteEdit(noteId, { doc: newDoc }));
           } else {
-            const created = await createNote({
-              type: noteTypeParam,
+            const created = await persistNoteCreate({
+              noteType: noteTypeParam,
               doc: newDoc,
             });
             setNoteId(created.id);
+            queued = created.queued;
           }
-          setSaveStatus('saved');
-          savedTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+          if (queued) {
+            // Salvo offline: mantém o rascunho até sincronizar.
+            setSaveStatus('queued');
+          } else {
+            clearDraft(key);
+            setSaveStatus('saved');
+            savedTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+          }
         } catch {
           setSaveStatus('error');
         }
@@ -479,6 +508,7 @@ function SaveIndicator({
   const configs = {
     saving: { dotClass: 'animate-pulse', dotColor: 'var(--cerebro-accent)', textKey: 'editor.status.saving' },
     saved: { dotClass: '', dotColor: 'var(--cerebro-success)', textKey: 'editor.status.saved' },
+    queued: { dotClass: '', dotColor: 'var(--cerebro-accent)', textKey: 'editor.status.queued' },
     error: { dotClass: '', dotColor: 'var(--cerebro-error)', textKey: 'editor.status.error' },
   } as const;
 

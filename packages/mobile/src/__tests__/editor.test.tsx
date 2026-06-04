@@ -85,6 +85,7 @@ vi.mock('@cerebro/ui', () => ({
 }));
 
 vi.mock('../lib/api/endpoints.js', () => ({
+  createCapture: vi.fn(),
   createNote: vi.fn(),
   editNote: vi.fn(),
   getTodayNote: vi.fn(),
@@ -110,6 +111,7 @@ function renderEditor(path: string) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  localStorage.clear(); // evita vazamento de rascunho entre testes
   // shouldAdvanceTime: true permite waitFor funcionar com fake timers
   vi.useFakeTimers({ shouldAdvanceTime: true });
 
@@ -179,6 +181,22 @@ describe('EditorPage — carregamento', () => {
 
     expect(endpoints.getTodayNote).toHaveBeenCalledWith('DEVOTIONAL');
     expect(screen.queryByTestId('loaded-doc')).toBeNull();
+  });
+
+  it('rascunho local tem precedência sobre o doc do servidor', async () => {
+    const DRAFT_DOC = {
+      type: 'doc',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Rascunho offline' }] }],
+    };
+    // Rascunho salvo (ex.: escrita offline anterior) para a nota note-1.
+    localStorage.setItem('cerebro.draft.note.note-1', JSON.stringify(DRAFT_DOC));
+
+    renderEditor('/editor/note-1');
+
+    await waitFor(() => screen.getByTestId('loaded-doc'));
+    expect(screen.getByTestId('loaded-doc').textContent).toBe(
+      JSON.stringify(DRAFT_DOC),
+    );
   });
 });
 

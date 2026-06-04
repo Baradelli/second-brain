@@ -1,12 +1,19 @@
+import { BottomTabBar, type Tab,ThemeProvider, ThemeToggle } from '@cerebro/ui';
 import { BookOpen, Home, PenLine, Plus, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 
-import { BottomTabBar, ThemeProvider, ThemeToggle, type Tab } from '@cerebro/ui';
 import { LanguageSwitcher } from './components/LanguageSwitcher.js';
+import { startOfflineSync } from './lib/offline/index.js';
 
 function AppShell() {
   const { t } = useTranslation();
+
+  // Sincroniza a fila offline (captura/escrita) ao reconectar e ao abrir o app.
+  useEffect(() => {
+    startOfflineSync();
+  }, []);
 
   const tabs: Tab[] = [
     { to: '/', icon: <Home size={20} strokeWidth={1.75} />, label: t('nav.home') },
