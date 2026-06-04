@@ -1,9 +1,13 @@
 import {
+  attachmentResponseSchema,
   captureResponseSchema,
   noteResponseSchema,
+  suggestedQuestionsGroupResponseSchema,
+  type AttachmentResponse,
   type CaptureResponse,
   type NoteResponse,
   type NoteType,
+  type SuggestedQuestionsGroupResponse,
 } from '@cerebro/shared';
 import { z } from 'zod';
 
@@ -95,6 +99,42 @@ export function editNote(
 
 export function getNoteById(id: string): Promise<NoteResponse> {
   return get(`/notes/${id}`, noteResponseSchema);
+}
+
+// ── Suggested questions ───────────────────────────────────────────────────────
+
+export function getSuggestedQuestions(
+  labelIds: string[],
+): Promise<SuggestedQuestionsGroupResponse[]> {
+  if (labelIds.length === 0) return Promise.resolve([]);
+  const query = labelIds.map(encodeURIComponent).join(',');
+  return get(
+    `/notes/suggested-questions?labelIds=${query}`,
+    z.array(suggestedQuestionsGroupResponseSchema),
+  );
+}
+
+// ── Attachments ───────────────────────────────────────────────────────────────
+
+export function attachFileToNote(
+  noteId: string,
+  file: {
+    url: string;
+    type: string;
+    mimeType?: string;
+    name?: string;
+    size?: number;
+  },
+): Promise<AttachmentResponse> {
+  return post(
+    `/notes/${noteId}/attachments`,
+    { ...file, userId: CURRENT_USER_ID, noteId },
+    attachmentResponseSchema,
+  );
+}
+
+export function getNoteAttachments(noteId: string): Promise<AttachmentResponse[]> {
+  return get(`/notes/${noteId}/attachments`, z.array(attachmentResponseSchema));
 }
 
 export async function getTodayNote(type: NoteType): Promise<NoteResponse | null> {

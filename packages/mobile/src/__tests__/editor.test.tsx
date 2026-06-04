@@ -28,6 +28,22 @@ const STUB_NOTE = (overrides: object = {}) => ({
   ...overrides,
 });
 
+const STUB_ATTACHMENT = (overrides: object = {}) => ({
+  id: 'att-1',
+  userId: 'owner',
+  noteId: 'note-1',
+  captureId: null,
+  url: 'data:image/png;base64,abc',
+  type: 'image',
+  mimeType: 'image/png',
+  name: 'foto.png',
+  size: 100,
+  transcription: null,
+  ocrStatus: null,
+  createdAt: new Date().toISOString(),
+  ...overrides,
+});
+
 // Mock @cerebro/ui sem importOriginal para evitar carregar TipTap no jsdom
 vi.mock('@cerebro/ui', () => ({
   RichEditor: ({
@@ -49,6 +65,23 @@ vi.mock('@cerebro/ui', () => ({
       </button>
     </div>
   ),
+  BottomSheet: ({
+    open,
+    onClose,
+    children,
+  }: {
+    open: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+  }) =>
+    open ? (
+      <div data-testid="bottom-sheet" role="dialog">
+        <button data-testid="sheet-close" onClick={onClose}>
+          ×
+        </button>
+        {children}
+      </div>
+    ) : null,
 }));
 
 vi.mock('../lib/api/endpoints.js', () => ({
@@ -56,6 +89,9 @@ vi.mock('../lib/api/endpoints.js', () => ({
   editNote: vi.fn(),
   getTodayNote: vi.fn(),
   getNoteById: vi.fn(),
+  getSuggestedQuestions: vi.fn(),
+  attachFileToNote: vi.fn(),
+  getNoteAttachments: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -84,6 +120,9 @@ beforeEach(() => {
   vi.mocked(endpoints.editNote).mockResolvedValue(
     STUB_NOTE({ doc: CHANGED_DOC, plainText: 'Mudado' }),
   );
+  vi.mocked(endpoints.getSuggestedQuestions).mockResolvedValue([]);
+  vi.mocked(endpoints.getNoteAttachments).mockResolvedValue([]);
+  vi.mocked(endpoints.attachFileToNote).mockResolvedValue(STUB_ATTACHMENT());
 });
 
 afterEach(() => {
@@ -196,5 +235,118 @@ describe('EditorPage — auto-save (doc ↔ API)', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
 
     await waitFor(() => screen.getByText('Salvo'));
+  });
+});
+
+// ── Perguntas sugeridas ───────────────────────────────────────────────────────
+
+describe('EditorPage — painel de perguntas sugeridas', () => {
+  it('abre painel e exibe perguntas agrupadas por label', async () => {
+    vi.mocked(endpoints.getNoteById).mockResolvedValue(
+      STUB_NOTE({ labelIds: ['label-1'] }),
+    );
+    vi.mocked(endpoints.getSuggestedQuestions).mockResolvedValue([
+      {
+        label: { id: 'label-1', name: 'Espiritualidade' },
+        questions: [
+          { id: 'q-1', labelId: 'label-1', text: 'O que aprendeu hoje?', order: 0, active: true },
+          { id: 'q-2', labelId: 'label-1', text: 'O que ficou como gratidão?', order: 1, active: true },
+        ],
+      },
+    ]);
+
+    renderEditor('/editor/note-1');
+    await waitFor(() => screen.getByTestId('rich-editor'));
+
+    await userEvent.click(screen.getByRole('button', { name: /perguntas/i }));
+
+    await waitFor(() => screen.getByText('Espiritualidade'));
+    expect(screen.getByText('O que aprendeu hoje?')).toBeInTheDocument();
+    expect(screen.getByText('O que ficou como gratidão?')).toBeInTheDocument();
+    expect(endpoints.getSuggestedQuestions).toHaveBeenCalledWith(['label-1']);
+  });
+
+  it('exibe estado vazio quando a nota não tem perguntas para os labels', async () => {
+    vi.mocked(endpoints.getSuggestedQuestions).mockResolvedValue([]);
+
+    renderEditor('/editor/note-1');
+    await waitFor(() => screen.getByTestId('rich-editor'));
+
+    await userEvent.click(screen.getByRole('button', { name: /perguntas/i }));
+
+    await waitFor(() =>
+      screen.getByText(/nenhuma pergunta para os labels/i),
+    );
+  });
+});
+
+// ── Anexos ────────────────────────────────────────────────────────────────────
+
+describe('EditorPage — painel de anexos', () => {
+  it('carrega e exibe anexos existentes ao abrir painel', async () => {
+    vi.mocked(endpoints.getNoteAttachments).mockResolvedValue([
+      STUB_ATTACHMENT(),
+    ]);
+
+    renderEditor('/editor/note-1');
+    await waitFor(() => screen.getByTestId('rich-editor'));
+
+    // Anexos são carregados assim que noteId é definido
+    await waitFor(() =>
+      expect(endpoints.getNoteAttachments).toHaveBeenCalledWith('note-1'),
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /foto/i }));
+
+    await waitFor(() => screen.getByRole('dialog'));
+
+    const img = screen.getByRole('img', { name: /foto\.png|anexo/i });
+    expect(img).toBeInTheDocument();
+  });
+
+  it('chama attachFileToNote ao selecionar arquivo e exibe novo anexo', async () => {
+    const NEW_ATTACHMENT = STUB_ATTACHMENT({ id: 'att-2', name: 'nova.png' });
+    vi.mocked(endpoints.attachFileToNote).mockResolvedValue(NEW_ATTACHMENT);
+
+    // Mock FileReader
+    const mockResult = 'data:image/png;base64,xyz';
+    const mockReadAsDataURL = vi.fn();
+    let capturedOnLoad: (() => void) | null = null;
+
+    vi.spyOn(globalThis, 'FileReader').mockImplementation(
+      () =>
+        ({
+          readAsDataURL: mockReadAsDataURL,
+          set onload(fn: () => void) {
+            capturedOnLoad = fn;
+          },
+          get result() {
+            return mockResult;
+          },
+        }) as unknown as FileReader,
+    );
+
+    renderEditor('/editor/note-1');
+    await waitFor(() => screen.getByTestId('rich-editor'));
+
+    await userEvent.click(screen.getByRole('button', { name: /foto/i }));
+    await waitFor(() => screen.getByRole('dialog'));
+
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['content'], 'nova.png', { type: 'image/png' });
+    await userEvent.upload(fileInput, file);
+
+    // Dispara o onload do FileReader dentro de act para cobrir o setState
+    await act(async () => {
+      capturedOnLoad?.();
+      await Promise.resolve();
+    });
+
+    await waitFor(() =>
+      expect(endpoints.attachFileToNote).toHaveBeenCalledWith(
+        'note-1',
+        expect.objectContaining({ url: mockResult, type: 'image' }),
+      ),
+    );
   });
 });
