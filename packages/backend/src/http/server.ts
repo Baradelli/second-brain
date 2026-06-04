@@ -1,5 +1,6 @@
 import path from 'node:path';
 
+import cors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
@@ -25,6 +26,13 @@ export async function buildServer() {
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
+
+  // CORS: o front (Vite) roda em outra origem que a API. Em dev liberamos
+  // qualquer origem; em prod, restrinja via CORS_ORIGIN (lista separada por vírgula).
+  const corsEnv = process.env['CORS_ORIGIN'];
+  await app.register(cors, {
+    origin: corsEnv ? corsEnv.split(',').map((o) => o.trim()) : true,
+  });
 
   await app.register(swagger, {
     openapi: {
