@@ -61,6 +61,36 @@ export const listGoalsQuerySchema = z.object({
 });
 export type ListGoalsQuery = z.infer<typeof listGoalsQuerySchema>;
 
+const dateRangeSchema = z.object({
+  from: z.string().datetime(),
+  to: z.string().datetime(),
+});
+
+export interface GoalProgressResponse {
+  goalId: string;
+  type: GoalTypeInput;
+  done: number;
+  target: number | null;
+  ratio: number | null;
+  period: { from: string; to: string } | null;
+  completed: boolean;
+  children?: GoalProgressResponse[];
+}
+
+export const goalProgressResponseSchema: z.ZodType<GoalProgressResponse> =
+  z.lazy(() =>
+    z.object({
+      goalId: z.string(),
+      type: goalType,
+      done: z.number(),
+      target: z.number().nullable(),
+      ratio: z.number().nullable(),
+      period: dateRangeSchema.nullable(),
+      completed: z.boolean(),
+      children: z.array(goalProgressResponseSchema).optional(),
+    }),
+  );
+
 export const goalResponseSchema = z.object({
   id: z.string(),
   userId: z.string(),

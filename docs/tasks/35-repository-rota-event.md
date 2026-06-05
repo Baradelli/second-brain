@@ -104,9 +104,10 @@ parte e o `goalProgressResponseSchema`.
 
 ## Definição de pronto
 
-- [ ] `PrismaEventRepository` (save/byId/**delete real**/find com janela e goalIds); contrato verde.
-- [ ] Schema Zod de Event em `shared/`; rotas check/skip/undo registradas, erros mapeados
+- [x] `PrismaEventRepository` (save/byId/**delete real**/find com janela e goalIds); contrato verde. (7/7)
+- [x] Schema Zod de Event em `shared/`; rotas check/skip/undo registradas, erros mapeados
       (404/400; 204 no undo).
-- [ ] (Se aprovado) `GET /goals/:id/progress` + schema.
-- [ ] Testes de rota e de contrato nos caminhos críticos; `unit` e `integration` verdes.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
+- [x] `GET /goals/:id/progress` + schema (incluído — Parte D).
+- [x] Testes de rota e de contrato nos caminhos críticos (7 rota); `unit` (214) e
+      `integration` (104) verdes.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.

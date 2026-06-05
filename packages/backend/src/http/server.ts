@@ -15,6 +15,7 @@ import {
 import { agendaRoutes } from '../routes/agenda-routes.js';
 import { attachmentRoutes } from '../routes/attachment-routes.js';
 import { captureRoutes } from '../routes/capture-routes.js';
+import { eventRoutes } from '../routes/event-routes.js';
 import { goalRoutes } from '../routes/goal-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
@@ -62,6 +63,7 @@ export async function buildServer() {
   await app.register(agendaRoutes, { prisma });
   await app.register(resourceRoutes, { prisma });
   await app.register(goalRoutes, { prisma });
+  await app.register(eventRoutes, { prisma });
 
   return app;
 }
