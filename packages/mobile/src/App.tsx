@@ -1,24 +1,51 @@
 import {
+  BottomSheet,
   BottomTabBar,
   type Tab,
   ThemeProvider,
   ThemeToggle,
 } from '@cerebro/ui';
 import { BookOpen, Home, PenLine, Plus, Sparkles } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { LanguageSwitcher } from './components/LanguageSwitcher.js';
 import { startOfflineSync } from './lib/offline/index.js';
 
+const NOTE_TYPES = [
+  {
+    type: 'DEVOTIONAL',
+    labelKey: 'editor.type.devotional',
+    color: 'var(--cerebro-devotional)',
+  },
+  {
+    type: 'REFLECTION',
+    labelKey: 'editor.type.reflection',
+    color: 'var(--cerebro-reflection)',
+  },
+  {
+    type: 'STUDY_NOTE',
+    labelKey: 'editor.type.study',
+    color: 'var(--cerebro-study)',
+  },
+  { type: 'NOTE', labelKey: 'editor.type.note', color: 'var(--cerebro-note)' },
+] as const;
+
 function AppShell() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [writeOpen, setWriteOpen] = useState(false);
 
   // Sincroniza a fila offline (captura/escrita) ao reconectar e ao abrir o app.
   useEffect(() => {
     startOfflineSync();
   }, []);
+
+  function startWriting(type: string) {
+    setWriteOpen(false);
+    navigate(`/editor?type=${type}`);
+  }
 
   const tabs: Tab[] = [
     {
@@ -38,9 +65,9 @@ function AppShell() {
       isFab: true,
     },
     {
-      to: '/editor',
       icon: <PenLine size={20} strokeWidth={1.75} />,
       label: t('nav.editor'),
+      onSelect: () => setWriteOpen(true),
     },
     {
       to: '/assistant',
@@ -89,6 +116,42 @@ function AppShell() {
       </div>
 
       <BottomTabBar tabs={tabs} />
+
+      <BottomSheet open={writeOpen} onClose={() => setWriteOpen(false)}>
+        <p
+          className="mb-4 font-display text-lg font-semibold"
+          style={{ color: 'var(--cerebro-fg)' }}
+        >
+          {t('editor.chooseType')}
+        </p>
+        <div className="flex flex-col gap-2">
+          {NOTE_TYPES.map(({ type, labelKey, color }) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => startWriting(type)}
+              data-testid={`write-type-${type}`}
+              className="flex items-center gap-3 rounded-[var(--radius-card)] px-4 py-3.5 transition-all duration-150 active:scale-[0.98]"
+              style={{
+                backgroundColor: 'var(--cerebro-raised)',
+                border: '1px solid var(--cerebro-border)',
+              }}
+            >
+              <span
+                className="h-7 w-1 rounded-full"
+                style={{ backgroundColor: color }}
+                aria-hidden
+              />
+              <span
+                className="text-sm font-semibold"
+                style={{ color: 'var(--cerebro-fg)' }}
+              >
+                {t(labelKey)}
+              </span>
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
     </div>
   );
 }

@@ -2,10 +2,12 @@ import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 
 export interface Tab {
-  to: string;
+  to?: string;
   icon: ReactNode;
   label: string;
   isFab?: boolean;
+  /** Aba de ação: em vez de navegar, dispara este callback (ex.: abrir um seletor). */
+  onSelect?: () => void;
 }
 
 interface BottomTabBarProps {
@@ -25,10 +27,12 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
       }}
     >
       {tabs.map((tab) => {
-        if (tab.isFab) {
+        const key = tab.to ?? tab.label;
+
+        if (tab.isFab && tab.to) {
           return (
             <NavLink
-              key={tab.to}
+              key={key}
               to={tab.to}
               aria-label={tab.label}
               className="group relative flex flex-1 items-center justify-center"
@@ -46,10 +50,37 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
             </NavLink>
           );
         }
+
+        // Aba de ação (sem rota): botão que dispara onSelect.
+        if (tab.onSelect) {
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={tab.onSelect}
+              aria-label={tab.label}
+              className="group flex flex-1 flex-col items-center justify-center gap-1 pt-1"
+            >
+              <span
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
+                style={{ color: 'var(--cerebro-muted)' }}
+              >
+                {tab.icon}
+              </span>
+              <span
+                className="text-[0.625rem] font-medium tracking-tight"
+                style={{ color: 'var(--cerebro-muted)' }}
+              >
+                {tab.label}
+              </span>
+            </button>
+          );
+        }
+
         return (
           <NavLink
-            key={tab.to}
-            to={tab.to}
+            key={key}
+            to={tab.to ?? '/'}
             end={tab.to === '/'}
             className="group flex flex-1 flex-col items-center justify-center gap-1 pt-1"
           >

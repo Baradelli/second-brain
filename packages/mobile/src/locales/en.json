@@ -38,6 +38,7 @@
   "capture.archived.hide": "Hide archived",
   "capture.archived.empty": "No archived captures.",
   "editor.placeholder": "Start writing…",
+  "editor.chooseType": "Write what?",
   "editor.type.devotional": "Devotional",
   "editor.type.reflection": "Reflection",
   "editor.type.study": "Study note",

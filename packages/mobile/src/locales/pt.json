@@ -38,6 +38,7 @@
   "capture.archived.hide": "Ocultar arquivados",
   "capture.archived.empty": "Nenhuma captura arquivada.",
   "editor.placeholder": "Comece a escrever…",
+  "editor.chooseType": "Escrever o quê?",
   "editor.type.devotional": "Devocional",
   "editor.type.reflection": "Reflexão",
   "editor.type.study": "Fichamento",
