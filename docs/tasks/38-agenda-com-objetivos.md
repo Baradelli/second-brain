@@ -92,10 +92,11 @@ Tarefa 36. Extrair essa seleção para um ponto único e usá-la nos dois:
 
 ## Definição de pronto
 
-- [ ] `TodayAgenda` ganha `goals` (agendados+convites de hoje, com `resolvedToday`), **sem
+- [x] `TodayAgenda` ganha `goals` (agendados+convites de hoje, com `resolvedToday`), **sem
       alterar** `date`/`journal`/`capturesToReview`.
-- [ ] A seleção de objetivos do dia é **compartilhada** com a Tarefa 36 (regra num lugar só).
-- [ ] Testes do UseCase atualizados (campos antigos intactos + novo `goals`); rota `/agenda`
+- [x] A seleção de objetivos do dia é **compartilhada** com a Tarefa 36 via
+      `SelectTodaysGoals` (regra num lugar só; `buildDayClosing` refatorado para usá-la).
+- [x] Testes do UseCase atualizados (campos antigos intactos + novo `goals`); rota `/agenda`
       com `goals` no schema; verdes.
-- [ ] `unit` e `integration` verdes.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- [x] `unit` (233) e `integration` (107) verdes.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.

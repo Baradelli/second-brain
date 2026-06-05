@@ -1,20 +1,11 @@
-import type { NoteScope } from '@cerebro/shared';
 import { DateTime } from 'luxon';
 
-import { dayRange } from '../domain/day-range.js';
-import type { Goal, GoalPeriod } from '../domain/goal.js';
-import { localWeekday } from '../domain/local-weekday.js';
 import type { EventRepository } from './ports/event-repository.js';
 import type { GoalRepository } from './ports/goal-repository.js';
 import type { SettingsReader } from './ports/settings-reader.js';
+import { SelectTodaysGoals } from './select-todays-goals.js';
 
 const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
-
-const PERIOD_TO_SCOPE: Record<GoalPeriod, NoteScope> = {
-  day: 'DAY',
-  week: 'WEEK',
-  month: 'MONTH',
-};
 
 export interface BuildDayClosingInput {
   userId: string;
@@ -38,93 +29,45 @@ export interface DayClosing {
 }
 
 export class BuildDayClosing {
+  private selector: SelectTodaysGoals;
+
   constructor(
-    private goals: GoalRepository,
-    private events: EventRepository,
+    goals: GoalRepository,
+    events: EventRepository,
     private settings: SettingsReader,
-  ) {}
+  ) {
+    this.selector = new SelectTodaysGoals(goals, events);
+  }
 
   async execute(input: BuildDayClosingInput): Promise<DayClosing> {
     const userSettings = await this.settings.getByUserId(input.userId);
     const timezone = userSettings?.timezone ?? DEFAULT_TIMEZONE;
-    const reference = input.reference;
 
-    const date = DateTime.fromJSDate(reference, { zone: timezone }).toFormat(
-      'yyyy-MM-dd',
-    );
-    const day = dayRange(reference, timezone, 'DAY');
-    const todayWeekday = localWeekday(reference, timezone);
+    const date = DateTime.fromJSDate(input.reference, {
+      zone: timezone,
+    }).toFormat('yyyy-MM-dd');
 
-    const habits = (
-      await this.goals.find({
-        userId: input.userId,
-        status: 'ACTIVE',
-        type: 'HABIT',
-      })
-    ).filter((g) => g.completedAt == null);
+    const items = await this.selector.execute({
+      userId: input.userId,
+      reference: input.reference,
+      timezone,
+    });
 
-    const pending: DayClosingItem[] = [];
+    const pending: DayClosingItem[] = items
+      .filter((i) => !i.resolvedToday)
+      .map((i) => ({
+        goalId: i.goalId,
+        title: i.title,
+        type: 'HABIT' as const,
+        kind: i.kind,
+        ...(i.periodTarget !== undefined
+          ? { periodTarget: i.periodTarget }
+          : {}),
+        ...(i.periodDone !== undefined ? { periodDone: i.periodDone } : {}),
+      }))
+      .sort(byKindThenTitle);
 
-    for (const goal of habits) {
-      const resolvedToday =
-        (
-          await this.events.find({
-            userId: input.userId,
-            goalId: goal.id,
-            from: day.from,
-            to: day.to,
-          })
-        ).length > 0;
-      if (resolvedToday) continue;
-
-      const item = await this.classify(goal, reference, timezone, todayWeekday);
-      if (item) pending.push(item);
-    }
-
-    pending.sort(byKindThenTitle);
     return { date, pending };
-  }
-
-  private async classify(
-    goal: Goal,
-    reference: Date,
-    timezone: string,
-    todayWeekday: number,
-  ): Promise<DayClosingItem | null> {
-    const usesWeekdays = goal.weekdays.length > 0;
-
-    if (usesWeekdays) {
-      if (!goal.weekdays.includes(todayWeekday)) return null;
-      return {
-        goalId: goal.id,
-        title: goal.title,
-        type: 'HABIT',
-        kind: 'scheduled',
-      };
-    }
-
-    // period + timesPerPeriod
-    if (goal.period == null || goal.timesPerPeriod == null) return null;
-    const period = dayRange(reference, timezone, PERIOD_TO_SCOPE[goal.period]);
-    const periodDone = (
-      await this.events.find({
-        userId: goal.userId,
-        goalId: goal.id,
-        type: 'done',
-        from: period.from,
-        to: period.to,
-      })
-    ).length;
-
-    if (periodDone >= goal.timesPerPeriod) return null;
-    return {
-      goalId: goal.id,
-      title: goal.title,
-      type: 'HABIT',
-      kind: 'invitation',
-      periodTarget: goal.timesPerPeriod,
-      periodDone,
-    };
   }
 }
 

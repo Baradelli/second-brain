@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { CaptureRepositoryFake } from '../_fakes/capture-repository-fake.js';
+import { EventRepositoryFake } from '../_fakes/event-repository-fake.js';
+import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { SettingsReaderFake } from '../_fakes/settings-reader-fake.js';
 import { BuildTodayAgenda } from '../build-today-agenda.js';
 import { FindNoteOfTheDay } from '../find-note-of-the-day.js';
 import { ListPendingCaptures } from '../list-pending-captures.js';
+import { SelectTodaysGoals } from '../select-todays-goals.js';
 
 // Reference: 2026-06-03 17:00 UTC = 2026-06-03 14:00 BRT (UTC-3)
 const REFERENCE = new Date('2026-06-03T17:00:00.000Z');
@@ -46,18 +49,23 @@ const makeCapture = (id: string, reviewAt: Date | null) => ({
 describe('BuildTodayAgenda', () => {
   let noteRepo: NoteRepositoryFake;
   let captureRepo: CaptureRepositoryFake;
+  let goalRepo: GoalRepositoryFake;
+  let eventRepo: EventRepositoryFake;
   let settingsReader: SettingsReaderFake;
   let usecase: BuildTodayAgenda;
 
   beforeEach(() => {
     noteRepo = new NoteRepositoryFake();
     captureRepo = new CaptureRepositoryFake();
+    goalRepo = new GoalRepositoryFake();
+    eventRepo = new EventRepositoryFake();
     settingsReader = new SettingsReaderFake();
     settingsReader.set(USER_ID, { timezone: TIMEZONE, reviewWeekday: 1 });
     usecase = new BuildTodayAgenda(
       settingsReader,
       new FindNoteOfTheDay(noteRepo),
       new ListPendingCaptures(captureRepo),
+      new SelectTodaysGoals(goalRepo, eventRepo),
     );
   });
 
@@ -132,6 +140,7 @@ describe('BuildTodayAgenda', () => {
       noSettingsReader,
       new FindNoteOfTheDay(noteRepo),
       new ListPendingCaptures(captureRepo),
+      new SelectTodaysGoals(goalRepo, eventRepo),
     );
 
     const agenda = await agendaUsecase.execute({
@@ -141,5 +150,52 @@ describe('BuildTodayAgenda', () => {
 
     expect(agenda.journal.devotional.done).toBe(false);
     expect(agenda.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('inclui os objetivos do dia (HABIT agendado hoje) com resolvedToday', async () => {
+    // REFERENCE é quarta-feira (weekday 3) em America/Sao_Paulo.
+    await goalRepo.save({
+      id: 'g-wed',
+      userId: USER_ID,
+      title: 'Ler',
+      description: null,
+      type: 'HABIT',
+      parentId: null,
+      targetValue: null,
+      unit: null,
+      period: null,
+      timesPerPeriod: null,
+      weekdays: [3],
+      startAt: null,
+      dueAt: null,
+      completedAt: null,
+      status: 'ACTIVE',
+      archivedAt: null,
+      createdAt: new Date('2026-05-01T00:00:00.000Z'),
+      labelIds: [],
+    });
+
+    const agenda = await usecase.execute({
+      userId: USER_ID,
+      reference: REFERENCE,
+    });
+
+    expect(agenda.goals).toHaveLength(1);
+    expect(agenda.goals[0]).toEqual({
+      goalId: 'g-wed',
+      title: 'Ler',
+      kind: 'scheduled',
+      resolvedToday: false,
+    });
+  });
+
+  it('os campos atuais seguem intactos (goals é só acréscimo)', async () => {
+    const agenda = await usecase.execute({
+      userId: USER_ID,
+      reference: REFERENCE,
+    });
+    expect(agenda.journal).toBeDefined();
+    expect(agenda.capturesToReview).toEqual([]);
+    expect(agenda.goals).toEqual([]);
   });
 });

@@ -20,6 +20,7 @@ import type { Goal } from '../domain/goal.js';
 import type { Note } from '../domain/note.js';
 import type { Resource } from '../domain/resource.js';
 import { PrismaCaptureRepository } from '../repositories/prisma-capture-repository.js';
+import { PrismaEventRepository } from '../repositories/prisma-event-repository.js';
 import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
 import { PrismaResourceRepository } from '../repositories/prisma-resource-repository.js';
@@ -34,6 +35,7 @@ import { ListPendingCaptures } from '../usecases/list-pending-captures.js';
 import { PromoteCaptureToGoal } from '../usecases/promote-capture-to-goal.js';
 import { PromoteCaptureToNote } from '../usecases/promote-capture-to-note.js';
 import { PromoteCaptureToResource } from '../usecases/promote-capture-to-resource.js';
+import { SelectTodaysGoals } from '../usecases/select-todays-goals.js';
 
 function captureToResponse(c: Capture): CaptureResponse {
   return {
@@ -80,6 +82,13 @@ const journalEntrySchema = z.object({
   noteId: z.string().optional(),
 });
 
+const agendaGoalSchema = z.object({
+  goalId: z.string(),
+  title: z.string(),
+  kind: z.enum(['scheduled', 'invitation']),
+  resolvedToday: z.boolean(),
+});
+
 const todayAgendaResponseSchema = z.object({
   date: z.string(),
   journal: z.object({
@@ -87,6 +96,7 @@ const todayAgendaResponseSchema = z.object({
     reflection: journalEntrySchema,
   }),
   capturesToReview: z.array(captureResponseSchema),
+  goals: z.array(agendaGoalSchema),
 });
 
 function resourceToResponse(r: Resource): ResourceResponse {
@@ -148,14 +158,16 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
   const noteRepo = new PrismaNoteRepository(options.prisma);
   const captureRepo = new PrismaCaptureRepository(options.prisma);
   const settingsReader = new PrismaSettingsReader(options.prisma);
+  const resourceRepo = new PrismaResourceRepository(options.prisma);
+  const goalRepo = new PrismaGoalRepository(options.prisma);
+  const eventRepo = new PrismaEventRepository(options.prisma);
 
   const buildTodayAgenda = new BuildTodayAgenda(
     settingsReader,
     new FindNoteOfTheDay(noteRepo),
     new ListPendingCaptures(captureRepo),
+    new SelectTodaysGoals(goalRepo, eventRepo),
   );
-  const resourceRepo = new PrismaResourceRepository(options.prisma);
-  const goalRepo = new PrismaGoalRepository(options.prisma);
   const archiveCapture = new ArchiveCapture(captureRepo);
   const promoteCaptureToNote = new PromoteCaptureToNote(
     captureRepo,

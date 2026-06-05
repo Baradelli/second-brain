@@ -40,6 +40,7 @@ describe('GET /agenda', () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(Array.isArray(body.goals)).toBe(true);
     expect(body.journal.devotional).toEqual({ done: false });
     expect(body.journal.reflection).toEqual({ done: false });
     expect(body.capturesToReview).toEqual([]);
