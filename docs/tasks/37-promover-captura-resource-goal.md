@@ -124,9 +124,11 @@ o impacto é só nesse teste, que será atualizado. A resposta segue discriminad
 
 ## Definição de pronto
 
-- [ ] `promoteCaptureToResource` e `promoteCaptureToGoal` criando a entidade e marcando a
+- [x] `promoteCaptureToResource` e `promoteCaptureToGoal` criando a entidade e marcando a
       captura PROCESSED com o `promotedToType` certo; validação de domínio herdada dos creates.
-- [ ] Helper de "consumir captura" compartilhado (sem duplicar a transição).
-- [ ] Rota de promote suportando os 3 destinos (conforme opção escolhida); timezone correto.
-- [ ] Testes (UseCase + rota) escritos antes, verdes; `unit` e `integration` verdes.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- [x] Helper de "consumir captura" compartilhado (`promote-capture-shared.ts`), e o
+      `PromoteCaptureToNote` refatorado para usá-lo (testes dele seguem verdes).
+- [x] Rota de promote (opção A) suportando os 3 destinos via `destination`; timezone do dono
+      da captura (corrigido o `'owner'` hardcoded).
+- [x] Testes (UseCase + rota) escritos antes, verdes; `unit` (231) e `integration` (107) verdes.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.

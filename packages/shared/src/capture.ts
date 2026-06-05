@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
+import { weekday } from './common.js';
+import { goalPeriod, goalType } from './goal.js';
 import { noteScope, noteType } from './note.js';
+import { resourceType } from './resource.js';
 
 export const createCaptureSchema = z.object({
   userId: z.string().min(1),
@@ -43,10 +46,36 @@ export const archiveCaptureSchema = z.object({
 
 export type ArchiveCaptureInput = z.infer<typeof archiveCaptureSchema>;
 
-export const promoteCaptureSchema = z.object({
-  type: noteType,
-  scope: noteScope.optional(),
-  title: z.string().optional(),
-});
+// Promoção de captura discriminada por destino (note | resource | goal).
+export const promoteCaptureSchema = z.discriminatedUnion('destination', [
+  z.object({
+    destination: z.literal('note'),
+    type: noteType,
+    scope: noteScope.optional(),
+    title: z.string().optional(),
+  }),
+  z.object({
+    destination: z.literal('resource'),
+    title: z.string().optional(),
+    type: resourceType,
+    url: z.string().url().nullish(),
+    author: z.string().nullish(),
+    description: z.string().nullish(),
+  }),
+  z.object({
+    destination: z.literal('goal'),
+    title: z.string().optional(),
+    type: goalType,
+    description: z.string().nullish(),
+    targetValue: z.number().positive().nullish(),
+    unit: z.string().nullish(),
+    period: goalPeriod.nullish(),
+    timesPerPeriod: z.number().int().positive().nullish(),
+    weekdays: z.array(weekday).optional(),
+    startAt: z.coerce.date().nullish(),
+    dueAt: z.coerce.date().nullish(),
+    parentId: z.string().nullish(),
+  }),
+]);
 
 export type PromoteCaptureInput = z.infer<typeof promoteCaptureSchema>;

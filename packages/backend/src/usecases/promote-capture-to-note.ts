@@ -2,14 +2,11 @@ import type { NoteScope, NoteType } from '@cerebro/shared';
 import { DateTime } from 'luxon';
 
 import type { Capture } from '../domain/capture.js';
-import {
-  CaptureAlreadyProcessedError,
-  CaptureNotFoundError,
-} from '../domain/errors.js';
 import type { Note } from '../domain/note.js';
 import { textToDoc } from '../domain/text-to-doc.js';
 import { CreateNote } from './create-note.js';
 import type { CaptureRepository } from './ports/capture-repository.js';
+import { loadPendingCapture, markPromoted } from './promote-capture-shared.js';
 
 export interface PromoteCaptureToNoteInput {
   captureId: string;
@@ -29,10 +26,7 @@ export class PromoteCaptureToNote {
   async execute(
     input: PromoteCaptureToNoteInput,
   ): Promise<{ note: Note; capture: Capture }> {
-    const capture = await this.captureRepo.byId(input.captureId);
-    if (!capture) throw new CaptureNotFoundError(input.captureId);
-    if (capture.status !== 'PENDING')
-      throw new CaptureAlreadyProcessedError(input.captureId);
+    const capture = await loadPendingCapture(this.captureRepo, input.captureId);
 
     const date = DateTime.fromJSDate(input.reference, { zone: input.timezone })
       .startOf('day')
@@ -49,13 +43,12 @@ export class PromoteCaptureToNote {
       labelIds: capture.labelIds,
     });
 
-    const now = new Date();
-    const updatedCapture = await this.captureRepo.update(input.captureId, {
-      status: 'PROCESSED',
-      processedAt: now,
-      promotedToType: 'note',
-      promotedToId: note.id,
-    });
+    const updatedCapture = await markPromoted(
+      this.captureRepo,
+      input.captureId,
+      'note',
+      note.id,
+    );
 
     return { note, capture: updatedCapture };
   }

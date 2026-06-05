@@ -1,20 +1,39 @@
-import type { CaptureResponse, NoteResponse } from '@cerebro/shared';
-import { captureResponseSchema, noteResponseSchema } from '@cerebro/shared';
+import type {
+  CaptureResponse,
+  GoalResponse,
+  NoteResponse,
+  ResourceResponse,
+} from '@cerebro/shared';
+import {
+  captureResponseSchema,
+  goalResponseSchema,
+  noteResponseSchema,
+  promoteCaptureSchema,
+  resourceResponseSchema,
+} from '@cerebro/shared';
 import type { PrismaClient } from '@prisma/client';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 import type { Capture } from '../domain/capture.js';
+import type { Goal } from '../domain/goal.js';
 import type { Note } from '../domain/note.js';
+import type { Resource } from '../domain/resource.js';
 import { PrismaCaptureRepository } from '../repositories/prisma-capture-repository.js';
+import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
+import { PrismaResourceRepository } from '../repositories/prisma-resource-repository.js';
 import { PrismaSettingsReader } from '../repositories/prisma-settings-reader.js';
 import { ArchiveCapture } from '../usecases/archive-capture.js';
 import { BuildTodayAgenda } from '../usecases/build-today-agenda.js';
+import { CreateGoal } from '../usecases/create-goal.js';
 import { CreateNote } from '../usecases/create-note.js';
+import { CreateResource } from '../usecases/create-resource.js';
 import { FindNoteOfTheDay } from '../usecases/find-note-of-the-day.js';
 import { ListPendingCaptures } from '../usecases/list-pending-captures.js';
+import { PromoteCaptureToGoal } from '../usecases/promote-capture-to-goal.js';
 import { PromoteCaptureToNote } from '../usecases/promote-capture-to-note.js';
+import { PromoteCaptureToResource } from '../usecases/promote-capture-to-resource.js';
 
 function captureToResponse(c: Capture): CaptureResponse {
   return {
@@ -70,20 +89,58 @@ const todayAgendaResponseSchema = z.object({
   capturesToReview: z.array(captureResponseSchema),
 });
 
+function resourceToResponse(r: Resource): ResourceResponse {
+  return {
+    id: r.id,
+    userId: r.userId,
+    title: r.title,
+    type: r.type,
+    url: r.url,
+    author: r.author,
+    description: r.description,
+    stage: r.stage,
+    status: r.status,
+    archivedAt: r.archivedAt?.toISOString() ?? null,
+    createdAt: r.createdAt.toISOString(),
+    labelIds: r.labelIds,
+  };
+}
+
+function goalToResponse(g: Goal): GoalResponse {
+  return {
+    id: g.id,
+    userId: g.userId,
+    title: g.title,
+    description: g.description,
+    type: g.type,
+    parentId: g.parentId,
+    targetValue: g.targetValue,
+    unit: g.unit,
+    period: g.period,
+    timesPerPeriod: g.timesPerPeriod,
+    weekdays: g.weekdays,
+    startAt: g.startAt?.toISOString() ?? null,
+    dueAt: g.dueAt?.toISOString() ?? null,
+    completedAt: g.completedAt?.toISOString() ?? null,
+    status: g.status,
+    archivedAt: g.archivedAt?.toISOString() ?? null,
+    createdAt: g.createdAt.toISOString(),
+    labelIds: g.labelIds,
+  };
+}
+
 const archiveBodySchema = z.object({
   reason: z.string().optional(),
 });
 
-const promoteBodySchema = z.object({
-  type: z.enum(['DEVOTIONAL', 'REFLECTION', 'STUDY_NOTE', 'NOTE']),
-  scope: z.enum(['DAY', 'WEEK', 'MONTH', 'YEAR']).optional(),
-  title: z.string().optional(),
-});
-
-const promoteResponseSchema = z.object({
-  note: noteResponseSchema,
-  capture: captureResponseSchema,
-});
+const promoteResponseSchema = z.union([
+  z.object({ note: noteResponseSchema, capture: captureResponseSchema }),
+  z.object({
+    resource: resourceResponseSchema,
+    capture: captureResponseSchema,
+  }),
+  z.object({ goal: goalResponseSchema, capture: captureResponseSchema }),
+]);
 
 export const agendaRoutes: FastifyPluginAsyncZod<{
   prisma: PrismaClient;
@@ -97,10 +154,20 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
     new FindNoteOfTheDay(noteRepo),
     new ListPendingCaptures(captureRepo),
   );
+  const resourceRepo = new PrismaResourceRepository(options.prisma);
+  const goalRepo = new PrismaGoalRepository(options.prisma);
   const archiveCapture = new ArchiveCapture(captureRepo);
   const promoteCaptureToNote = new PromoteCaptureToNote(
     captureRepo,
     new CreateNote(noteRepo),
+  );
+  const promoteCaptureToResource = new PromoteCaptureToResource(
+    captureRepo,
+    new CreateResource(resourceRepo),
+  );
+  const promoteCaptureToGoal = new PromoteCaptureToGoal(
+    captureRepo,
+    new CreateGoal(goalRepo),
   );
 
   app.get(
@@ -146,19 +213,63 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string() }),
-        body: promoteBodySchema,
+        body: promoteCaptureSchema,
         response: { 201: promoteResponseSchema },
       },
     },
     async (req, reply) => {
+      const captureId = req.params.id;
+      const body = req.body;
+
+      if (body.destination === 'resource') {
+        const { resource, capture } = await promoteCaptureToResource.execute({
+          captureId,
+          title: body.title,
+          type: body.type,
+          url: body.url,
+          author: body.author,
+          description: body.description,
+        });
+        return reply.status(201).send({
+          resource: resourceToResponse(resource),
+          capture: captureToResponse(capture),
+        });
+      }
+
+      if (body.destination === 'goal') {
+        const { goal, capture } = await promoteCaptureToGoal.execute({
+          captureId,
+          title: body.title,
+          type: body.type,
+          description: body.description,
+          targetValue: body.targetValue,
+          unit: body.unit,
+          period: body.period,
+          timesPerPeriod: body.timesPerPeriod,
+          weekdays: body.weekdays,
+          startAt: body.startAt,
+          dueAt: body.dueAt,
+          parentId: body.parentId,
+        });
+        return reply.status(201).send({
+          goal: goalToResponse(goal),
+          capture: captureToResponse(capture),
+        });
+      }
+
+      // destination === 'note' — timezone do dono da captura (não mais hardcoded).
+      const existing = await captureRepo.byId(captureId);
+      const timezone = existing
+        ? ((await settingsReader.getByUserId(existing.userId))?.timezone ??
+          'UTC')
+        : 'UTC';
       const { note, capture } = await promoteCaptureToNote.execute({
-        captureId: req.params.id,
-        type: req.body.type,
-        scope: req.body.scope,
-        title: req.body.title,
+        captureId,
+        type: body.type,
+        scope: body.scope,
+        title: body.title,
         reference: new Date(),
-        timezone:
-          (await settingsReader.getByUserId('owner'))?.timezone ?? 'UTC',
+        timezone,
       });
       return reply.status(201).send({
         note: noteToResponse(note),
