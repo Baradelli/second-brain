@@ -31,9 +31,10 @@ function weekdayNarrow(idx: number, lang: string): string {
 interface GoalFormProps {
   onSubmit: (body: CreateGoalBody) => void;
   submitting?: boolean;
+  defaultTitle?: string;
 }
 
-export function GoalForm({ onSubmit, submitting }: GoalFormProps) {
+export function GoalForm({ onSubmit, submitting, defaultTitle }: GoalFormProps) {
   const { t, i18n } = useTranslation();
   const [cadence, setCadence] = useState<'weekdays' | 'period'>('weekdays');
   const [weekdays, setWeekdays] = useState<number[]>([]);
@@ -45,7 +46,7 @@ export function GoalForm({ onSubmit, submitting }: GoalFormProps) {
     formState: { errors },
   } = useForm<GoalFormValues>({
     resolver: zodResolver(goalFormSchema),
-    defaultValues: { type: 'HABIT' },
+    defaultValues: { type: 'HABIT', title: defaultTitle ?? '' },
   });
 
   const type = watch('type');

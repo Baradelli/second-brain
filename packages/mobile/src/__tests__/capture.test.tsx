@@ -1,5 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { forwardRef } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -30,6 +31,15 @@ vi.mock('@cerebro/ui', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SectionHeader: ({ label }: { label: string }) => <h2>{label}</h2>,
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+  Input: forwardRef<
+    HTMLInputElement,
+    { label?: string } & React.InputHTMLAttributes<HTMLInputElement>
+  >(({ label, ...props }, ref) => (
+    <label>
+      {label}
+      <input aria-label={label} ref={ref} {...props} />
+    </label>
+  )),
   BottomSheet: ({
     open,
     children,
@@ -55,7 +65,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
   editNote: vi.fn(),
   listCaptures: vi.fn(),
   archiveCapture: vi.fn(),
-  promoteCaptureToNote: vi.fn(),
+  promoteCapture: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -96,6 +106,8 @@ function renderCapturePage() {
           path="/editor/:noteId"
           element={<div data-testid="editor-page">Editor</div>}
         />
+        <Route path="/library" element={<div data-testid="library-page" />} />
+        <Route path="/goals" element={<div data-testid="goals-page" />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -109,7 +121,7 @@ beforeEach(() => {
   vi.mocked(endpoints.archiveCapture).mockResolvedValue(
     STUB_CAPTURE({ status: 'ARCHIVED', archivedAt: new Date().toISOString() }),
   );
-  vi.mocked(endpoints.promoteCaptureToNote).mockResolvedValue({
+  vi.mocked(endpoints.promoteCapture).mockResolvedValue({
     note: STUB_NOTE(),
     capture: STUB_CAPTURE({ status: 'PROCESSED' }),
   });
@@ -229,16 +241,93 @@ describe('CapturePage — promover para nota', () => {
     await user.click(screen.getByRole('button', { name: '→ Nota' }));
 
     const sheet = screen.getByTestId('promote-sheet');
-    await user.click(within(sheet).getByText('Nota'));
+    await user.click(within(sheet).getByTestId('note-type-NOTE'));
 
-    expect(endpoints.promoteCaptureToNote).toHaveBeenCalledWith(
-      'cap-2',
-      'NOTE',
-    );
+    expect(endpoints.promoteCapture).toHaveBeenCalledWith('cap-2', {
+      destination: 'note',
+      type: 'NOTE',
+    });
 
     await act(async () => {});
 
     await waitFor(() => screen.getByTestId('editor-page'));
+  });
+
+  it('promove para Resource e navega para a biblioteca', async () => {
+    vi.mocked(endpoints.listCaptures).mockResolvedValue([
+      STUB_CAPTURE({ id: 'cap-3', text: 'Livro X' }),
+    ]);
+    vi.mocked(endpoints.promoteCapture).mockResolvedValue({
+      resource: { id: 'res-1' },
+      capture: STUB_CAPTURE({ status: 'PROCESSED' }),
+    } as never);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderCapturePage();
+    await waitFor(() => screen.getByText('Livro X'));
+
+    await user.click(screen.getByRole('button', { name: '→ Nota' }));
+    const sheet = screen.getByTestId('promote-sheet');
+    await user.click(within(sheet).getByTestId('destination-resource'));
+    await user.click(within(sheet).getByRole('button', { name: 'Salvar' }));
+
+    expect(endpoints.promoteCapture).toHaveBeenCalledWith(
+      'cap-3',
+      expect.objectContaining({ destination: 'resource', title: 'Livro X', type: 'book' }),
+    );
+    await act(async () => {});
+    await waitFor(() => screen.getByTestId('library-page'));
+  });
+
+  it('promove para Goal e navega para objetivos', async () => {
+    vi.mocked(endpoints.listCaptures).mockResolvedValue([
+      STUB_CAPTURE({ id: 'cap-4', text: 'Treinar' }),
+    ]);
+    vi.mocked(endpoints.promoteCapture).mockResolvedValue({
+      goal: { id: 'g-1' },
+      capture: STUB_CAPTURE({ status: 'PROCESSED' }),
+    } as never);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderCapturePage();
+    await waitFor(() => screen.getByText('Treinar'));
+
+    await user.click(screen.getByRole('button', { name: '→ Nota' }));
+    const sheet = screen.getByTestId('promote-sheet');
+    await user.click(within(sheet).getByTestId('destination-goal'));
+    await user.click(within(sheet).getByTestId('weekday-1'));
+    await user.click(within(sheet).getByRole('button', { name: 'Salvar' }));
+
+    expect(endpoints.promoteCapture).toHaveBeenCalledWith(
+      'cap-4',
+      expect.objectContaining({ destination: 'goal', type: 'HABIT', weekdays: [1] }),
+    );
+    await act(async () => {});
+    await waitFor(() => screen.getByTestId('goals-page'));
+  });
+
+  it('mostra erro e mantém a captura quando o promote falha', async () => {
+    vi.mocked(endpoints.listCaptures).mockResolvedValue([
+      STUB_CAPTURE({ id: 'cap-5', text: 'Falha' }),
+    ]);
+    vi.mocked(endpoints.promoteCapture).mockRejectedValue(new Error('400'));
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderCapturePage();
+    await waitFor(() => screen.getByText('Falha'));
+
+    await user.click(screen.getByRole('button', { name: '→ Nota' }));
+    const sheet = screen.getByTestId('promote-sheet');
+    await user.click(within(sheet).getByTestId('note-type-NOTE'));
+
+    await act(async () => {});
+    await waitFor(() =>
+      expect(
+        within(screen.getByTestId('promote-sheet')).getByText(
+          'Não foi possível transformar. Confira os campos.',
+        ),
+      ).toBeInTheDocument(),
+    );
   });
 });
 

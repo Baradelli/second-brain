@@ -54,10 +54,36 @@ export function getAgenda(): Promise<TodayAgenda> {
 
 // ── Captures ──────────────────────────────────────────────────────────────────
 
-const promoteCaptureResponseSchema = z.object({
-  note: noteResponseSchema,
-  capture: captureResponseSchema,
-});
+const promoteResultSchema = z.union([
+  z.object({ note: noteResponseSchema, capture: captureResponseSchema }),
+  z.object({ resource: resourceResponseSchema, capture: captureResponseSchema }),
+  z.object({ goal: goalResponseSchema, capture: captureResponseSchema }),
+]);
+
+export type PromoteCaptureBody =
+  | { destination: 'note'; type: NoteType; scope?: string; title?: string }
+  | {
+      destination: 'resource';
+      type: ResourceTypeInput;
+      title?: string;
+      url?: string | null;
+      author?: string | null;
+      description?: string | null;
+    }
+  | {
+      destination: 'goal';
+      type: GoalTypeInput;
+      title?: string;
+      description?: string | null;
+      targetValue?: number | null;
+      unit?: string | null;
+      period?: GoalPeriodInput | null;
+      timesPerPeriod?: number | null;
+      weekdays?: number[];
+      parentId?: string | null;
+    };
+
+export type PromoteCaptureResult = z.infer<typeof promoteResultSchema>;
 
 export function createCapture(text: string): Promise<CaptureResponse> {
   return post(
@@ -83,15 +109,22 @@ export function archiveCapture(
   return post(`/captures/${id}/archive`, { reason }, captureResponseSchema);
 }
 
+export function promoteCapture(
+  id: string,
+  body: PromoteCaptureBody,
+): Promise<PromoteCaptureResult> {
+  return post(`/captures/${id}/promote`, body, promoteResultSchema);
+}
+
+/** Atalho retrocompatível para o destino note (usado pela tela de captura). */
 export function promoteCaptureToNote(
   id: string,
   type: NoteType,
 ): Promise<{ note: NoteResponse; capture: CaptureResponse }> {
-  return post(
-    `/captures/${id}/promote`,
-    { type },
-    promoteCaptureResponseSchema,
-  );
+  return promoteCapture(id, { destination: 'note', type }) as Promise<{
+    note: NoteResponse;
+    capture: CaptureResponse;
+  }>;
 }
 
 // ── Notes ─────────────────────────────────────────────────────────────────────

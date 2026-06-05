@@ -11,11 +11,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { GoalForm } from '../components/GoalForm.js';
 import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
+import { ResourceForm } from '../components/ResourceForm.js';
 import {
   archiveCapture,
+  type CreateGoalBody,
+  type CreateResourceBody,
   listCaptures,
-  promoteCaptureToNote,
+  promoteCapture,
+  type PromoteCaptureBody,
 } from '../lib/api/endpoints.js';
 
 const PROMOTE_TYPES: Array<{
@@ -65,6 +70,7 @@ export function CapturePage() {
     null,
   );
   const [promoting, setPromoting] = useState(false);
+  const [promoteError, setPromoteError] = useState(false);
 
   const loadPending = useCallback(async () => {
     setLoadingPending(true);
@@ -85,14 +91,19 @@ export function CapturePage() {
     setPending((prev) => prev.filter((c) => c.id !== id));
   }
 
-  async function handlePromote(type: NoteType) {
+  async function handlePromote(body: PromoteCaptureBody) {
     if (!promoteTarget) return;
     setPromoting(true);
+    setPromoteError(false);
     try {
-      const { note } = await promoteCaptureToNote(promoteTarget.id, type);
+      const result = await promoteCapture(promoteTarget.id, body);
       setPending((prev) => prev.filter((c) => c.id !== promoteTarget.id));
       setPromoteTarget(null);
-      navigate(`/editor/${note.id}`);
+      if ('note' in result) navigate(`/editor/${result.note.id}`);
+      else if ('resource' in result) navigate('/library');
+      else navigate('/goals');
+    } catch {
+      setPromoteError(true);
     } finally {
       setPromoting(false);
     }
@@ -206,8 +217,10 @@ export function CapturePage() {
         onClose={() => setPromoteTarget(null)}
       >
         <PromoteSheetContent
-          onSelect={(t) => void handlePromote(t)}
+          captureText={promoteTarget?.text ?? ''}
+          onPromote={(body) => void handlePromote(body)}
           promoting={promoting}
+          error={promoteError}
         />
       </BottomSheet>
     </main>
@@ -289,49 +302,119 @@ function CaptureCard({
   );
 }
 
+type PromoteDestination = 'note' | 'resource' | 'goal';
+
 function PromoteSheetContent({
-  onSelect,
+  captureText,
+  onPromote,
   promoting,
+  error,
 }: {
-  onSelect: (type: NoteType) => void;
+  captureText: string;
+  onPromote: (body: PromoteCaptureBody) => void;
   promoting: boolean;
+  error: boolean;
 }) {
   const { t } = useTranslation();
+  const [destination, setDestination] = useState<PromoteDestination>('note');
+
+  const destinations: { key: PromoteDestination; labelKey: string }[] = [
+    { key: 'note', labelKey: 'promote.destination.note' },
+    { key: 'resource', labelKey: 'promote.destination.resource' },
+    { key: 'goal', labelKey: 'promote.destination.goal' },
+  ];
+
   return (
     <div>
       <p
-        className="mb-4 font-display text-lg font-semibold"
+        className="mb-3 font-display text-lg font-semibold"
         style={{ color: 'var(--cerebro-fg)' }}
       >
         {t('capture.promote.chooseType')}
       </p>
-      <div className="flex flex-col gap-2">
-        {PROMOTE_TYPES.map(({ type, labelKey, color }) => (
+
+      {/* Seletor de destino */}
+      <div className="mb-4 flex gap-2" data-testid="promote-destinations">
+        {destinations.map(({ key, labelKey }) => (
           <button
-            key={type}
+            key={key}
             type="button"
-            disabled={promoting}
-            onClick={() => onSelect(type)}
-            className="flex items-center gap-3 rounded-[var(--radius-card)] px-4 py-3.5 transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
+            onClick={() => setDestination(key)}
+            data-testid={`destination-${key}`}
+            className="flex-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
             style={{
-              backgroundColor: 'var(--cerebro-raised)',
+              backgroundColor:
+                destination === key
+                  ? 'var(--cerebro-accent-soft)'
+                  : 'transparent',
+              color:
+                destination === key
+                  ? 'var(--cerebro-accent)'
+                  : 'var(--cerebro-muted)',
               border: '1px solid var(--cerebro-border)',
             }}
           >
-            <span
-              className="h-7 w-1 rounded-full"
-              style={{ backgroundColor: color }}
-              aria-hidden
-            />
-            <span
-              className="text-sm font-semibold"
-              style={{ color: 'var(--cerebro-fg)' }}
-            >
-              {t(labelKey)}
-            </span>
+            {t(labelKey)}
           </button>
         ))}
       </div>
+
+      {error && (
+        <p className="mb-3 text-xs" style={{ color: 'var(--cerebro-error)' }}>
+          {t('promote.error')}
+        </p>
+      )}
+
+      {destination === 'note' && (
+        <div className="flex flex-col gap-2">
+          {PROMOTE_TYPES.map(({ type, labelKey, color }) => (
+            <button
+              key={type}
+              type="button"
+              disabled={promoting}
+              onClick={() => onPromote({ destination: 'note', type })}
+              data-testid={`note-type-${type}`}
+              className="flex items-center gap-3 rounded-[var(--radius-card)] px-4 py-3.5 transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
+              style={{
+                backgroundColor: 'var(--cerebro-raised)',
+                border: '1px solid var(--cerebro-border)',
+              }}
+            >
+              <span
+                className="h-7 w-1 rounded-full"
+                style={{ backgroundColor: color }}
+                aria-hidden
+              />
+              <span
+                className="text-sm font-semibold"
+                style={{ color: 'var(--cerebro-fg)' }}
+              >
+                {t(labelKey)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {destination === 'resource' && (
+        <ResourceForm
+          defaultTitle={captureText}
+          submitting={promoting}
+          onSubmit={(body: CreateResourceBody) =>
+            onPromote({ destination: 'resource', ...body })
+          }
+        />
+      )}
+
+      {destination === 'goal' && (
+        <GoalForm
+          defaultTitle={captureText}
+          submitting={promoting}
+          onSubmit={(body: CreateGoalBody) =>
+            onPromote({ destination: 'goal', ...body })
+          }
+        />
+      )}
     </div>
   );
 }

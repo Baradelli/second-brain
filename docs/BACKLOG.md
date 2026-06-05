@@ -58,7 +58,7 @@
 - [x] **39** — Tela Biblioteca: listar/criar `Resource`, filtros por stage/label (design system da 19b). → `tasks/39-tela-biblioteca.md`
 - [x] **40** — Tela de Goals + painel "X objetivos ativos". → `tasks/40-tela-goals.md`
 - [x] **41** — Tela "Fechar o dia" (**fiz** / **não fiz porque…** / **deixa pra lá**) — o tom anti-culpa mora aqui. → `tasks/41-tela-fechar-o-dia.md`
-- [ ] **42** — Promoção na tela de revisão de captura (note | resource | goal). → `tasks/42-tela-promover-captura.md`
+- [x] **42** — Promoção na tela de revisão de captura (note | resource | goal). → `tasks/42-tela-promover-captura.md`
 
 ## Definição de "MVP 2 pronto"
 

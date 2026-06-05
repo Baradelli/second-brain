@@ -28,9 +28,14 @@ type ResourceFormValues = z.infer<typeof resourceFormSchema>;
 interface ResourceFormProps {
   onSubmit: (body: CreateResourceBody) => void;
   submitting?: boolean;
+  defaultTitle?: string;
 }
 
-export function ResourceForm({ onSubmit, submitting }: ResourceFormProps) {
+export function ResourceForm({
+  onSubmit,
+  submitting,
+  defaultTitle,
+}: ResourceFormProps) {
   const { t } = useTranslation();
   const {
     register,
@@ -38,7 +43,7 @@ export function ResourceForm({ onSubmit, submitting }: ResourceFormProps) {
     formState: { errors },
   } = useForm<ResourceFormValues>({
     resolver: zodResolver(resourceFormSchema),
-    defaultValues: { type: 'book' },
+    defaultValues: { type: 'book', title: defaultTitle ?? '' },
   });
 
   const submit = handleSubmit((values) => {

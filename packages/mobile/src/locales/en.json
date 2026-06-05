@@ -129,5 +129,9 @@
   "dayClosing.reason.confirm": "Note it",
   "dayClosing.closed.title": "Day closed",
   "dayClosing.closed.body": "Rest — tomorrow starts fresh.",
+  "promote.destination.note": "Note",
+  "promote.destination.resource": "Resource",
+  "promote.destination.goal": "Goal",
+  "promote.error": "Couldn't promote. Check the fields.",
   "assistant.comingSoonBody": "A helper to review and connect your ideas arrives in a later chapter."
 }

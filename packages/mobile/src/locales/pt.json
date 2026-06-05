@@ -129,5 +129,9 @@
   "dayClosing.reason.confirm": "Anotar",
   "dayClosing.closed.title": "Dia fechado",
   "dayClosing.closed.body": "Descanse — amanhã recomeça em branco.",
+  "promote.destination.note": "Anotação",
+  "promote.destination.resource": "Recurso",
+  "promote.destination.goal": "Objetivo",
+  "promote.error": "Não foi possível transformar. Confira os campos.",
   "assistant.comingSoonBody": "Um ajudante para revisar e conectar suas ideias chega num próximo capítulo."
 }

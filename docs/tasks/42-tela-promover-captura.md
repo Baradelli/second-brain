@@ -74,9 +74,10 @@ Manter um wrapper `promoteCaptureToNote(id, type)` que chama `promoteCapture(id,
 
 ## Definição de pronto
 
-- [ ] Na revisão de captura, promover oferece note | resource | goal, com o form mínimo de cada,
+- [x] Na revisão de captura, promover oferece note | resource | goal, com o form mínimo de cada,
       chamando `POST /captures/:id/promote` discriminado; captura some da lista ao promover.
-- [ ] Formulários de Resource/Goal reusados (sem duplicar); erros 400 amigáveis.
-- [ ] `@cerebro/ui` + CSS vars + i18n; testes dos 3 destinos + erro verdes; suíte do mobile verde.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
-- [ ] **MVP 2 concluído** — conferir a "Definição de MVP 2 pronto" no `BACKLOG.md`.
+- [x] Formulários de Resource/Goal reusados (sem duplicar; `defaultTitle` = texto da captura);
+      erros 400 amigáveis (mensagem no sheet, captura mantida).
+- [x] `@cerebro/ui` + CSS vars + i18n; testes dos 3 destinos + erro verdes; suíte do mobile verde (71).
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- [x] **MVP 2 concluído** — todas as tarefas 25–42 marcadas no `BACKLOG.md`.
