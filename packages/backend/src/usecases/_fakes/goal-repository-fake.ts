@@ -1,8 +1,5 @@
 import type { Goal } from '../../domain/goal.js';
-import type {
-  GoalFilter,
-  GoalRepository,
-} from '../ports/goal-repository.js';
+import type { GoalFilter, GoalRepository } from '../ports/goal-repository.js';
 
 export class GoalRepositoryFake implements GoalRepository {
   private store = new Map<string, Goal>();

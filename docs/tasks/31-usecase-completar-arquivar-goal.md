@@ -33,8 +33,8 @@ já pronto (Tarefas 29/30).
 ```ts
 interface CompleteGoalInput {
   id: string;
-  userId: string;        // dono; senão GoalNotFoundError (não vaza)
-  completedAt?: Date;    // default: now
+  userId: string; // dono; senão GoalNotFoundError (não vaza)
+  completedAt?: Date; // default: now
 }
 type CompleteGoalOutput = Goal;
 ```
@@ -54,8 +54,8 @@ Regras (testar):
 ```ts
 interface ArchiveGoalInput {
   id: string;
-  userId: string;     // dono; senão GoalNotFoundError
-  archivedAt?: Date;  // default: now
+  userId: string; // dono; senão GoalNotFoundError
+  archivedAt?: Date; // default: now
 }
 type ArchiveGoalOutput = Goal;
 ```

@@ -1,7 +1,7 @@
 import {
-  type GoalResponse,
   createGoalSchema,
   editGoalSchema,
+  type GoalResponse,
   goalResponseSchema,
   listGoalsQuerySchema,
 } from '@cerebro/shared';

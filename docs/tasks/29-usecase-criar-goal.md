@@ -30,7 +30,12 @@ aplicação, isolada de persistência/transporte.
 export type GoalType = 'HABIT' | 'TARGET' | 'PROJECT' | 'UMBRELLA';
 export type GoalPeriod = 'day' | 'week' | 'month';
 
-export const GOAL_TYPES: readonly GoalType[] = ['HABIT', 'TARGET', 'PROJECT', 'UMBRELLA'];
+export const GOAL_TYPES: readonly GoalType[] = [
+  'HABIT',
+  'TARGET',
+  'PROJECT',
+  'UMBRELLA',
+];
 export const GOAL_PERIODS: readonly GoalPeriod[] = ['day', 'week', 'month'];
 
 export interface Goal {

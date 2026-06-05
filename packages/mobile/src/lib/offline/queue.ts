@@ -1,4 +1,4 @@
-import { type IDBPDatabase,openDB } from 'idb';
+import { type IDBPDatabase, openDB } from 'idb';
 
 import type { Command, CommandQueue, StoredCommand } from './types.js';
 

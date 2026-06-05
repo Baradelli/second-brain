@@ -1,8 +1,8 @@
 import {
-  type ResourceResponse,
   createResourceSchema,
   editResourceSchema,
   listResourcesQuerySchema,
+  type ResourceResponse,
   resourceResponseSchema,
 } from '@cerebro/shared';
 import type { PrismaClient } from '@prisma/client';

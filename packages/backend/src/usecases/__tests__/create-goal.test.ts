@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { InvalidGoalError } from '../../domain/errors.js';
 import type { Goal } from '../../domain/goal.js';
-import { CreateGoal } from '../create-goal.js';
 import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
+import { CreateGoal } from '../create-goal.js';
 
 const USER = 'user-1';
 

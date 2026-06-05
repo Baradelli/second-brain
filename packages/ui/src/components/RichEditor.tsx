@@ -2,7 +2,7 @@ import Color from '@tiptap/extension-color';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextStyle from '@tiptap/extension-text-style';
-import { EditorContent, useEditor, type JSONContent } from '@tiptap/react';
+import { EditorContent, type JSONContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import {
   Bold,
@@ -83,7 +83,8 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
     <div
       className="no-scrollbar flex shrink-0 items-center gap-0.5 overflow-x-auto px-3 py-1.5"
       style={{
-        backgroundColor: 'color-mix(in srgb, var(--cerebro-bg) 80%, transparent)',
+        backgroundColor:
+          'color-mix(in srgb, var(--cerebro-bg) 80%, transparent)',
         borderBottom: '1px solid var(--cerebro-border)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',

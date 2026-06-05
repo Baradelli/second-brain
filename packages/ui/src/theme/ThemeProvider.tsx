@@ -1,5 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { ThemeContext, type Theme } from './ThemeContext.js';
+import { type ReactNode, useEffect, useState } from 'react';
+
+import { type Theme, ThemeContext } from './ThemeContext.js';
 
 const STORAGE_KEY = 'cerebro-theme';
 
@@ -7,7 +8,8 @@ function getInitialTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'dark' || stored === 'light') return stored;
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+      return 'dark';
   } catch {
     // localStorage or matchMedia unavailable
   }

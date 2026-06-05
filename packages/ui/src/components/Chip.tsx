@@ -6,10 +6,17 @@ interface ChipProps {
   className?: string;
 }
 
-export function Chip({ children, variant = 'default', className = '' }: ChipProps) {
+export function Chip({
+  children,
+  variant = 'default',
+  className = '',
+}: ChipProps) {
   const styles =
     variant === 'accent'
-      ? { backgroundColor: 'var(--cerebro-accent-soft)', color: 'var(--cerebro-accent)' }
+      ? {
+          backgroundColor: 'var(--cerebro-accent-soft)',
+          color: 'var(--cerebro-accent)',
+        }
       : {
           backgroundColor: 'transparent',
           color: 'var(--cerebro-muted)',

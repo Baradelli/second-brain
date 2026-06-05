@@ -80,7 +80,9 @@ describe('POST /uploads', () => {
       app.inject({
         method: 'POST',
         url: '/uploads',
-        headers: { 'content-type': `multipart/form-data; boundary=${BOUNDARY}` },
+        headers: {
+          'content-type': `multipart/form-data; boundary=${BOUNDARY}`,
+        },
         payload: fileBody('foto.png', 'image/png', Buffer.from('x')),
       });
 

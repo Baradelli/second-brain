@@ -12,7 +12,7 @@ import {
 } from '@cerebro/shared';
 import { z } from 'zod';
 
-import { CURRENT_USER_ID,get, patch, post, postFile } from './client.js';
+import { CURRENT_USER_ID, get, patch, post, postFile } from './client.js';
 
 // ── Agenda ────────────────────────────────────────────────────────────────────
 
@@ -44,7 +44,11 @@ const promoteCaptureResponseSchema = z.object({
 });
 
 export function createCapture(text: string): Promise<CaptureResponse> {
-  return post('/captures', { text, userId: CURRENT_USER_ID }, captureResponseSchema);
+  return post(
+    '/captures',
+    { text, userId: CURRENT_USER_ID },
+    captureResponseSchema,
+  );
 }
 
 export function listCaptures(
@@ -67,7 +71,11 @@ export function promoteCaptureToNote(
   id: string,
   type: NoteType,
 ): Promise<{ note: NoteResponse; capture: CaptureResponse }> {
-  return post(`/captures/${id}/promote`, { type }, promoteCaptureResponseSchema);
+  return post(
+    `/captures/${id}/promote`,
+    { type },
+    promoteCaptureResponseSchema,
+  );
 }
 
 // ── Notes ─────────────────────────────────────────────────────────────────────
@@ -142,13 +150,21 @@ export function attachFileToNote(
   );
 }
 
-export function getNoteAttachments(noteId: string): Promise<AttachmentResponse[]> {
+export function getNoteAttachments(
+  noteId: string,
+): Promise<AttachmentResponse[]> {
   return get(`/notes/${noteId}/attachments`, z.array(attachmentResponseSchema));
 }
 
-export async function getTodayNote(type: NoteType): Promise<NoteResponse | null> {
+export async function getTodayNote(
+  type: NoteType,
+): Promise<NoteResponse | null> {
   const now = new Date();
-  const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const dayStart = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  ).toISOString();
   const dayEnd = new Date(
     now.getFullYear(),
     now.getMonth(),

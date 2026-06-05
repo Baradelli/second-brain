@@ -1,7 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { processQueue } from '../sync.js';
-import type { Command, CommandQueue, OfflineApi, StoredCommand } from '../types.js';
+import type {
+  Command,
+  CommandQueue,
+  OfflineApi,
+  StoredCommand,
+} from '../types.js';
 
 // ── Fila fake em memória (núcleo testado sem IndexedDB) ─────────────────────────
 
@@ -11,7 +16,8 @@ class FakeQueue implements CommandQueue {
   private seq = 1;
 
   constructor(initial: Command[] = []) {
-    for (const c of initial) this.items.push({ ...c, seq: this.seq++ } as StoredCommand);
+    for (const c of initial)
+      this.items.push({ ...c, seq: this.seq++ } as StoredCommand);
   }
 
   enqueue(cmd: Command): Promise<void> {
@@ -139,7 +145,11 @@ describe('processQueue', () => {
         id: 'cmd-1',
         type: 'createNote',
         createdAt: '2026-06-04T10:00:00Z',
-        payload: { clientId: 'temp-1', noteType: 'DEVOTIONAL', doc: { type: 'doc' } },
+        payload: {
+          clientId: 'temp-1',
+          noteType: 'DEVOTIONAL',
+          doc: { type: 'doc' },
+        },
       },
       {
         id: 'cmd-2',

@@ -1,4 +1,9 @@
-import { type AttachmentResponse, type NoteType, noteType, type SuggestedQuestionsGroupResponse } from '@cerebro/shared';
+import {
+  type AttachmentResponse,
+  type NoteType,
+  noteType,
+  type SuggestedQuestionsGroupResponse,
+} from '@cerebro/shared';
 import { BottomSheet, RichEditor } from '@cerebro/ui';
 import { ArrowLeft, Camera, HelpCircle, ImagePlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -139,7 +144,9 @@ export function EditorPage() {
       setAttachments([]);
       return;
     }
-    getNoteAttachments(noteId).then(setAttachments).catch(() => {});
+    getNoteAttachments(noteId)
+      .then(setAttachments)
+      .catch(() => {});
   }, [noteId]);
 
   const handleChange = useCallback(
@@ -171,7 +178,10 @@ export function EditorPage() {
           } else {
             clearDraft(key);
             setSaveStatus('saved');
-            savedTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+            savedTimerRef.current = setTimeout(
+              () => setSaveStatus('idle'),
+              2000,
+            );
           }
         } catch {
           setSaveStatus('error');
@@ -209,7 +219,8 @@ export function EditorPage() {
       <div
         className="sticky top-0 z-20 flex items-center justify-between px-3 py-2.5"
         style={{
-          backgroundColor: 'color-mix(in srgb, var(--cerebro-bg) 82%, transparent)',
+          backgroundColor:
+            'color-mix(in srgb, var(--cerebro-bg) 82%, transparent)',
           borderBottom: '1px solid var(--cerebro-border)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
@@ -251,7 +262,9 @@ export function EditorPage() {
             }}
           >
             <Camera size={15} strokeWidth={1.85} />
-            {attachments.length > 0 ? attachments.length : t('editor.attach.button')}
+            {attachments.length > 0
+              ? attachments.length
+              : t('editor.attach.button')}
           </button>
         </div>
 
@@ -367,7 +380,10 @@ function QuestionsPanel({
                   <li
                     key={q.id}
                     className="flex items-start gap-2.5 text-[0.95rem] leading-relaxed"
-                    style={{ fontFamily: 'Fraunces, serif', color: 'var(--cerebro-fg)' }}
+                    style={{
+                      fontFamily: 'Fraunces, serif',
+                      color: 'var(--cerebro-fg)',
+                    }}
                   >
                     <span
                       className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
@@ -506,10 +522,26 @@ function SaveIndicator({
   if (status === 'idle') return <div className="h-5 w-20" aria-hidden />;
 
   const configs = {
-    saving: { dotClass: 'animate-pulse', dotColor: 'var(--cerebro-accent)', textKey: 'editor.status.saving' },
-    saved: { dotClass: '', dotColor: 'var(--cerebro-success)', textKey: 'editor.status.saved' },
-    queued: { dotClass: '', dotColor: 'var(--cerebro-accent)', textKey: 'editor.status.queued' },
-    error: { dotClass: '', dotColor: 'var(--cerebro-error)', textKey: 'editor.status.error' },
+    saving: {
+      dotClass: 'animate-pulse',
+      dotColor: 'var(--cerebro-accent)',
+      textKey: 'editor.status.saving',
+    },
+    saved: {
+      dotClass: '',
+      dotColor: 'var(--cerebro-success)',
+      textKey: 'editor.status.saved',
+    },
+    queued: {
+      dotClass: '',
+      dotColor: 'var(--cerebro-accent)',
+      textKey: 'editor.status.queued',
+    },
+    error: {
+      dotClass: '',
+      dotColor: 'var(--cerebro-error)',
+      textKey: 'editor.status.error',
+    },
   } as const;
 
   const cfg = configs[status];

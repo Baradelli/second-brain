@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 
 import { InvalidGoalError } from '../domain/errors.js';
 import {
-  GOAL_TYPES,
   type Goal,
+  GOAL_TYPES,
   type GoalPeriod,
   type GoalType,
 } from '../domain/goal.js';

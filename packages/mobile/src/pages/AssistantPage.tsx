@@ -1,7 +1,6 @@
+import { EmptyState } from '@cerebro/ui';
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-import { EmptyState } from '@cerebro/ui';
 
 export function AssistantPage() {
   const { t } = useTranslation();

@@ -3,9 +3,9 @@ import {
   ResourceNotFoundError,
 } from '../domain/errors.js';
 import {
+  type Resource,
   RESOURCE_STAGES,
   RESOURCE_TYPES,
-  type Resource,
   type ResourceStage,
   type ResourceType,
 } from '../domain/resource.js';

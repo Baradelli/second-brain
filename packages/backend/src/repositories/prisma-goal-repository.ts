@@ -1,8 +1,4 @@
-import type {
-  Goal as PrismaGoal,
-  Label,
-  PrismaClient,
-} from '@prisma/client';
+import type { Goal as PrismaGoal, Label, PrismaClient } from '@prisma/client';
 
 import type { Goal } from '../domain/goal.js';
 import type {

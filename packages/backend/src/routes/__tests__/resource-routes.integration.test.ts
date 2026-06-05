@@ -10,7 +10,11 @@ async function clearResources() {
   await prisma.resource.deleteMany({ where: { userId: USER_ID } });
 }
 
-const baseBody = { userId: USER_ID, title: 'Domain-Driven Design', type: 'book' };
+const baseBody = {
+  userId: USER_ID,
+  title: 'Domain-Driven Design',
+  type: 'book',
+};
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 

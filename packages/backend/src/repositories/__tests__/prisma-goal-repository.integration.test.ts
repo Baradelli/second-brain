@@ -68,9 +68,7 @@ describe('PrismaGoalRepository', () => {
   });
 
   it('saves a TARGET child pointing to an UMBRELLA parent', async () => {
-    await repo.save(
-      makeGoal({ id: 'umb', type: 'UMBRELLA', weekdays: [] }),
-    );
+    await repo.save(makeGoal({ id: 'umb', type: 'UMBRELLA', weekdays: [] }));
     await repo.save(
       makeGoal({
         id: 'child',
@@ -93,7 +91,13 @@ describe('PrismaGoalRepository', () => {
     await repo.save(makeGoal({ id: 'active', status: 'ACTIVE' }));
     await repo.save(makeGoal({ id: 'archived', status: 'ARCHIVED' }));
     await repo.save(
-      makeGoal({ id: 'child', type: 'TARGET', weekdays: [], targetValue: 1, parentId: 'umb' }),
+      makeGoal({
+        id: 'child',
+        type: 'TARGET',
+        weekdays: [],
+        targetValue: 1,
+        parentId: 'umb',
+      }),
     );
 
     const active = await repo.find({

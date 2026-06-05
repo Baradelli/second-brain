@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Goal } from '../../domain/goal.js';
-import { ListActiveGoals } from '../list-active-goals.js';
 import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
+import { ListActiveGoals } from '../list-active-goals.js';
 
 const USER = 'user-1';
 
@@ -56,7 +56,9 @@ describe('ListActiveGoals', () => {
   });
 
   it('filters by parentId', async () => {
-    await repo.save(makeGoal({ id: 'umb', type: 'UMBRELLA', targetValue: null }));
+    await repo.save(
+      makeGoal({ id: 'umb', type: 'UMBRELLA', targetValue: null }),
+    );
     await repo.save(makeGoal({ id: 'child', parentId: 'umb' }));
     await repo.save(makeGoal({ id: 'root', parentId: null }));
 

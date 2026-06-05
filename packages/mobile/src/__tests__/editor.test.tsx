@@ -186,10 +186,18 @@ describe('EditorPage — carregamento', () => {
   it('rascunho local tem precedência sobre o doc do servidor', async () => {
     const DRAFT_DOC = {
       type: 'doc',
-      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Rascunho offline' }] }],
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Rascunho offline' }],
+        },
+      ],
     };
     // Rascunho salvo (ex.: escrita offline anterior) para a nota note-1.
-    localStorage.setItem('cerebro.draft.note.note-1', JSON.stringify(DRAFT_DOC));
+    localStorage.setItem(
+      'cerebro.draft.note.note-1',
+      JSON.stringify(DRAFT_DOC),
+    );
 
     renderEditor('/editor/note-1');
 
@@ -220,7 +228,9 @@ describe('EditorPage — auto-save (doc ↔ API)', () => {
     await waitFor(() => screen.getByTestId('rich-editor'));
     await user.click(screen.getByTestId('trigger-change'));
 
-    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
 
     expect(endpoints.createNote).toHaveBeenCalledOnce();
     expect(endpoints.createNote).toHaveBeenCalledWith(
@@ -236,7 +246,9 @@ describe('EditorPage — auto-save (doc ↔ API)', () => {
     await waitFor(() => screen.getByTestId('rich-editor'));
     await user.click(screen.getByTestId('trigger-change'));
 
-    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
 
     expect(endpoints.editNote).toHaveBeenCalledOnce();
     expect(endpoints.editNote).toHaveBeenCalledWith('note-1', {
@@ -254,7 +266,9 @@ describe('EditorPage — auto-save (doc ↔ API)', () => {
 
     expect(screen.getByText('Salvando…')).toBeInTheDocument();
 
-    await act(async () => { await vi.advanceTimersByTimeAsync(1500); });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
 
     await waitFor(() => screen.getByText('Salvo'));
   });
@@ -271,8 +285,20 @@ describe('EditorPage — painel de perguntas sugeridas', () => {
       {
         label: { id: 'label-1', name: 'Espiritualidade' },
         questions: [
-          { id: 'q-1', labelId: 'label-1', text: 'O que aprendeu hoje?', order: 0, active: true },
-          { id: 'q-2', labelId: 'label-1', text: 'O que ficou como gratidão?', order: 1, active: true },
+          {
+            id: 'q-1',
+            labelId: 'label-1',
+            text: 'O que aprendeu hoje?',
+            order: 0,
+            active: true,
+          },
+          {
+            id: 'q-2',
+            labelId: 'label-1',
+            text: 'O que ficou como gratidão?',
+            order: 1,
+            active: true,
+          },
         ],
       },
     ]);
@@ -296,9 +322,7 @@ describe('EditorPage — painel de perguntas sugeridas', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /perguntas/i }));
 
-    await waitFor(() =>
-      screen.getByText(/nenhuma pergunta para os labels/i),
-    );
+    await waitFor(() => screen.getByText(/nenhuma pergunta para os labels/i));
   });
 });
 
@@ -361,7 +385,9 @@ describe('EditorPage — painel de anexos', () => {
 
     // 3) o novo anexo aparece na lista
     await waitFor(() =>
-      expect(screen.getByRole('img', { name: /nova\.png/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole('img', { name: /nova\.png/i }),
+      ).toBeInTheDocument(),
     );
   });
 });

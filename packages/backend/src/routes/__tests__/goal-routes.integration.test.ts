@@ -91,7 +91,12 @@ describe('PATCH /goals/:id', () => {
     const created = await app.inject({
       method: 'POST',
       url: '/goals',
-      payload: { userId: USER_ID, title: 'Antigo', type: 'HABIT', weekdays: [1] },
+      payload: {
+        userId: USER_ID,
+        title: 'Antigo',
+        type: 'HABIT',
+        weekdays: [1],
+      },
     });
     const id = created.json().id;
 

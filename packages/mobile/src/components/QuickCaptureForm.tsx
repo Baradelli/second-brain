@@ -10,7 +10,10 @@ interface QuickCaptureFormProps {
   rows?: number;
 }
 
-export function QuickCaptureForm({ onCaptured, rows = 3 }: QuickCaptureFormProps) {
+export function QuickCaptureForm({
+  onCaptured,
+  rows = 3,
+}: QuickCaptureFormProps) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -60,7 +63,8 @@ export function QuickCaptureForm({ onCaptured, rows = 3 }: QuickCaptureFormProps
         className="w-full resize-none bg-transparent px-2 pt-1.5 text-[0.95rem] leading-relaxed outline-none placeholder:text-[var(--cerebro-faint)]"
         style={{ color: 'var(--cerebro-fg)' }}
         onKeyDown={(e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') void handleSubmit();
+          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter')
+            void handleSubmit();
         }}
       />
       <div
@@ -69,7 +73,10 @@ export function QuickCaptureForm({ onCaptured, rows = 3 }: QuickCaptureFormProps
       >
         <span
           className="flex items-center gap-1.5 px-1 text-xs font-medium transition-opacity duration-300"
-          style={{ color: 'var(--cerebro-success)', opacity: justCaptured ? 1 : 0 }}
+          style={{
+            color: 'var(--cerebro-success)',
+            opacity: justCaptured ? 1 : 0,
+          }}
           aria-live="polite"
         >
           <Check size={14} strokeWidth={2.5} />

@@ -25,10 +25,9 @@ describe('OfflineQueue (IndexedDB)', () => {
     await queue.enqueue(capture('dois', '2026-06-04T10:01:00Z'));
 
     const all = await queue.all();
-    expect(all.map((c) => c.type === 'createCapture' && c.payload.text)).toEqual([
-      'um',
-      'dois',
-    ]);
+    expect(
+      all.map((c) => c.type === 'createCapture' && c.payload.text),
+    ).toEqual(['um', 'dois']);
     expect(all[0]!.seq).toBeLessThan(all[1]!.seq);
     expect(await queue.size()).toBe(2);
   });
@@ -59,7 +58,9 @@ describe('OfflineQueue (IndexedDB)', () => {
 
     const left = await queue.all();
     expect(left).toHaveLength(1);
-    expect(left[0]!.type === 'createCapture' && left[0]!.payload.text).toBe('dois');
+    expect(left[0]!.type === 'createCapture' && left[0]!.payload.text).toBe(
+      'dois',
+    );
   });
 
   it('mapeia e resolve id temporário → real (e passthrough quando não há mapa)', async () => {

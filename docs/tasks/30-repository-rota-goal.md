@@ -47,7 +47,11 @@ update(id: string, patch: Partial<Goal>): Promise<Goal>;
 `src/usecases/list-active-goals.ts`:
 
 ```ts
-interface ListActiveGoalsInput { userId: string; type?: GoalType; parentId?: string; }
+interface ListActiveGoalsInput {
+  userId: string;
+  type?: GoalType;
+  parentId?: string;
+}
 // retorna goals status='ACTIVE' do usuário; filtros type/parentId opcionais. Só tradução→find.
 ```
 

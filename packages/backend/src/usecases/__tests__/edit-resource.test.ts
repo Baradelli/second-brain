@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ResourceNotFoundError } from '../../domain/errors.js';
 import type { Resource } from '../../domain/resource.js';
-import { EditResource } from '../edit-resource.js';
 import { ResourceRepositoryFake } from '../_fakes/resource-repository-fake.js';
+import { EditResource } from '../edit-resource.js';
 
 function makeResource(overrides?: Partial<Resource>): Resource {
   return {
@@ -76,7 +76,11 @@ describe('EditResource', () => {
     });
     expect(replaced.labelIds).toEqual(['l3']);
 
-    const kept = await useCase.execute({ id: 'res-1', userId: 'user-1', title: 'y' });
+    const kept = await useCase.execute({
+      id: 'res-1',
+      userId: 'user-1',
+      title: 'y',
+    });
     expect(kept.labelIds).toEqual(['l3']);
   });
 
@@ -99,9 +103,7 @@ describe('EditResource', () => {
   });
 
   it('never changes status/archivedAt via edit', async () => {
-    await repo.save(
-      makeResource({ status: 'ACTIVE', archivedAt: null }),
-    );
+    await repo.save(makeResource({ status: 'ACTIVE', archivedAt: null }));
 
     const result = await useCase.execute({
       id: 'res-1',

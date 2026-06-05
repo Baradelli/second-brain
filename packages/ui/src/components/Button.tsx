@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { type ButtonHTMLAttributes, forwardRef } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -32,7 +32,10 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', className = '', style, ...props }, ref) => (
+  (
+    { variant = 'primary', size = 'md', className = '', style, ...props },
+    ref,
+  ) => (
     <button
       ref={ref}
       className={`inline-flex items-center justify-center gap-2 tracking-tight transition-all duration-150 disabled:pointer-events-none disabled:opacity-45 hover:brightness-[1.04] active:scale-[0.97] ${sizeClasses[size]} ${className}`}

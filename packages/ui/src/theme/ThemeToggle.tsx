@@ -14,7 +14,11 @@ export function ThemeToggle() {
       className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150 hover:bg-[var(--cerebro-accent-soft)] active:scale-90"
       style={{ color: 'var(--cerebro-muted)' }}
     >
-      {isDark ? <Sun size={18} strokeWidth={1.75} /> : <Moon size={18} strokeWidth={1.75} />}
+      {isDark ? (
+        <Sun size={18} strokeWidth={1.75} />
+      ) : (
+        <Moon size={18} strokeWidth={1.75} />
+      )}
     </button>
   );
 }

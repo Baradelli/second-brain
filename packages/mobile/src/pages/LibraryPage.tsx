@@ -1,7 +1,6 @@
+import { EmptyState } from '@cerebro/ui';
 import { BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-import { EmptyState } from '@cerebro/ui';
 
 export function LibraryPage() {
   const { t } = useTranslation();

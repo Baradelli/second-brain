@@ -65,7 +65,7 @@ export function postFile<S extends z.ZodTypeAny>(
 ): Promise<z.infer<S>> {
   const form = new FormData();
   form.append('file', file);
-  return request<z.infer<S>>(path, { method: 'POST', body: form }).then((data) =>
-    schema.parse(data),
+  return request<z.infer<S>>(path, { method: 'POST', body: form }).then(
+    (data) => schema.parse(data),
   );
 }

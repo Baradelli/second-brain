@@ -26,7 +26,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           style={{
             backgroundColor: 'var(--cerebro-raised)',
             color: 'var(--cerebro-fg)',
-            border: error ? '1px solid var(--cerebro-error)' : '1px solid var(--cerebro-border)',
+            border: error
+              ? '1px solid var(--cerebro-error)'
+              : '1px solid var(--cerebro-border)',
             // @ts-expect-error custom property
             '--tw-ring-color': 'var(--cerebro-accent-soft)',
           }}

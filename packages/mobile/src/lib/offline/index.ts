@@ -13,7 +13,10 @@ function isOffline(): boolean {
 }
 
 function newId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+  if (
+    typeof crypto !== 'undefined' &&
+    typeof crypto.randomUUID === 'function'
+  ) {
     return crypto.randomUUID();
   }
   return `cid-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
@@ -26,7 +29,9 @@ function nowIso(): string {
 // ── Captura ─────────────────────────────────────────────────────────────────────
 
 /** Tenta enviar a captura; se offline ou falhar, enfileira (não perde nada). */
-export async function submitCapture(text: string): Promise<{ queued: boolean }> {
+export async function submitCapture(
+  text: string,
+): Promise<{ queued: boolean }> {
   if (!isOffline()) {
     try {
       await api.createCapture(text);

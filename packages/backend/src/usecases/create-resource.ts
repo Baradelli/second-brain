@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 
 import { InvalidResourceError } from '../domain/errors.js';
 import {
-  RESOURCE_TYPES,
   type Resource,
+  RESOURCE_TYPES,
   type ResourceType,
 } from '../domain/resource.js';
 import type { ResourceRepository } from './ports/resource-repository.js';

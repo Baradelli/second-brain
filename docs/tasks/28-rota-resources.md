@@ -36,7 +36,12 @@ Novo arquivo `packages/shared/src/resource.ts`, exportado em `packages/shared/sr
 import { z } from 'zod';
 
 export const resourceType = z.enum([
-  'book', 'course', 'video', 'article', 'podcast', 'other',
+  'book',
+  'course',
+  'video',
+  'article',
+  'podcast',
+  'other',
 ]);
 export type ResourceTypeInput = z.infer<typeof resourceType>;
 
@@ -103,7 +108,7 @@ export type ResourceResponse = z.infer<typeof resourceResponseSchema>;
 ```ts
 export interface ListResourcesInput {
   userId: string;
-  stage?: ResourceStage;     // tipo do domínio
+  stage?: ResourceStage; // tipo do domínio
   labelId?: string;
   status?: 'ACTIVE' | 'ARCHIVED'; // default 'ACTIVE'
 }

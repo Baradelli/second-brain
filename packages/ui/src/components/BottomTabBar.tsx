@@ -17,7 +17,8 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
     <nav
       className="fixed inset-x-0 bottom-0 z-50 flex h-[4.75rem] items-stretch justify-around px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
       style={{
-        backgroundColor: 'color-mix(in srgb, var(--cerebro-bg) 82%, transparent)',
+        backgroundColor:
+          'color-mix(in srgb, var(--cerebro-bg) 82%, transparent)',
         borderTop: '1px solid var(--cerebro-border)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
@@ -57,8 +58,12 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
                 <span
                   className="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
                   style={{
-                    color: isActive ? 'var(--cerebro-accent)' : 'var(--cerebro-muted)',
-                    backgroundColor: isActive ? 'var(--cerebro-accent-soft)' : 'transparent',
+                    color: isActive
+                      ? 'var(--cerebro-accent)'
+                      : 'var(--cerebro-muted)',
+                    backgroundColor: isActive
+                      ? 'var(--cerebro-accent-soft)'
+                      : 'transparent',
                   }}
                 >
                   {tab.icon}
@@ -66,7 +71,9 @@ export function BottomTabBar({ tabs }: BottomTabBarProps) {
                 <span
                   className="text-[0.625rem] font-medium tracking-tight transition-colors duration-200"
                   style={{
-                    color: isActive ? 'var(--cerebro-accent)' : 'var(--cerebro-muted)',
+                    color: isActive
+                      ? 'var(--cerebro-accent)'
+                      : 'var(--cerebro-muted)',
                   }}
                 >
                   {tab.label}

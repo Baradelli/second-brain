@@ -9,8 +9,8 @@ import type { PrismaClient } from '@prisma/client';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
-import type { Note } from '../domain/note.js';
 import { NoteNotFoundError } from '../domain/errors.js';
+import type { Note } from '../domain/note.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
 import { CreateNote } from '../usecases/create-note.js';
 import { EditNote } from '../usecases/edit-note.js';

@@ -52,10 +52,18 @@ export function AgendaPage() {
     setLoading(true);
     setError(false);
     getAgenda()
-      .then((data) => { if (!cancelled) setAgenda(data); })
-      .catch(() => { if (!cancelled) setError(true); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .then((data) => {
+        if (!cancelled) setAgenda(data);
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -78,7 +86,10 @@ export function AgendaPage() {
         </h1>
         <p
           className="mt-2.5 text-[0.95rem] italic leading-relaxed"
-          style={{ fontFamily: 'Fraunces, serif', color: 'var(--cerebro-muted)' }}
+          style={{
+            fontFamily: 'Fraunces, serif',
+            color: 'var(--cerebro-muted)',
+          }}
         >
           {t('agenda.greeting.subtitle')}
         </p>
@@ -102,7 +113,10 @@ export function AgendaPage() {
         <>
           {/* ── Journal section ────────────────────────────────────────── */}
           <section className="px-5 mb-7">
-            <SectionHeader label={t('agenda.section.journal')} className="mb-3" />
+            <SectionHeader
+              label={t('agenda.section.journal')}
+              className="mb-3"
+            />
             <div className="grid grid-cols-2 gap-3">
               <JournalCard
                 type="DEVOTIONAL"
@@ -142,7 +156,10 @@ export function AgendaPage() {
 
           {/* ── Quick capture ───────────────────────────────────────────── */}
           <section className="px-5">
-            <SectionHeader label={t('capture.section.input')} className="mb-3" />
+            <SectionHeader
+              label={t('capture.section.input')}
+              className="mb-3"
+            />
             <QuickCaptureForm />
           </section>
         </>
@@ -229,7 +246,8 @@ function JournalCard({
 function CapturePreviewCard({ text }: { text: string }) {
   const navigate = useNavigate();
   const firstLine = text.split('\n')[0] ?? text;
-  const preview = firstLine.length > 80 ? `${firstLine.slice(0, 80)}…` : firstLine;
+  const preview =
+    firstLine.length > 80 ? `${firstLine.slice(0, 80)}…` : firstLine;
   return (
     <button
       type="button"

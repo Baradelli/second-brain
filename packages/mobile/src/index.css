@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "@cerebro/ui/theme.css";
+@import 'tailwindcss';
+@import '@cerebro/ui/theme.css';
 
 /* Tailwind precisa escanear os componentes compartilhados de @cerebro/ui,
    senão classes usadas só lá (ex.: a tab bar fixa) não entram no CSS. */
@@ -17,8 +17,9 @@
   --color-subtle: var(--cerebro-border);
   --color-accent: var(--cerebro-accent);
 
-  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-serif: Fraunces, ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans:
+    'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: Fraunces, ui-serif, Georgia, 'Times New Roman', serif;
 
   --radius-card: 1.125rem;
   --radius-card-lg: 1.5rem;
@@ -32,15 +33,20 @@ html {
 body {
   background-color: var(--cerebro-bg);
   color: var(--cerebro-fg);
-  font-family: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family:
+    'Hanken Grotesk',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-feature-settings: "ss01", "cv01";
+  font-feature-settings: 'ss01', 'cv01';
 }
 
 /* Sutil grão de papel — quase imperceptível, dá vida ao fundo chapado */
 body::before {
-  content: "";
+  content: '';
   position: fixed;
   inset: 0;
   z-index: 0;

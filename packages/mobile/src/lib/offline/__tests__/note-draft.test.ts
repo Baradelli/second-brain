@@ -9,7 +9,9 @@ afterEach(() => {
 describe('note-draft', () => {
   it('monta a chave por id ou por tipo (nota nova)', () => {
     expect(draftKey('note-1', 'NOTE')).toBe('cerebro.draft.note.note-1');
-    expect(draftKey(null, 'DEVOTIONAL')).toBe('cerebro.draft.note.new:DEVOTIONAL');
+    expect(draftKey(null, 'DEVOTIONAL')).toBe(
+      'cerebro.draft.note.new:DEVOTIONAL',
+    );
   });
 
   it('salva e restaura o doc', () => {

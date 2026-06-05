@@ -132,9 +132,7 @@ describe('CapturePage — captura rápida', () => {
     await user.click(screen.getByRole('button', { name: 'Capturar' }));
 
     expect(endpoints.createCapture).toHaveBeenCalledWith('Nova ideia');
-    await waitFor(() =>
-      expect(screen.getByRole('textbox')).toHaveValue(''),
-    );
+    await waitFor(() => expect(screen.getByRole('textbox')).toHaveValue(''));
   });
 
   it('não envia com texto vazio', async () => {
@@ -180,9 +178,7 @@ describe('CapturePage — fila de pendentes', () => {
   it('mostra estado vazio quando não há pendentes', async () => {
     renderCapturePage();
 
-    await waitFor(() =>
-      screen.getByText('Nenhuma captura para revisar. Boa!'),
-    );
+    await waitFor(() => screen.getByText('Nenhuma captura para revisar. Boa!'));
   });
 
   it('arquivar chama a API e remove a captura da lista', async () => {
@@ -198,9 +194,7 @@ describe('CapturePage — fila de pendentes', () => {
     await user.click(screen.getByRole('button', { name: 'Arquivar' }));
 
     expect(endpoints.archiveCapture).toHaveBeenCalledWith('cap-1');
-    await waitFor(() =>
-      expect(screen.queryByText('Para arquivar')).toBeNull(),
-    );
+    await waitFor(() => expect(screen.queryByText('Para arquivar')).toBeNull());
   });
 });
 
@@ -237,7 +231,10 @@ describe('CapturePage — promover para nota', () => {
     const sheet = screen.getByTestId('promote-sheet');
     await user.click(within(sheet).getByText('Nota'));
 
-    expect(endpoints.promoteCaptureToNote).toHaveBeenCalledWith('cap-2', 'NOTE');
+    expect(endpoints.promoteCaptureToNote).toHaveBeenCalledWith(
+      'cap-2',
+      'NOTE',
+    );
 
     await act(async () => {});
 
@@ -251,7 +248,13 @@ describe('CapturePage — arquivados', () => {
   it('carrega e exibe arquivados ao expandir a seção', async () => {
     vi.mocked(endpoints.listCaptures).mockImplementation(async (status) => {
       if (status === 'ARCHIVED')
-        return [STUB_CAPTURE({ id: 'arch-1', text: 'Arquivada há tempos', status: 'ARCHIVED' })];
+        return [
+          STUB_CAPTURE({
+            id: 'arch-1',
+            text: 'Arquivada há tempos',
+            status: 'ARCHIVED',
+          }),
+        ];
       return [];
     });
 

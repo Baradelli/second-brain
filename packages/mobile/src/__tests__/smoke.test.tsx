@@ -19,8 +19,18 @@ vi.mock('@cerebro/ui', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SectionHeader: ({ label }: { label: string }) => <h2>{label}</h2>,
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
-  Button: ({ children, onClick, disabled }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean }) => (
-    <button onClick={onClick} disabled={disabled}>{children}</button>
+  Button: ({
+    children,
+    onClick,
+    disabled,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    disabled?: boolean;
+  }) => (
+    <button onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
   ),
 }));
 

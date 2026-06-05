@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { InvalidResourceError } from '../../domain/errors.js';
-import { CreateResource } from '../create-resource.js';
 import { ResourceRepositoryFake } from '../_fakes/resource-repository-fake.js';
+import { CreateResource } from '../create-resource.js';
 
 describe('CreateResource', () => {
   let repo: ResourceRepositoryFake;

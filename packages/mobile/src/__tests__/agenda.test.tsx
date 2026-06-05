@@ -57,18 +57,12 @@ function renderAgendaPage() {
     <MemoryRouter initialEntries={['/']}>
       <Routes>
         <Route path="/" element={<AgendaPage />} />
-        <Route
-          path="/editor"
-          element={<div data-testid="editor-page" />}
-        />
+        <Route path="/editor" element={<div data-testid="editor-page" />} />
         <Route
           path="/editor/:noteId"
           element={<div data-testid="editor-page" />}
         />
-        <Route
-          path="/capture"
-          element={<div data-testid="capture-page" />}
-        />
+        <Route path="/capture" element={<div data-testid="capture-page" />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -95,9 +89,7 @@ describe('AgendaPage — renderização', () => {
 
   it('mostra os dois cartões do diário', async () => {
     renderAgendaPage();
-    await waitFor(() =>
-      screen.getByTestId('journal-card-devotional'),
-    );
+    await waitFor(() => screen.getByTestId('journal-card-devotional'));
     expect(screen.getByTestId('journal-card-reflection')).toBeInTheDocument();
   });
 });
@@ -146,7 +138,10 @@ describe('AgendaPage — estado do diário', () => {
     await waitFor(() => screen.getByTestId('journal-card-devotional'));
 
     const card = screen.getByTestId('journal-card-devotional');
-    expect(card).toHaveAttribute('aria-label', expect.stringContaining('Escrever'));
+    expect(card).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('Escrever'),
+    );
   });
 
   it('mostra "Feito hoje" quando devocional concluído', async () => {
@@ -162,7 +157,10 @@ describe('AgendaPage — estado do diário', () => {
     await waitFor(() => screen.getByTestId('journal-card-devotional'));
 
     const card = screen.getByTestId('journal-card-devotional');
-    expect(card).toHaveAttribute('aria-label', expect.stringContaining('Feito hoje'));
+    expect(card).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining('Feito hoje'),
+    );
   });
 
   it('cartão de devocional não feito navega para /editor?type=DEVOTIONAL', async () => {
@@ -199,9 +197,7 @@ describe('AgendaPage — estado do diário', () => {
 describe('AgendaPage — capturas a revisar', () => {
   it('mostra estado vazio quando não há capturas', async () => {
     renderAgendaPage();
-    await waitFor(() =>
-      screen.getByText('Nenhuma captura para revisar'),
-    );
+    await waitFor(() => screen.getByText('Nenhuma captura para revisar'));
   });
 
   it('mostra preview das capturas quando há itens', async () => {

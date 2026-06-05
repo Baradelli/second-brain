@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Resource } from '../../domain/resource.js';
-import { ListResources } from '../list-resources.js';
 import { ResourceRepositoryFake } from '../_fakes/resource-repository-fake.js';
+import { ListResources } from '../list-resources.js';
 
 function makeResource(overrides?: Partial<Resource>): Resource {
   return {

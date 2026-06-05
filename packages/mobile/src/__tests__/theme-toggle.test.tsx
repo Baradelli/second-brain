@@ -1,8 +1,7 @@
+import { ThemeProvider, ThemeToggle } from '@cerebro/ui';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { ThemeProvider, ThemeToggle } from '@cerebro/ui';
 
 function mockMatchMedia(prefersDark: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -44,7 +43,9 @@ describe('ThemeToggle — alterna e persiste', () => {
       </ThemeProvider>,
     );
 
-    await user.click(screen.getByRole('button', { name: /switch to dark mode/i }));
+    await user.click(
+      screen.getByRole('button', { name: /switch to dark mode/i }),
+    );
 
     expect(document.documentElement.classList.contains('dark')).toBe(true);
     expect(localStorage.getItem('cerebro-theme')).toBe('dark');
@@ -58,8 +59,12 @@ describe('ThemeToggle — alterna e persiste', () => {
       </ThemeProvider>,
     );
 
-    await user.click(screen.getByRole('button', { name: /switch to dark mode/i }));
-    await user.click(screen.getByRole('button', { name: /switch to light mode/i }));
+    await user.click(
+      screen.getByRole('button', { name: /switch to dark mode/i }),
+    );
+    await user.click(
+      screen.getByRole('button', { name: /switch to light mode/i }),
+    );
 
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(localStorage.getItem('cerebro-theme')).toBe('light');

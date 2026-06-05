@@ -11,17 +11,33 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
 import {
   archiveCapture,
   listCaptures,
   promoteCaptureToNote,
 } from '../lib/api/endpoints.js';
-import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
 
-const PROMOTE_TYPES: Array<{ type: NoteType; labelKey: string; color: string }> = [
-  { type: 'DEVOTIONAL', labelKey: 'editor.type.devotional', color: 'var(--cerebro-devotional)' },
-  { type: 'REFLECTION', labelKey: 'editor.type.reflection', color: 'var(--cerebro-reflection)' },
-  { type: 'STUDY_NOTE', labelKey: 'editor.type.study', color: 'var(--cerebro-study)' },
+const PROMOTE_TYPES: Array<{
+  type: NoteType;
+  labelKey: string;
+  color: string;
+}> = [
+  {
+    type: 'DEVOTIONAL',
+    labelKey: 'editor.type.devotional',
+    color: 'var(--cerebro-devotional)',
+  },
+  {
+    type: 'REFLECTION',
+    labelKey: 'editor.type.reflection',
+    color: 'var(--cerebro-reflection)',
+  },
+  {
+    type: 'STUDY_NOTE',
+    labelKey: 'editor.type.study',
+    color: 'var(--cerebro-study)',
+  },
   { type: 'NOTE', labelKey: 'editor.type.note', color: 'var(--cerebro-note)' },
 ];
 
@@ -45,7 +61,9 @@ export function CapturePage() {
   const [showArchived, setShowArchived] = useState(false);
   const [loadingArchived, setLoadingArchived] = useState(false);
 
-  const [promoteTarget, setPromoteTarget] = useState<CaptureResponse | null>(null);
+  const [promoteTarget, setPromoteTarget] = useState<CaptureResponse | null>(
+    null,
+  );
   const [promoting, setPromoting] = useState(false);
 
   const loadPending = useCallback(async () => {
@@ -152,7 +170,9 @@ export function CapturePage() {
           className="mt-6 mb-2 inline-flex items-center gap-1 text-xs font-medium transition-opacity duration-150 hover:opacity-60"
           style={{ color: 'var(--cerebro-muted)' }}
         >
-          {showArchived ? t('capture.archived.hide') : t('capture.archived.show')}
+          {showArchived
+            ? t('capture.archived.hide')
+            : t('capture.archived.show')}
           <ChevronDown
             size={14}
             strokeWidth={2}
@@ -163,7 +183,10 @@ export function CapturePage() {
 
         {showArchived && (
           <div className="mt-2 space-y-3">
-            <SectionHeader label={t('capture.section.archived')} className="mb-2" />
+            <SectionHeader
+              label={t('capture.section.archived')}
+              className="mb-2"
+            />
             {loadingArchived ? (
               <LoadingDots />
             ) : archived.length === 0 ? (
@@ -182,7 +205,10 @@ export function CapturePage() {
         open={promoteTarget !== null}
         onClose={() => setPromoteTarget(null)}
       >
-        <PromoteSheetContent onSelect={(t) => void handlePromote(t)} promoting={promoting} />
+        <PromoteSheetContent
+          onSelect={(t) => void handlePromote(t)}
+          promoting={promoting}
+        />
       </BottomSheet>
     </main>
   );
@@ -222,7 +248,10 @@ function CaptureCard({
       >
         {capture.text}
       </p>
-      <p className="mt-2 text-[0.6875rem] font-medium uppercase tracking-wide" style={{ color: 'var(--cerebro-faint)' }}>
+      <p
+        className="mt-2 text-[0.6875rem] font-medium uppercase tracking-wide"
+        style={{ color: 'var(--cerebro-faint)' }}
+      >
         {relativeTime(capture.createdAt)}
       </p>
 
