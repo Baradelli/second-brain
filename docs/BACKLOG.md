@@ -36,7 +36,7 @@
 
 ### Bloco J — Goal
 
-- [ ] **29** — Domínio + UseCase `createGoal` (valida `type`; cadência exclusiva; `parent` só para filho de UMBRELLA). → `tasks/29-usecase-criar-goal.md`
+- [x] **29** — Domínio + UseCase `createGoal` (valida `type`; cadência exclusiva; `parent` só para filho de UMBRELLA). → `tasks/29-usecase-criar-goal.md`
 - [ ] **30** — Repository de Goal (interface + fake + Prisma + contrato) + Schema Zod + rotas `/goals` (criar, listar ativos, editar). → `tasks/30-repository-rota-goal.md`
 - [ ] **31** — UseCase `completeGoal` (manual, inclusive UMBRELLA) + `archiveGoal` (soft delete + bloqueio se tiver filhos ativos). → `tasks/31-usecase-completar-arquivar-goal.md`
 

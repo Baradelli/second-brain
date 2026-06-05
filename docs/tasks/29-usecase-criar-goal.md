@@ -174,11 +174,11 @@ Ciclo red → green → refactor.
 
 ## Definição de pronto
 
-- [ ] Domínio `Goal` + erros criados.
-- [ ] Interface `GoalRepository` (save/byId) + fake disponível.
-- [ ] `createGoal` implementado, dependendo só da interface.
-- [ ] Testes de UseCase escritos **antes**, todos verdes, cobrindo as 6 regras (com os casos
-      de cadência exclusiva e parent de UMBRELLA).
-- [ ] Defaults corretos (`ACTIVE`, `completedAt=null`, `weekdays`/`labelIds` `[]`).
-- [ ] Sem Prisma/Fastify/Zod/tela tocados.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
+- [x] Domínio `Goal` + erros criados.
+- [x] Interface `GoalRepository` (save/byId) + fake disponível.
+- [x] `createGoal` implementado, dependendo só da interface.
+- [x] Testes de UseCase escritos **antes**, todos verdes, cobrindo as 6 regras (com os casos
+      de cadência exclusiva e parent de UMBRELLA). (20 testes)
+- [x] Defaults corretos (`ACTIVE`, `completedAt=null`, `weekdays`/`labelIds` `[]`).
+- [x] Sem Prisma/Fastify/Zod/tela tocados.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.

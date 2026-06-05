@@ -90,3 +90,17 @@ export class InvalidResourceError extends Error {
     this.name = 'InvalidResourceError';
   }
 }
+
+export class GoalNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Goal not found: ${id}`);
+    this.name = 'GoalNotFoundError';
+  }
+}
+
+export class InvalidGoalError extends Error {
+  constructor(message: string) {
+    super(`Invalid goal: ${message}`);
+    this.name = 'InvalidGoalError';
+  }
+}
