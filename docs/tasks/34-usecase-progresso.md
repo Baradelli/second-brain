@@ -142,11 +142,12 @@ como o capture-routes já faz).
 
 ## Definição de pronto
 
-- [ ] `EventRepository.find` no fake (janela `occurredAt` inclusiva, `goalId`/`goalIds`/`type`).
-- [ ] `computeGoalProgress` puro, cobrindo HABIT (as 2 cadências), TARGET/PROJECT e UMBRELLA,
+- [x] `EventRepository.find` no fake (janela `occurredAt` inclusiva, `goalId`/`goalIds`/`type`).
+- [x] `computeGoalProgress` puro, cobrindo HABIT (as 2 cadências), TARGET/PROJECT e UMBRELLA,
       com `ratio` clampado e `completed` correto.
-- [ ] **TDD pesado**: testes escritos antes, cobertura alta (cadências, janela/timezone,
-      agregação de UMBRELLA, bordas), todos verdes.
-- [ ] Cálculo de calendário só via `dayRange`/Luxon (nada de `new Date` para período).
-- [ ] Sem Prisma/Fastify/Zod/tela tocados.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
+- [x] **TDD pesado**: testes escritos antes, cobertura alta (cadências, janela/timezone,
+      agregação de UMBRELLA, bordas), todos verdes. (11 testes)
+- [x] Cálculo de calendário só via `dayRange`/Luxon (`countDistinctDays` em `domain/`); nada de
+      `new Date` para período.
+- [x] Sem Prisma/Fastify/Zod/tela tocados.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.

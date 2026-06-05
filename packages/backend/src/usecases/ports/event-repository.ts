@@ -13,5 +13,5 @@ export interface EventRepository {
   save(event: Event): Promise<Event>;
   byId(id: string): Promise<Event | null>;
   delete(id: string): Promise<void>; // hard delete (exceção do undo)
-  // find(filter: EventFilter): Promise<Event[]>; // chega na Tarefa 34
+  find(filter: EventFilter): Promise<Event[]>;
 }
