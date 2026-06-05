@@ -138,6 +138,7 @@ export function createNote(body: {
   title?: string;
   scope?: string;
   date?: string;
+  resourceId?: string;
 }): Promise<NoteResponse> {
   return post(
     '/notes',

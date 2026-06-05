@@ -57,6 +57,7 @@ export interface PersistNoteCreateInput {
   title?: string;
   scope?: string;
   date?: string;
+  resourceId?: string;
 }
 
 /**
@@ -74,6 +75,7 @@ export async function persistNoteCreate(
         title: input.title,
         scope: input.scope,
         date: input.date,
+        resourceId: input.resourceId,
       });
       return { id: note.id, queued: false };
     } catch {

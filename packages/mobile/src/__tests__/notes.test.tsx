@@ -20,6 +20,7 @@ vi.mock('@cerebro/ui', () => ({
 
 vi.mock('../lib/api/endpoints.js', () => ({
   listNotes: vi.fn(),
+  listResources: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -58,6 +59,7 @@ function renderNotesPage() {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(endpoints.listNotes).mockResolvedValue([]);
+  vi.mocked(endpoints.listResources).mockResolvedValue([]);
 });
 
 afterEach(async () => {
@@ -105,6 +107,38 @@ describe('NotesPage', () => {
     await user.click(screen.getByTestId('new-note-button'));
     await user.click(screen.getByTestId('write-type-DEVOTIONAL'));
 
+    await waitFor(() => screen.getByTestId('editor-new'));
+  });
+
+  it('fichamento exige escolher um recurso antes de abrir o editor', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listResources).mockResolvedValue([
+      {
+        id: 'res-9',
+        userId: 'owner',
+        title: 'Clean Code',
+        type: 'book',
+        url: null,
+        author: null,
+        description: null,
+        stage: 'backlog',
+        status: 'ACTIVE',
+        archivedAt: null,
+        createdAt: '2026-06-01T00:00:00.000Z',
+        labelIds: [],
+      } as never,
+    ]);
+    renderNotesPage();
+    await waitFor(() => screen.getByTestId('new-note-button'));
+
+    await user.click(screen.getByTestId('new-note-button'));
+    await user.click(screen.getByTestId('write-type-STUDY_NOTE'));
+
+    // mostra o seletor de recurso (não navega direto)
+    await waitFor(() => screen.getByTestId('pick-resource-res-9'));
+    expect(screen.queryByTestId('editor-new')).toBeNull();
+
+    await user.click(screen.getByTestId('pick-resource-res-9'));
     await waitFor(() => screen.getByTestId('editor-new'));
   });
 });

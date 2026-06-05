@@ -1,11 +1,11 @@
-import type { NoteResponse, NoteType } from '@cerebro/shared';
+import type { NoteResponse, NoteType, ResourceResponse } from '@cerebro/shared';
 import { BottomSheet, Card, EmptyState } from '@cerebro/ui';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { listNotes } from '../lib/api/endpoints.js';
+import { listNotes, listResources } from '../lib/api/endpoints.js';
 
 const NOTE_TYPES: { type: NoteType; labelKey: string; color: string }[] = [
   {
@@ -56,6 +56,31 @@ export function NotesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [addStep, setAddStep] = useState<'type' | 'resource'>('type');
+  const [resources, setResources] = useState<ResourceResponse[]>([]);
+
+  function openAdd() {
+    setAddStep('type');
+    setAddOpen(true);
+  }
+
+  function chooseType(type: NoteType) {
+    if (type === 'STUDY_NOTE') {
+      // Fichamento é sempre sobre um recurso → escolher o recurso primeiro.
+      listResources({ status: 'ACTIVE' })
+        .then(setResources)
+        .catch(() => setResources([]));
+      setAddStep('resource');
+      return;
+    }
+    setAddOpen(false);
+    navigate(`/editor?type=${type}`);
+  }
+
+  function chooseResource(resourceId: string) {
+    setAddOpen(false);
+    navigate(`/editor?type=STUDY_NOTE&resourceId=${resourceId}`);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -87,7 +112,7 @@ export function NotesPage() {
         </h1>
         <button
           type="button"
-          onClick={() => setAddOpen(true)}
+          onClick={openAdd}
           data-testid="new-note-button"
           className="inline-flex items-center gap-1.5 rounded-full px-4 text-xs font-semibold"
           style={{
@@ -193,44 +218,101 @@ export function NotesPage() {
         </div>
       )}
 
-      {/* Adicionar nota → escolher tipo → editor */}
+      {/* Adicionar nota → escolher tipo (e recurso, se fichamento) → editor */}
       <BottomSheet open={addOpen} onClose={() => setAddOpen(false)}>
-        <p
-          className="mb-4 font-display text-lg font-semibold"
-          style={{ color: 'var(--cerebro-fg)' }}
-        >
-          {t('editor.chooseType')}
-        </p>
-        <div className="flex flex-col gap-2">
-          {NOTE_TYPES.map(({ type, labelKey, color }) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => {
-                setAddOpen(false);
-                navigate(`/editor?type=${type}`);
-              }}
-              data-testid={`write-type-${type}`}
-              className="flex items-center gap-3 rounded-[var(--radius-card)] px-4 py-3.5 transition-all duration-150 active:scale-[0.98]"
-              style={{
-                backgroundColor: 'var(--cerebro-raised)',
-                border: '1px solid var(--cerebro-border)',
-              }}
+        {addStep === 'type' ? (
+          <>
+            <p
+              className="mb-4 font-display text-lg font-semibold"
+              style={{ color: 'var(--cerebro-fg)' }}
             >
-              <span
-                className="h-7 w-1 rounded-full"
-                style={{ backgroundColor: color }}
-                aria-hidden
-              />
-              <span
-                className="text-sm font-semibold"
-                style={{ color: 'var(--cerebro-fg)' }}
-              >
-                {t(labelKey)}
-              </span>
-            </button>
-          ))}
-        </div>
+              {t('editor.chooseType')}
+            </p>
+            <div className="flex flex-col gap-2">
+              {NOTE_TYPES.map(({ type, labelKey, color }) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => chooseType(type)}
+                  data-testid={`write-type-${type}`}
+                  className="flex items-center gap-3 rounded-[var(--radius-card)] px-4 py-3.5 transition-all duration-150 active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'var(--cerebro-raised)',
+                    border: '1px solid var(--cerebro-border)',
+                  }}
+                >
+                  <span
+                    className="h-7 w-1 rounded-full"
+                    style={{ backgroundColor: color }}
+                    aria-hidden
+                  />
+                  <span
+                    className="text-sm font-semibold"
+                    style={{ color: 'var(--cerebro-fg)' }}
+                  >
+                    {t(labelKey)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <p
+              className="mb-1 font-display text-lg font-semibold"
+              style={{ color: 'var(--cerebro-fg)' }}
+            >
+              {t('notes.chooseResource')}
+            </p>
+            <p
+              className="mb-4 text-xs"
+              style={{ color: 'var(--cerebro-muted)' }}
+            >
+              {t('notes.chooseResource.help')}
+            </p>
+            {resources.length === 0 ? (
+              <div className="flex flex-col gap-3">
+                <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
+                  {t('notes.noResources')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddOpen(false);
+                    navigate('/library');
+                  }}
+                  data-testid="go-to-library"
+                  className="rounded-full px-4 py-2 text-xs font-semibold"
+                  style={{
+                    backgroundColor: 'var(--cerebro-accent)',
+                    color: 'var(--cerebro-on-accent)',
+                  }}
+                >
+                  {t('notes.goToLibrary')}
+                </button>
+              </div>
+            ) : (
+              <div className="flex max-h-[50vh] flex-col gap-2 overflow-auto">
+                {resources.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => chooseResource(r.id)}
+                    data-testid={`pick-resource-${r.id}`}
+                    className="rounded-[var(--radius-card)] px-4 py-3 text-left text-sm font-medium transition-all duration-150 active:scale-[0.98]"
+                    style={{
+                      backgroundColor: 'var(--cerebro-raised)',
+                      border: '1px solid var(--cerebro-border)',
+                      color: 'var(--cerebro-fg)',
+                    }}
+                  >
+                    {r.title}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </BottomSheet>
     </main>
   );

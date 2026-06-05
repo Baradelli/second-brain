@@ -34,6 +34,7 @@ export async function processQueue(
           title: cmd.payload.title,
           scope: cmd.payload.scope,
           date: cmd.payload.date,
+          resourceId: cmd.payload.resourceId,
         });
         await queue.mapId(cmd.payload.clientId, note.id);
       } else {

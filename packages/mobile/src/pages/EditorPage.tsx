@@ -78,6 +78,7 @@ export function EditorPage() {
   const [searchParams] = useSearchParams();
 
   const noteTypeParam = resolveType(searchParams.get('type'));
+  const resourceIdParam = searchParams.get('resourceId') ?? undefined;
   const ritual = RITUAL[noteTypeParam];
 
   const [noteId, setNoteId] = useState<string | null>(routeNoteId ?? null);
@@ -168,6 +169,7 @@ export function EditorPage() {
             const created = await persistNoteCreate({
               noteType: noteTypeParam,
               doc: newDoc,
+              resourceId: resourceIdParam,
             });
             setNoteId(created.id);
             queued = created.queued;
@@ -188,7 +190,7 @@ export function EditorPage() {
         }
       }, 1500);
     },
-    [noteId, noteTypeParam],
+    [noteId, noteTypeParam, resourceIdParam],
   );
 
   useEffect(

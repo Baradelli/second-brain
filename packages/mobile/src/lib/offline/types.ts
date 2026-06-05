@@ -21,6 +21,7 @@ export interface CreateNoteCommand {
     title?: string;
     scope?: string;
     date?: string;
+    resourceId?: string;
   };
 }
 
@@ -60,6 +61,7 @@ export interface OfflineApi {
     title?: string;
     scope?: string;
     date?: string;
+    resourceId?: string;
   }): Promise<{ id: string }>;
   editNote(
     id: string,
