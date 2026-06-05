@@ -162,6 +162,15 @@ export function getNoteById(id: string): Promise<NoteResponse> {
   return get(`/notes/${id}`, noteResponseSchema);
 }
 
+export function listNotes(
+  params: { type?: NoteType; status?: 'ACTIVE' | 'ARCHIVED' } = {},
+): Promise<NoteResponse[]> {
+  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  query.set('status', params.status ?? 'ACTIVE');
+  if (params.type) query.set('type', params.type);
+  return get(`/notes?${query.toString()}`, z.array(noteResponseSchema));
+}
+
 // ── Suggested questions ───────────────────────────────────────────────────────
 
 export function getSuggestedQuestions(
