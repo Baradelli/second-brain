@@ -18,6 +18,7 @@ import { captureRoutes } from '../routes/capture-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
+import { resourceRoutes } from '../routes/resource-routes.js';
 import { uploadRoutes } from '../routes/upload-routes.js';
 
 export async function buildServer() {
@@ -58,6 +59,7 @@ export async function buildServer() {
   await app.register(labelRoutes, { prisma });
   await app.register(guideQuestionRoutes, { prisma });
   await app.register(agendaRoutes, { prisma });
+  await app.register(resourceRoutes, { prisma });
 
   return app;
 }
