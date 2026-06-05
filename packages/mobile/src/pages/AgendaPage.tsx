@@ -1,11 +1,15 @@
 import { Card, EmptyState, SectionHeader } from '@cerebro/ui';
-import { ArrowRight, Check, Inbox, Moon, Sunrise } from 'lucide-react';
+import { ArrowRight, Check, Inbox, Moon, Sunrise, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
-import { getAgenda, type TodayAgenda } from '../lib/api/endpoints.js';
+import {
+  getAgenda,
+  listActiveGoals,
+  type TodayAgenda,
+} from '../lib/api/endpoints.js';
 
 function getGreetingKey(): string {
   const hour = new Date().getHours();
@@ -43,9 +47,11 @@ const JOURNAL_CONFIG = {
 
 export function AgendaPage() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [agenda, setAgenda] = useState<TodayAgenda | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [activeGoals, setActiveGoals] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,6 +66,20 @@ export function AgendaPage() {
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    listActiveGoals()
+      .then((goals) => {
+        if (!cancelled) setActiveGoals(goals.length);
+      })
+      .catch(() => {
+        /* painel é secundário; silencioso se falhar */
       });
     return () => {
       cancelled = true;
@@ -129,6 +149,42 @@ export function AgendaPage() {
                 noteId={agenda.journal.reflection.noteId}
               />
             </div>
+          </section>
+
+          {/* ── Objetivos ativos (painel) ──────────────────────────────── */}
+          <section className="px-5 mb-7">
+            <button
+              type="button"
+              onClick={() => navigate('/goals')}
+              data-testid="active-goals-panel"
+              className="w-full text-left transition-transform duration-150 active:scale-[0.99]"
+            >
+              <Card padding="sm">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: 'var(--cerebro-accent-soft)',
+                      color: 'var(--cerebro-accent)',
+                    }}
+                    aria-hidden
+                  >
+                    <Target size={18} strokeWidth={1.75} />
+                  </span>
+                  <p
+                    className="flex-1 text-sm font-medium"
+                    style={{ color: 'var(--cerebro-fg)' }}
+                  >
+                    {t('agenda.goals.active', { count: activeGoals })}
+                  </p>
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={2.25}
+                    style={{ color: 'var(--cerebro-muted)' }}
+                  />
+                </div>
+              </Card>
+            </button>
           </section>
 
           {/* ── Captures to review ─────────────────────────────────────── */}

@@ -3,6 +3,14 @@ import {
   attachmentResponseSchema,
   type CaptureResponse,
   captureResponseSchema,
+  type EventResponse,
+  eventResponseSchema,
+  type GoalPeriodInput,
+  type GoalProgressResponse,
+  goalProgressResponseSchema,
+  type GoalResponse,
+  goalResponseSchema,
+  type GoalTypeInput,
   type LabelNodeResponse,
   labelNodeResponseSchema,
   type NoteResponse,
@@ -207,6 +215,63 @@ export function editResource(
     `/resources/${id}`,
     { ...body, userId: CURRENT_USER_ID },
     resourceResponseSchema,
+  );
+}
+
+// ── Goals ─────────────────────────────────────────────────────────────────────
+
+export function listActiveGoals(
+  params: { type?: GoalTypeInput; parentId?: string } = {},
+): Promise<GoalResponse[]> {
+  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  if (params.type) query.set('type', params.type);
+  if (params.parentId) query.set('parentId', params.parentId);
+  return get(`/goals?${query.toString()}`, z.array(goalResponseSchema));
+}
+
+export interface CreateGoalBody {
+  title: string;
+  type: GoalTypeInput;
+  description?: string | null;
+  targetValue?: number | null;
+  unit?: string | null;
+  period?: GoalPeriodInput | null;
+  timesPerPeriod?: number | null;
+  weekdays?: number[];
+  parentId?: string | null;
+}
+
+export function createGoal(body: CreateGoalBody): Promise<GoalResponse> {
+  return post(
+    '/goals',
+    { ...body, userId: CURRENT_USER_ID },
+    goalResponseSchema,
+  );
+}
+
+export function getGoalProgress(id: string): Promise<GoalProgressResponse> {
+  return get(
+    `/goals/${id}/progress?userId=${CURRENT_USER_ID}`,
+    goalProgressResponseSchema,
+  );
+}
+
+export function checkGoal(
+  id: string,
+  body: { value?: number } = {},
+): Promise<EventResponse> {
+  return post(
+    `/goals/${id}/check`,
+    { ...body, userId: CURRENT_USER_ID },
+    eventResponseSchema,
+  );
+}
+
+export function completeGoal(id: string): Promise<GoalResponse> {
+  return post(
+    `/goals/${id}/complete`,
+    { userId: CURRENT_USER_ID },
+    goalResponseSchema,
   );
 }
 

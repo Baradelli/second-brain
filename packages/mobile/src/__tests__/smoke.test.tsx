@@ -13,6 +13,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
     capturesToReview: [],
   }),
   createCapture: vi.fn(),
+  listActiveGoals: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock('@cerebro/ui', () => ({

@@ -34,6 +34,7 @@ vi.mock('../components/QuickCaptureForm.js', () => ({
 vi.mock('../lib/api/endpoints.js', () => ({
   getAgenda: vi.fn(),
   createCapture: vi.fn(),
+  listActiveGoals: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -72,6 +73,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.useFakeTimers({ shouldAdvanceTime: true });
   vi.mocked(endpoints.getAgenda).mockResolvedValue(stubAgenda());
+  vi.mocked(endpoints.listActiveGoals).mockResolvedValue([]);
 });
 
 afterEach(async () => {

@@ -5,6 +5,7 @@ import { AgendaPage } from './pages/AgendaPage.js';
 import { AssistantPage } from './pages/AssistantPage.js';
 import { CapturePage } from './pages/CapturePage.js';
 import { EditorPage } from './pages/EditorPage.js';
+import { GoalsPage } from './pages/GoalsPage.js';
 import { LibraryPage } from './pages/LibraryPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
 
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AgendaPage /> },
       { path: 'library', element: <LibraryPage /> },
+      { path: 'goals', element: <GoalsPage /> },
       { path: 'capture', element: <CapturePage /> },
       { path: 'review', element: <ReviewPage /> },
       { path: 'editor', element: <EditorPage /> },

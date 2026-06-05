@@ -88,8 +88,9 @@ A tab bar já tem 5 slots cheios. Proponho: **`/goals` é rota secundária**, ac
 
 ## Definição de pronto
 
-- [ ] `/goals` lista ativos com progresso (`ProgressRing`), cria goal (form Zod) e faz check
-      (HABIT 1 toque; TARGET/PROJECT com value) / conclui UMBRELLA.
-- [ ] Painel "X objetivos ativos" na Agenda navega para `/goals`, sem quebrar a Agenda.
-- [ ] `@cerebro/ui` + CSS vars + i18n; testes dos fluxos verdes; suíte do mobile verde.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- [x] `/goals` lista ativos com progresso (`ProgressRing`), cria goal (form Zod) e faz check
+      (HABIT 1 toque; TARGET/PROJECT com value via bottom sheet) / conclui UMBRELLA.
+- [x] Painel "X objetivos ativos" na Agenda navega para `/goals`, sem quebrar a Agenda.
+- [x] `@cerebro/ui` + CSS vars + i18n; testes dos fluxos verdes (4); suíte do mobile verde (63).
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- Nav: `/goals` é rota secundária (via painel da Agenda), sem mexer na tab bar — conforme decidido.
