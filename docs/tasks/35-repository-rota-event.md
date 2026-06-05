@@ -37,13 +37,13 @@ os UseCases; os UseCases contêm a regra.
 `packages/shared/src/event.ts` (+ export no `index.ts`):
 
 - `checkGoalSchema`: `{ userId: z.string().min(1), value: z.number().positive().nullish(),
-  occurredAt: z.coerce.date().optional() }`.
+occurredAt: z.coerce.date().optional() }`.
 - `skipGoalSchema`: `{ userId: z.string().min(1), reason: z.string().trim().min(1),
-  occurredAt: z.coerce.date().optional() }`.
+occurredAt: z.coerce.date().optional() }`.
 - `undoCheckSchema` (body do DELETE/undo): `{ userId: z.string().min(1) }`.
 - `eventResponseSchema`: `{ id, userId, goalId, type: z.enum(['done','skip']),
-  value: z.number().nullable(), reason: z.string().nullable(),
-  occurredAt: z.string().datetime(), createdAt: z.string().datetime() }`.
+value: z.number().nullable(), reason: z.string().nullable(),
+occurredAt: z.string().datetime(), createdAt: z.string().datetime() }`.
 - (Opcional, ver decisão) `goalProgressResponseSchema` se expusermos a rota de progresso.
 
 ## Parte C — Rotas

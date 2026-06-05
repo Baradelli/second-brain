@@ -25,9 +25,9 @@ domínio `Event` e o `EventRepository` (save) da Tarefa 32.
 ```ts
 export interface SkipGoalInput {
   goalId: string;
-  userId: string;     // dono; senão GoalNotFoundError (não vaza)
-  reason: string;     // OBRIGATÓRIO, não-vazio (trim)
-  occurredAt?: Date;  // default: now
+  userId: string; // dono; senão GoalNotFoundError (não vaza)
+  reason: string; // OBRIGATÓRIO, não-vazio (trim)
+  occurredAt?: Date; // default: now
 }
 type SkipGoalOutput = Event; // type='skip', value=null
 

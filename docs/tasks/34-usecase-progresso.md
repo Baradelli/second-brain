@@ -42,18 +42,18 @@ find(filter: EventFilter): Promise<Event[]>;
 ```ts
 export interface ComputeGoalProgressInput {
   goalId: string;
-  userId: string;     // dono; senão GoalNotFoundError
-  reference?: Date;    // "agora" para definir o período corrente (default: now)
+  userId: string; // dono; senão GoalNotFoundError
+  reference?: Date; // "agora" para definir o período corrente (default: now)
 }
 
 export interface GoalProgress {
   goalId: string;
   type: GoalType;
-  done: number;        // HABIT: nº de dias/ocorrências no período; TARGET/PROJECT: soma de value
+  done: number; // HABIT: nº de dias/ocorrências no período; TARGET/PROJECT: soma de value
   target: number | null; // HABIT: cadência esperada no período; TARGET/PROJECT: targetValue; UMBRELLA: nº de filhos ativos
-  ratio: number | null;  // done/target, **clampado [0,1]**; null quando target é null/0
+  ratio: number | null; // done/target, **clampado [0,1]**; null quando target é null/0
   period: { from: Date; to: Date } | null; // HABIT: janela; TARGET/PROJECT/UMBRELLA: null
-  completed: boolean;  // goal.completedAt != null OU ratio>=1 (ver decisão)
+  completed: boolean; // goal.completedAt != null OU ratio>=1 (ver decisão)
   children?: GoalProgress[]; // só UMBRELLA: progresso de cada filho ativo
 }
 
@@ -67,6 +67,7 @@ Obter `timezone` via `SettingsReader.getByUserId` (default `'America/Sao_Paulo'`
 como o capture-routes já faz).
 
 ### HABIT
+
 - **Cadência `weekdays`**: período = semana corrente (`dayRange(reference, tz, 'WEEK')`).
   `target = weekdays.length`. `done = nº de dias distintos` (no tz) com ao menos 1 evento
   `done` na janela. (Contar **dias distintos**, não eventos, p/ não inflar com 2 checks no
@@ -77,11 +78,13 @@ como o capture-routes já faz).
 - `ratio = clamp(done / target, 0, 1)`.
 
 ### TARGET / PROJECT
+
 - Sem janela (`period=null`). `done = soma de value` de **todos** os eventos `done` do goal
   (`value ?? 0`). `target = goal.targetValue` (pode ser null → `ratio=null`).
 - `ratio = target ? clamp(done/target, 0, 1) : null`.
 
 ### UMBRELLA
+
 - `done`/somatório próprio não se aplica. Buscar **filhos ativos**
   (`GoalRepository.find({ userId, parentId: goalId, status:'ACTIVE' })`), calcular o progresso
   de cada um (recursão de 1 nível — UMBRELLA não aninha) e:
@@ -90,6 +93,7 @@ como o capture-routes já faz).
   - `children = [progress de cada filho]`.
 
 ### `completed`
+
 - Para HABIT/TARGET/PROJECT: `completed = goal.completedAt != null || (ratio != null && ratio >= 1)`.
 - Para UMBRELLA: `completed = goal.completedAt != null` (UMBRELLA fecha na mão; não "completa"
   sozinha pelos filhos). (Decisão.)
