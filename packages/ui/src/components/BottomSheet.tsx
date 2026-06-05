@@ -21,7 +21,7 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
       <div
         aria-hidden
         onClick={onClose}
-        className="fixed inset-0 z-40 transition-opacity duration-200"
+        className="fixed inset-0 z-[60] transition-opacity duration-200"
         style={{
           backgroundColor: 'rgba(24, 20, 15, 0.40)',
           backdropFilter: 'blur(3px)',
@@ -33,7 +33,7 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
       <div
         role="dialog"
         aria-modal="true"
-        className="fixed inset-x-0 bottom-0 z-50 px-2 pb-2"
+        className="fixed inset-x-0 bottom-0 z-[70] px-2 pb-2"
         style={{
           transform: open ? 'translateY(0)' : 'translateY(110%)',
           transition: 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1)',
