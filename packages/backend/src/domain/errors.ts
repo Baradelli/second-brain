@@ -76,3 +76,17 @@ export class GuideQuestionNotFoundError extends Error {
     this.name = 'GuideQuestionNotFoundError';
   }
 }
+
+export class ResourceNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Resource not found: ${id}`);
+    this.name = 'ResourceNotFoundError';
+  }
+}
+
+export class InvalidResourceError extends Error {
+  constructor(message: string) {
+    super(`Invalid resource: ${message}`);
+    this.name = 'InvalidResourceError';
+  }
+}

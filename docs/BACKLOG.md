@@ -30,7 +30,7 @@
 ### Bloco I — Fundação (schema + Resource)
 
 - [x] **25** — Migração Prisma: `Resource`, `Goal`, `Event` + FKs opcionais em `Note` + relações de `Label`/`User`. (Migração pura, sem TDD.) → `tasks/25-migracao-mvp2.md`
-- [ ] **26** — Domínio + UseCase `createResource` / `editResource` (valida `type`/`stage`, vincula labels). → `tasks/26-usecase-resource.md`
+- [x] **26** — Domínio + UseCase `createResource` / `editResource` (valida `type`/`stage`, vincula labels). → `tasks/26-usecase-resource.md`
 - [ ] **27** — Repository de Resource (interface + fake + Prisma + contrato). → `tasks/27-repository-resource.md`
 - [ ] **28** — UseCase `listResources` (filtro por stage/label) + Schema Zod em `shared/` + rotas `/resources`. → `tasks/28-rota-resources.md`
 
