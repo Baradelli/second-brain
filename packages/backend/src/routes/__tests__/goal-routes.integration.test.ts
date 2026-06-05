@@ -127,3 +127,78 @@ describe('PATCH /goals/:id', () => {
     expect(res.statusCode).toBe(404);
   });
 });
+
+describe('POST /goals/:id/complete', () => {
+  it('completa o goal → 200 com completedAt preenchido', async () => {
+    const created = await app.inject({
+      method: 'POST',
+      url: '/goals',
+      payload: {
+        userId: USER_ID,
+        title: 'Meta',
+        type: 'TARGET',
+        targetValue: 5,
+      },
+    });
+    const id = created.json().id;
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/goals/${id}/complete`,
+      payload: { userId: USER_ID },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.completedAt).not.toBeNull();
+    expect(body.status).toBe('ACTIVE');
+  });
+});
+
+describe('POST /goals/:id/archive', () => {
+  it('arquiva goal sem filhos → 200 ARCHIVED', async () => {
+    const created = await app.inject({
+      method: 'POST',
+      url: '/goals',
+      payload: { userId: USER_ID, title: 'Solo', type: 'HABIT', weekdays: [1] },
+    });
+    const id = created.json().id;
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/goals/${id}/archive`,
+      payload: { userId: USER_ID },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().status).toBe('ARCHIVED');
+  });
+
+  it('arquivar UMBRELLA com filho ativo → 409', async () => {
+    const umb = await app.inject({
+      method: 'POST',
+      url: '/goals',
+      payload: { userId: USER_ID, title: 'Saúde', type: 'UMBRELLA' },
+    });
+    const umbId = umb.json().id;
+    await app.inject({
+      method: 'POST',
+      url: '/goals',
+      payload: {
+        userId: USER_ID,
+        title: 'Correr',
+        type: 'TARGET',
+        targetValue: 10,
+        parentId: umbId,
+      },
+    });
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/goals/${umbId}/archive`,
+      payload: { userId: USER_ID },
+    });
+
+    expect(res.statusCode).toBe(409);
+  });
+});

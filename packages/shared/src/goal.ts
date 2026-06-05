@@ -42,6 +42,18 @@ export const editGoalSchema = z.object({
 });
 export type EditGoalBody = z.infer<typeof editGoalSchema>;
 
+export const completeGoalSchema = z.object({
+  userId: z.string().min(1),
+  completedAt: z.coerce.date().optional(),
+});
+export type CompleteGoalBody = z.infer<typeof completeGoalSchema>;
+
+export const archiveGoalSchema = z.object({
+  userId: z.string().min(1),
+  archivedAt: z.coerce.date().optional(),
+});
+export type ArchiveGoalBody = z.infer<typeof archiveGoalSchema>;
+
 export const listGoalsQuerySchema = z.object({
   userId: z.string().min(1),
   type: goalType.optional(),

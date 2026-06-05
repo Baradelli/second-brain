@@ -104,3 +104,10 @@ export class InvalidGoalError extends Error {
     this.name = 'InvalidGoalError';
   }
 }
+
+export class GoalHasActiveChildrenError extends Error {
+  constructor(public readonly count: number) {
+    super(`Cannot archive goal: it has ${count} active child goal(s).`);
+    this.name = 'GoalHasActiveChildrenError';
+  }
+}

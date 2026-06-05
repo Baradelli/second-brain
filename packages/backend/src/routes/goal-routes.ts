@@ -1,4 +1,6 @@
 import {
+  archiveGoalSchema,
+  completeGoalSchema,
   createGoalSchema,
   editGoalSchema,
   type GoalResponse,
@@ -9,9 +11,15 @@ import type { PrismaClient } from '@prisma/client';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
-import { GoalNotFoundError, InvalidGoalError } from '../domain/errors.js';
+import {
+  GoalHasActiveChildrenError,
+  GoalNotFoundError,
+  InvalidGoalError,
+} from '../domain/errors.js';
 import type { Goal } from '../domain/goal.js';
 import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
+import { ArchiveGoal } from '../usecases/archive-goal.js';
+import { CompleteGoal } from '../usecases/complete-goal.js';
 import { CreateGoal } from '../usecases/create-goal.js';
 import { EditGoal } from '../usecases/edit-goal.js';
 import { ListActiveGoals } from '../usecases/list-active-goals.js';
@@ -46,6 +54,8 @@ export const goalRoutes: FastifyPluginAsyncZod<{
   const createGoal = new CreateGoal(repo);
   const editGoal = new EditGoal(repo);
   const listActiveGoals = new ListActiveGoals(repo);
+  const completeGoal = new CompleteGoal(repo);
+  const archiveGoal = new ArchiveGoal(repo);
 
   app.post(
     '/goals',
@@ -115,6 +125,70 @@ export const goalRoutes: FastifyPluginAsyncZod<{
         }
         if (error instanceof InvalidGoalError) {
           return reply.status(400).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/goals/:id/complete',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: completeGoalSchema,
+        response: {
+          200: goalResponseSchema,
+          400: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const goal = await completeGoal.execute({
+          id: req.params.id,
+          ...req.body,
+        });
+        return toResponse(goal);
+      } catch (error) {
+        if (error instanceof GoalNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (error instanceof InvalidGoalError) {
+          return reply.status(400).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/goals/:id/archive',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: archiveGoalSchema,
+        response: {
+          200: goalResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const goal = await archiveGoal.execute({
+          id: req.params.id,
+          ...req.body,
+        });
+        return toResponse(goal);
+      } catch (error) {
+        if (error instanceof GoalNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (error instanceof GoalHasActiveChildrenError) {
+          return reply.status(409).send({ error: error.message });
         }
         throw error;
       }

@@ -131,12 +131,12 @@ Adicionar `completeGoalSchema` e `archiveGoalSchema` em `packages/shared/src/goa
 
 ## Definição de pronto
 
-- [ ] `completeGoal` (manual, qualquer tipo incl. UMBRELLA; não mexe em status; idempotente;
-      bloqueia se arquivado) com testes unit verdes.
-- [ ] `archiveGoal` (soft delete; bloqueia com `GoalHasActiveChildrenError` se há filho ativo;
-      idempotente) com testes unit verdes.
-- [ ] `GoalHasActiveChildrenError` no padrão do `LabelInUseError`.
-- [ ] Rotas `/goals/:id/complete` e `/goals/:id/archive` + schemas Zod; erros mapeados
-      (404 / 400 / 409); teste de rota nos caminhos críticos.
-- [ ] `unit` e `integration` verdes.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
+- [x] `completeGoal` (manual, qualquer tipo incl. UMBRELLA; não mexe em status; idempotente;
+      bloqueia se arquivado) com testes unit verdes. (7 testes)
+- [x] `archiveGoal` (soft delete; bloqueia com `GoalHasActiveChildrenError` se há filho ativo;
+      idempotente) com testes unit verdes. (5 testes)
+- [x] `GoalHasActiveChildrenError` no padrão do `LabelInUseError`.
+- [x] Rotas `/goals/:id/complete` e `/goals/:id/archive` + schemas Zod; erros mapeados
+      (404 / 400 / 409); teste de rota nos caminhos críticos. (3 testes)
+- [x] `unit` (185) e `integration` (90) verdes.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
