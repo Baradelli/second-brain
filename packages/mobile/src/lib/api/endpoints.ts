@@ -3,6 +3,8 @@ import {
   attachmentResponseSchema,
   type CaptureResponse,
   captureResponseSchema,
+  type DayClosingResponse,
+  dayClosingResponseSchema,
   type EventResponse,
   eventResponseSchema,
   type GoalPeriodInput,
@@ -272,6 +274,23 @@ export function completeGoal(id: string): Promise<GoalResponse> {
     `/goals/${id}/complete`,
     { userId: CURRENT_USER_ID },
     goalResponseSchema,
+  );
+}
+
+export function skipGoal(id: string, reason: string): Promise<EventResponse> {
+  return post(
+    `/goals/${id}/skip`,
+    { reason, userId: CURRENT_USER_ID },
+    eventResponseSchema,
+  );
+}
+
+// ── Fechar o dia ────────────────────────────────────────────────────────────
+
+export function getDayClosing(): Promise<DayClosingResponse> {
+  return get(
+    `/day-closing?userId=${CURRENT_USER_ID}&day=today`,
+    dayClosingResponseSchema,
   );
 }
 

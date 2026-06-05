@@ -185,6 +185,39 @@ export function AgendaPage() {
                 </div>
               </Card>
             </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/day-closing')}
+              data-testid="day-closing-cta"
+              className="mt-2.5 w-full text-left transition-transform duration-150 active:scale-[0.99]"
+            >
+              <Card padding="sm">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: 'var(--cerebro-reflection-soft, var(--cerebro-accent-soft))',
+                      color: 'var(--cerebro-reflection, var(--cerebro-accent))',
+                    }}
+                    aria-hidden
+                  >
+                    <Moon size={18} strokeWidth={1.75} />
+                  </span>
+                  <p
+                    className="flex-1 text-sm font-medium"
+                    style={{ color: 'var(--cerebro-fg)' }}
+                  >
+                    {t('agenda.dayClosing.cta')}
+                  </p>
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={2.25}
+                    style={{ color: 'var(--cerebro-muted)' }}
+                  />
+                </div>
+              </Card>
+            </button>
           </section>
 
           {/* ── Captures to review ─────────────────────────────────────── */}

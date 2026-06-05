@@ -88,9 +88,9 @@ Rota `/day-closing`, acessada por um **CTA na Agenda** (ex.: à noite, ou sempre
 
 ## Definição de pronto
 
-- [ ] `/day-closing` lista pendentes e resolve cada um como fiz (check) / não fiz porque…
+- [x] `/day-closing` lista pendentes e resolve cada um como fiz (check) / não fiz porque…
       (skip + motivo obrigatório) / deixa pra lá (só UI, sem backend).
-- [ ] Tom anti-culpa em toda a microcópia (i18n), estado "dia fechado" sem placar.
-- [ ] CTA na Agenda abre a tela; `@cerebro/ui` + CSS vars + i18n.
-- [ ] Testes dos fluxos verdes; suíte do mobile verde.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- [x] Tom anti-culpa em toda a microcópia (i18n), estado "dia fechado" sem placar.
+- [x] CTA na Agenda abre a tela; `@cerebro/ui` + CSS vars + i18n.
+- [x] Testes dos fluxos verdes (5); suíte do mobile verde (68).
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.

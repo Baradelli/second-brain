@@ -117,5 +117,17 @@
   "goal.field.timesPerPeriod": "Vezes",
   "goal.field.targetValue": "Meta",
   "goal.field.unit": "Unidade",
+  "agenda.dayClosing.cta": "Fechar o dia",
+  "dayClosing.title": "Fechar o dia",
+  "dayClosing.subtitle": "Um instante para recapitular — sem cobrança.",
+  "dayClosing.error": "Não foi possível carregar o fechamento",
+  "dayClosing.invitation": "Se quiser, ainda dá tempo",
+  "dayClosing.action.did": "Fiz",
+  "dayClosing.action.didnt": "Não fiz porque…",
+  "dayClosing.action.letGo": "Deixa pra lá",
+  "dayClosing.reason.placeholder": "O que aconteceu hoje?",
+  "dayClosing.reason.confirm": "Anotar",
+  "dayClosing.closed.title": "Dia fechado",
+  "dayClosing.closed.body": "Descanse — amanhã recomeça em branco.",
   "assistant.comingSoonBody": "Um ajudante para revisar e conectar suas ideias chega num próximo capítulo."
 }

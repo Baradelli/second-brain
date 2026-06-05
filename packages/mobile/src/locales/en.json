@@ -117,5 +117,17 @@
   "goal.field.timesPerPeriod": "Times",
   "goal.field.targetValue": "Target",
   "goal.field.unit": "Unit",
+  "agenda.dayClosing.cta": "Close the day",
+  "dayClosing.title": "Close the day",
+  "dayClosing.subtitle": "A moment to look back — no scorekeeping.",
+  "dayClosing.error": "Couldn't load the day closing",
+  "dayClosing.invitation": "If you'd like, there's still time",
+  "dayClosing.action.did": "Did it",
+  "dayClosing.action.didnt": "Didn't, because…",
+  "dayClosing.action.letGo": "Let it go",
+  "dayClosing.reason.placeholder": "What happened today?",
+  "dayClosing.reason.confirm": "Note it",
+  "dayClosing.closed.title": "Day closed",
+  "dayClosing.closed.body": "Rest — tomorrow starts fresh.",
   "assistant.comingSoonBody": "A helper to review and connect your ideas arrives in a later chapter."
 }
