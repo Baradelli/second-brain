@@ -1,0 +1,72 @@
+import { z } from 'zod';
+
+import { weekday } from './common.js';
+
+export const goalType = z.enum(['HABIT', 'TARGET', 'PROJECT', 'UMBRELLA']);
+export type GoalTypeInput = z.infer<typeof goalType>;
+
+export const goalPeriod = z.enum(['day', 'week', 'month']);
+export type GoalPeriodInput = z.infer<typeof goalPeriod>;
+
+// Exclusividade cadência/medida NÃO cabe bem em Zod — fica no UseCase. Aqui só tipos/formatos.
+export const createGoalSchema = z.object({
+  userId: z.string().min(1),
+  title: z.string().trim().min(1),
+  type: goalType,
+  description: z.string().nullish(),
+  targetValue: z.number().positive().nullish(),
+  unit: z.string().nullish(),
+  period: goalPeriod.nullish(),
+  timesPerPeriod: z.number().int().positive().nullish(),
+  weekdays: z.array(weekday).optional(),
+  startAt: z.coerce.date().nullish(),
+  dueAt: z.coerce.date().nullish(),
+  parentId: z.string().nullish(),
+  labelIds: z.array(z.string()).optional(),
+});
+export type CreateGoalBody = z.infer<typeof createGoalSchema>;
+
+// type/parentId não são editáveis (recria-se para mudar).
+export const editGoalSchema = z.object({
+  userId: z.string().min(1),
+  title: z.string().trim().min(1).optional(),
+  description: z.string().nullish(),
+  targetValue: z.number().positive().nullish(),
+  unit: z.string().nullish(),
+  period: goalPeriod.nullish(),
+  timesPerPeriod: z.number().int().positive().nullish(),
+  weekdays: z.array(weekday).optional(),
+  startAt: z.coerce.date().nullish(),
+  dueAt: z.coerce.date().nullish(),
+  labelIds: z.array(z.string()).optional(),
+});
+export type EditGoalBody = z.infer<typeof editGoalSchema>;
+
+export const listGoalsQuerySchema = z.object({
+  userId: z.string().min(1),
+  type: goalType.optional(),
+  parentId: z.string().optional(),
+});
+export type ListGoalsQuery = z.infer<typeof listGoalsQuerySchema>;
+
+export const goalResponseSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  type: goalType,
+  parentId: z.string().nullable(),
+  targetValue: z.number().nullable(),
+  unit: z.string().nullable(),
+  period: goalPeriod.nullable(),
+  timesPerPeriod: z.number().nullable(),
+  weekdays: z.array(weekday),
+  startAt: z.string().datetime().nullable(),
+  dueAt: z.string().datetime().nullable(),
+  completedAt: z.string().datetime().nullable(),
+  status: z.enum(['ACTIVE', 'ARCHIVED']),
+  archivedAt: z.string().datetime().nullable(),
+  createdAt: z.string().datetime(),
+  labelIds: z.array(z.string()),
+});
+export type GoalResponse = z.infer<typeof goalResponseSchema>;

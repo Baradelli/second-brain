@@ -152,9 +152,11 @@ Regras do `editGoal` (testar):
 
 ## Definição de pronto
 
-- [ ] `GoalRepository` estendido (find/update) no fake e no Prisma; contrato verde.
-- [ ] `listActiveGoals` e `editGoal` com testes unit (TDD); `editGoal` reaplica a coerência por
-      tipo via helper compartilhado; não toca `type`/`status`/`archivedAt`/`completedAt`.
-- [ ] Schema Zod de Goal em `shared/`; rotas POST/GET/PATCH `/goals` registradas, erros mapeados.
-- [ ] Testes de rota (integração) nos caminhos críticos, verdes; `unit` e `integration` verdes.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
+- [x] `GoalRepository` estendido (find/update) no fake e no Prisma; contrato verde. (6/6)
+- [x] `listActiveGoals` e `editGoal` com testes unit (TDD); `editGoal` reaplica a coerência por
+      tipo via helper compartilhado (`domain/goal-rules.ts`, e `createGoal` refatorado p/ usá-lo);
+      não toca `type`/`status`/`archivedAt`/`completedAt`.
+- [x] Schema Zod de Goal em `shared/`; rotas POST/GET/PATCH `/goals` registradas, erros mapeados.
+- [x] Testes de rota (integração) nos caminhos críticos, verdes (5/5); `unit` (173) e
+      `integration` (87) verdes.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
