@@ -56,7 +56,10 @@ export function getAgenda(): Promise<TodayAgenda> {
 
 const promoteResultSchema = z.union([
   z.object({ note: noteResponseSchema, capture: captureResponseSchema }),
-  z.object({ resource: resourceResponseSchema, capture: captureResponseSchema }),
+  z.object({
+    resource: resourceResponseSchema,
+    capture: captureResponseSchema,
+  }),
   z.object({ goal: goalResponseSchema, capture: captureResponseSchema }),
 ]);
 

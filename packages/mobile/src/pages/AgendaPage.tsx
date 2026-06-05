@@ -197,7 +197,8 @@ export function AgendaPage() {
                   <span
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
                     style={{
-                      backgroundColor: 'var(--cerebro-reflection-soft, var(--cerebro-accent-soft))',
+                      backgroundColor:
+                        'var(--cerebro-reflection-soft, var(--cerebro-accent-soft))',
                       color: 'var(--cerebro-reflection, var(--cerebro-accent))',
                     }}
                     aria-hidden

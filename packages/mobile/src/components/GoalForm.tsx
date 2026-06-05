@@ -34,7 +34,11 @@ interface GoalFormProps {
   defaultTitle?: string;
 }
 
-export function GoalForm({ onSubmit, submitting, defaultTitle }: GoalFormProps) {
+export function GoalForm({
+  onSubmit,
+  submitting,
+  defaultTitle,
+}: GoalFormProps) {
   const { t, i18n } = useTranslation();
   const [cadence, setCadence] = useState<'weekdays' | 'period'>('weekdays');
   const [weekdays, setWeekdays] = useState<number[]>([]);

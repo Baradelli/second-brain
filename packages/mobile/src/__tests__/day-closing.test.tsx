@@ -10,7 +10,9 @@ vi.mock('@cerebro/ui', () => ({
   Button: ({
     children,
     ...rest
-  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  }: {
+    children: React.ReactNode;
+  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...rest}>{children}</button>
   ),
 }));

@@ -273,7 +273,11 @@ describe('CapturePage — promover para nota', () => {
 
     expect(endpoints.promoteCapture).toHaveBeenCalledWith(
       'cap-3',
-      expect.objectContaining({ destination: 'resource', title: 'Livro X', type: 'book' }),
+      expect.objectContaining({
+        destination: 'resource',
+        title: 'Livro X',
+        type: 'book',
+      }),
     );
     await act(async () => {});
     await waitFor(() => screen.getByTestId('library-page'));
@@ -300,7 +304,11 @@ describe('CapturePage — promover para nota', () => {
 
     expect(endpoints.promoteCapture).toHaveBeenCalledWith(
       'cap-4',
-      expect.objectContaining({ destination: 'goal', type: 'HABIT', weekdays: [1] }),
+      expect.objectContaining({
+        destination: 'goal',
+        type: 'HABIT',
+        weekdays: [1],
+      }),
     );
     await act(async () => {});
     await waitFor(() => screen.getByTestId('goals-page'));

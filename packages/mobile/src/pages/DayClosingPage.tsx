@@ -54,7 +54,10 @@ export function DayClosingPage() {
         </h1>
         <p
           className="mt-2 text-[0.95rem] italic leading-relaxed"
-          style={{ fontFamily: 'Fraunces, serif', color: 'var(--cerebro-muted)' }}
+          style={{
+            fontFamily: 'Fraunces, serif',
+            color: 'var(--cerebro-muted)',
+          }}
         >
           {t('dayClosing.subtitle')}
         </p>
