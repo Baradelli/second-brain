@@ -33,7 +33,7 @@ default = `capture.text` (trim) quando ausente. (Decisão.)
 ```ts
 export interface PromoteCaptureToResourceInput {
   captureId: string;
-  title?: string;           // default: capture.text (trim)
+  title?: string; // default: capture.text (trim)
   type: ResourceType;
   url?: string | null;
   author?: string | null;
@@ -49,12 +49,16 @@ export interface PromoteCaptureToResourceInput {
 ```ts
 export interface PromoteCaptureToGoalInput {
   captureId: string;
-  title?: string;           // default: capture.text (trim)
+  title?: string; // default: capture.text (trim)
   type: GoalType;
   description?: string | null;
-  targetValue?: number | null; unit?: string | null;
-  period?: GoalPeriod | null; timesPerPeriod?: number | null; weekdays?: number[];
-  startAt?: Date | null; dueAt?: Date | null;
+  targetValue?: number | null;
+  unit?: string | null;
+  period?: GoalPeriod | null;
+  timesPerPeriod?: number | null;
+  weekdays?: number[];
+  startAt?: Date | null;
+  dueAt?: Date | null;
   parentId?: string | null;
 }
 // retorna { goal: Goal; capture: Capture }

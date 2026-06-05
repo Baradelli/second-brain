@@ -19,7 +19,7 @@ Acrescentar à `TodayAgenda` a lista de objetivos relevantes hoje, reaproveitand
 ```ts
 interface TodayAgenda {
   date: string;
-  journal: { devotional: {done; noteId?}; reflection: {done; noteId?} };
+  journal: { devotional: { done; noteId? }; reflection: { done; noteId? } };
   capturesToReview: Capture[];
 }
 ```

@@ -49,7 +49,7 @@
 
 ### Bloco L — Fechar o dia + integrações
 
-- [ ] **36** — UseCase `buildDayClosing` (pendentes de hoje: `weekdays` fixos + convites de período aberto) + rota `GET /day-closing?day=today`. → `tasks/36-usecase-fechar-o-dia.md`
+- [x] **36** — UseCase `buildDayClosing` (pendentes de hoje: `weekdays` fixos + convites de período aberto) + rota `GET /day-closing?day=today`. → `tasks/36-usecase-fechar-o-dia.md`
 - [ ] **37** — Estender `promoteCapture` para destino `resource` e `goal` (hoje só `note`). → `tasks/37-promover-captura-resource-goal.md`
 - [ ] **38** — Estender `buildTodayAgenda` com os objetivos do dia (sem quebrar o contrato atual da agenda). → `tasks/38-agenda-com-objetivos.md`
 

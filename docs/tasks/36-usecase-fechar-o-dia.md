@@ -44,7 +44,7 @@ export interface DayClosingItem {
   kind: DayClosingKind;
   // para invitation: quanto falta no período (informativo, não cobrança)
   periodTarget?: number; // timesPerPeriod
-  periodDone?: number;   // done no período corrente
+  periodDone?: number; // done no período corrente
 }
 
 export interface DayClosing {
@@ -114,9 +114,10 @@ Buscar HABITs ativos (`GoalRepository.find({ userId, status:'ACTIVE', type:'HABI
 
 ## Definição de pronto
 
-- [ ] `buildDayClosing` lista `scheduled` (weekdays de hoje) + `invitation` (período aberto),
+- [x] `buildDayClosing` lista `scheduled` (weekdays de hoje) + `invitation` (período aberto),
       excluindo resolvidos hoje, concluídos e arquivados.
-- [ ] Cálculo de dia/semana/mês via `dayRange`/Luxon (nada de `new Date` para calendário).
-- [ ] Testes de UseCase escritos **antes**, verdes; rota `GET /day-closing` + schema + 1 teste.
-- [ ] `unit` e `integration` verdes.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- [x] Cálculo de dia/semana/mês via `dayRange`/Luxon (`localWeekday` em `domain/`); nada de
+      `new Date` para calendário.
+- [x] Testes de UseCase escritos **antes**, verdes (10); rota `GET /day-closing` + schema + 1 teste.
+- [x] `unit` (224) e `integration` (105) verdes.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
