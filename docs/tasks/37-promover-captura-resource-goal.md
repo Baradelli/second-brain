@@ -77,10 +77,11 @@ Para cada um:
 > Extrair o "consumir captura" (validar PENDING + marcar PROCESSED) num helper compartilhado
 > pelos três UseCases (note/resource/goal), evitando repetir a transição. (Não espalhar a regra.)
 
-## Rota — decisão de design (precisa do seu aval)
+## Rota — DECIDIDO: opção A (body discriminado por `destination`)
 
 Hoje: `POST /captures/:id/promote` com body `{ type:NoteType, scope?, title? }` (note-específico).
-Para suportar 3 destinos, proponho **body discriminado por `destination`**:
+Mantém-se **um único endpoint** `POST /captures/:id/promote`, com body **discriminado por
+`destination`**:
 
 ```ts
 // shared/
@@ -91,15 +92,10 @@ promoteCaptureSchema = z.discriminatedUnion('destination', [
 ]);
 ```
 
-A rota passa a exigir `destination`. **Isso muda o contrato atual do promote** (clientes/teste
-passam a mandar `destination:'note'`). Como a tela de promote ainda não existe (Tarefa 42), o
-impacto é só no teste de rota atual, que eu atualizo.
-
-**Alternativa (sem quebrar):** manter `POST /captures/:id/promote` como está (note) e adicionar
-`POST /captures/:id/promote/resource` e `.../goal`. Mais rotas, zero migração.
-
-→ **Preciso que você escolha**: (A) union com `destination` (recomendo — casa com a Tarefa 42),
-ou (B) duas rotas novas. A spec assume (A); se preferir (B), ajusto.
+A rota passa a **exigir `destination`**. Isso muda o contrato atual do promote (o teste de rota
+atual passa a mandar `destination:'note'`); como a tela de promote ainda não existe (Tarefa 42),
+o impacto é só nesse teste, que será atualizado. A resposta segue discriminada/uniforme:
+`{ note | resource | goal, capture }` conforme o destino. (Aprovado pelo dono.)
 
 ## Testes a escrever PRIMEIRO
 
