@@ -3,9 +3,15 @@ import {
   attachmentResponseSchema,
   type CaptureResponse,
   captureResponseSchema,
+  type LabelNodeResponse,
+  labelNodeResponseSchema,
   type NoteResponse,
   noteResponseSchema,
   type NoteType,
+  type ResourceResponse,
+  resourceResponseSchema,
+  type ResourceStageInput,
+  type ResourceTypeInput,
   type SuggestedQuestionsGroupResponse,
   suggestedQuestionsGroupResponseSchema,
   uploadResponseSchema,
@@ -154,6 +160,78 @@ export function getNoteAttachments(
   noteId: string,
 ): Promise<AttachmentResponse[]> {
   return get(`/notes/${noteId}/attachments`, z.array(attachmentResponseSchema));
+}
+
+// ── Resources (Biblioteca) ──────────────────────────────────────────────────
+
+export interface ListResourcesParams {
+  stage?: ResourceStageInput;
+  labelId?: string;
+  status?: 'ACTIVE' | 'ARCHIVED';
+}
+
+export function listResources(
+  params: ListResourcesParams = {},
+): Promise<ResourceResponse[]> {
+  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  if (params.stage) query.set('stage', params.stage);
+  if (params.labelId) query.set('labelId', params.labelId);
+  query.set('status', params.status ?? 'ACTIVE');
+  return get(`/resources?${query.toString()}`, z.array(resourceResponseSchema));
+}
+
+export interface CreateResourceBody {
+  title: string;
+  type: ResourceTypeInput;
+  url?: string | null;
+  author?: string | null;
+  description?: string | null;
+  labelIds?: string[];
+}
+
+export function createResource(
+  body: CreateResourceBody,
+): Promise<ResourceResponse> {
+  return post(
+    '/resources',
+    { ...body, userId: CURRENT_USER_ID },
+    resourceResponseSchema,
+  );
+}
+
+export function editResource(
+  id: string,
+  body: Partial<CreateResourceBody> & { stage?: ResourceStageInput },
+): Promise<ResourceResponse> {
+  return patch(
+    `/resources/${id}`,
+    { ...body, userId: CURRENT_USER_ID },
+    resourceResponseSchema,
+  );
+}
+
+// ── Labels ──────────────────────────────────────────────────────────────────
+
+export function listLabels(): Promise<LabelNodeResponse[]> {
+  return get(
+    `/labels?userId=${CURRENT_USER_ID}`,
+    z.array(labelNodeResponseSchema),
+  );
+}
+
+/** Achata a árvore de labels para uma lista plana (id + name), p/ filtros simples. */
+export function flattenLabels(
+  nodes: LabelNodeResponse[],
+): { id: string; name: string }[] {
+  const out: { id: string; name: string }[] = [];
+  const walk = (list: LabelNodeResponse[]) => {
+    for (const n of list) {
+      out.push({ id: n.id, name: n.name });
+      if (n.children?.length) walk(n.children);
+    }
+  };
+  walk(nodes);
+  return out;
 }
 
 export async function getTodayNote(

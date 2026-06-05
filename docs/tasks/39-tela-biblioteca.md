@@ -91,8 +91,10 @@ Não testar pixels/estilo (é QA do dono).
 
 ## Definição de pronto
 
-- [ ] Biblioteca lista recursos (loading/erro/vazio), filtra por stage (e label, se incluído),
-      e cria recurso via formulário validado por Zod.
-- [ ] Tudo via `@cerebro/ui` + CSS vars + i18n (sem texto solto, sem cor hardcoded).
-- [ ] Testes dos fluxos (lista/criar/filtro/vazio) verdes; suíte do mobile verde.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- [x] Biblioteca lista recursos (loading/erro/vazio), filtra por stage, e cria recurso via
+      formulário validado por Zod (RHF). Avançar stage por toque (ciclo).
+- [x] Tudo via `@cerebro/ui` + CSS vars + i18n (sem texto solto, sem cor hardcoded).
+- [x] Testes dos fluxos (lista/criar/filtro/vazio) verdes (4); suíte do mobile verde (59).
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar e **parar**.
+- Obs.: filtro por **label** ficou de fora desta entrega (decisão de enxugar — só stage
+  agora). O backend suporta `labelId`; entra como polimento se você quiser.
