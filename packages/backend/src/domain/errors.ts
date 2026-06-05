@@ -111,3 +111,17 @@ export class GoalHasActiveChildrenError extends Error {
     this.name = 'GoalHasActiveChildrenError';
   }
 }
+
+export class EventNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Event not found: ${id}`);
+    this.name = 'EventNotFoundError';
+  }
+}
+
+export class InvalidCheckError extends Error {
+  constructor(message: string) {
+    super(`Invalid check: ${message}`);
+    this.name = 'InvalidCheckError';
+  }
+}

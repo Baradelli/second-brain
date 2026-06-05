@@ -42,7 +42,7 @@
 
 ### Bloco K — Event + progresso
 
-- [ ] **32** — Domínio + UseCase `checkGoal` (cria `Event done`; `value` para TARGET/PROJECT; **rejeita UMBRELLA**) + `undoCheck` (**hard delete** — a exceção). → `tasks/32-usecase-check-undo.md`
+- [x] **32** — Domínio + UseCase `checkGoal` (cria `Event done`; `value` para TARGET/PROJECT; **rejeita UMBRELLA**) + `undoCheck` (**hard delete** — a exceção). → `tasks/32-usecase-check-undo.md`
 - [ ] **33** — UseCase `skipGoal` (cria `Event skip` com `reason` **obrigatório**). → `tasks/33-usecase-skip.md`
 - [ ] **34** — UseCase `computeGoalProgress` (HABIT conta eventos no período; TARGET/PROJECT somam `value`; UMBRELLA agrega filhos) — puro, só leitura, **TDD pesado aqui**. → `tasks/34-usecase-progresso.md`
 - [ ] **35** — Repository de Event (interface + fake + Prisma + contrato) + rotas de check/skip/undo. → `tasks/35-repository-rota-event.md`

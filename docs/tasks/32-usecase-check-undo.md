@@ -35,9 +35,9 @@ export interface Event {
   userId: string;
   goalId: string;
   type: EventType;
-  value: number | null;  // TARGET/PROJECT: quanto somou neste check (done). skip: null
+  value: number | null; // TARGET/PROJECT: quanto somou neste check (done). skip: null
   reason: string | null; // obrigatório quando type='skip' (Tarefa 33). done: null
-  occurredAt: Date;      // instante UTC
+  occurredAt: Date; // instante UTC
   createdAt: Date;
 }
 ```
@@ -55,10 +55,10 @@ necessário (a Tarefa 34 acrescenta `find`; a 35 faz o Prisma + contrato):
 export interface EventFilter {
   userId: string;
   goalId?: string;
-  goalIds?: string[];          // agregação de UMBRELLA (Tarefa 34)
+  goalIds?: string[]; // agregação de UMBRELLA (Tarefa 34)
   type?: EventType;
-  from?: Date;                 // occurredAt >= from
-  to?: Date;                   // occurredAt <= to
+  from?: Date; // occurredAt >= from
+  to?: Date; // occurredAt <= to
 }
 
 export interface EventRepository {
@@ -78,9 +78,9 @@ export interface EventRepository {
 ```ts
 export interface CheckGoalInput {
   goalId: string;
-  userId: string;       // dono; senão GoalNotFoundError (não vaza)
+  userId: string; // dono; senão GoalNotFoundError (não vaza)
   value?: number | null; // TARGET/PROJECT: quanto somou neste check
-  occurredAt?: Date;    // default: now
+  occurredAt?: Date; // default: now
 }
 type CheckGoalOutput = Event; // type='done'
 
@@ -157,10 +157,11 @@ type UndoCheckOutput = void;
 
 ## Definição de pronto
 
-- [ ] Domínio `Event` + erros criados.
-- [ ] `EventRepository` (save/byId/delete) + fake.
-- [ ] `checkGoal` (rejeita UMBRELLA; regra de `value` por tipo; goal arquivado/owner) e
+- [x] Domínio `Event` + erros criados.
+- [x] `EventRepository` (save/byId/delete) + fake.
+- [x] `checkGoal` (rejeita UMBRELLA; regra de `value` por tipo; goal arquivado/owner) e
       `undoCheck` (hard delete de `done`) implementados, dependendo só das interfaces.
-- [ ] Testes de UseCase escritos **antes**, todos verdes, cobrindo as 9 regras.
-- [ ] Sem Prisma/Fastify/Zod/tela tocados.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
+- [x] Testes de UseCase escritos **antes**, todos verdes, cobrindo as 9 regras.
+      (check-goal: 9 · undo-check: 3)
+- [x] Sem Prisma/Fastify/Zod/tela tocados.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
