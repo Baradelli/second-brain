@@ -75,8 +75,8 @@ type SkipGoalOutput = Event; // type='skip', value=null
 
 ## Definição de pronto
 
-- [ ] `skipGoal` implementado, dependendo só das interfaces (Goal + Event repos).
-- [ ] `reason` obrigatório; rejeita UMBRELLA e goal arquivado; not-found para owner errado.
-- [ ] Testes de UseCase escritos **antes**, todos verdes (5 regras).
-- [ ] Sem Prisma/Fastify/Zod/tela tocados.
-- [ ] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
+- [x] `skipGoal` implementado, dependendo só das interfaces (Goal + Event repos).
+- [x] `reason` obrigatório; rejeita UMBRELLA e goal arquivado; not-found para owner errado.
+- [x] Testes de UseCase escritos **antes**, todos verdes (6 testes).
+- [x] Sem Prisma/Fastify/Zod/tela tocados.
+- [x] Marcar `BACKLOG.md` + esta "Definição de pronto", reportar feito vs definição e **parar**.
