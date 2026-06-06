@@ -104,7 +104,8 @@ Hoje labels são invisíveis no app, apesar de existirem no banco.
 - A4. Tela "Labels" (CRUD + árvore). **Front · M** — **[x] feito** (`LabelsPage`, via ícone no header).
 - A5. Plugar `LabelPicker` nos forms (Resource, Goal, Note, Captura/promote). **Front · M**
       — **[~] parcial**: Resource e Goal feitos; **falta Nota (editor) e Captura** (A3b).
-- A6 (antigo). ~~Filtro por label com rollup~~ → vira **A4 simples** (sem rollup), pois labels são planas.
+- A4. Filtro por label (simples, sem rollup) nas listas. **Front · M** — **[x] feito**
+      (`LabelFilter` client-side em Biblioteca e Objetivos; Notas depende de A3b).
 - **A6 (novo) — Remover a árvore do schema** (migração tira `Label.parentId`; backend
   `list-label-tree`→lista plana, remover reparent/ciclo do `editLabel`/`createLabel`). **Back · M** · *futuro*
 

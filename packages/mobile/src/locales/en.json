@@ -66,6 +66,7 @@
   "labels.color.none": "No color",
   "labels.pick": "Labels",
   "labels.pickEmpty": "No labels created yet (create them via the top icon).",
+  "labels.filterAll": "All",
   "editor.type.devotional": "Devotional",
   "editor.type.reflection": "Reflection",
   "editor.type.study": "Study note",

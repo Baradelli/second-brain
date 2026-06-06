@@ -43,6 +43,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
   listResources: vi.fn(),
   createResource: vi.fn(),
   editResource: vi.fn(),
+  listLabels: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -68,6 +69,7 @@ function makeResource(overrides: Record<string, unknown> = {}) {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(endpoints.listResources).mockResolvedValue([]);
+  vi.mocked(endpoints.listLabels).mockResolvedValue([]);
 });
 
 afterEach(async () => {
@@ -101,6 +103,36 @@ describe('LibraryPage', () => {
         stage: 'done',
       }),
     );
+  });
+
+  it('filtra por label (client-side, mostra só os que têm a label)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listResources).mockResolvedValue([
+      makeResource({ id: 'with', title: 'Com label', labelIds: ['l1'] }) as never,
+      makeResource({ id: 'without', title: 'Sem label', labelIds: [] }) as never,
+    ]);
+    vi.mocked(endpoints.listLabels).mockResolvedValue([
+      {
+        id: 'l1',
+        userId: 'owner',
+        name: 'Tech',
+        parentId: null,
+        color: null,
+        status: 'ACTIVE',
+        archivedAt: null,
+        createdAt: '2026-06-01T00:00:00.000Z',
+        children: [],
+      } as never,
+    ]);
+    render(<LibraryPage />);
+
+    await waitFor(() => screen.getByText('Com label'));
+    expect(screen.getByText('Sem label')).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('label-filter-l1'));
+
+    await waitFor(() => expect(screen.queryByText('Sem label')).toBeNull());
+    expect(screen.getByText('Com label')).toBeInTheDocument();
   });
 
   it('cria um recurso e recarrega a lista', async () => {

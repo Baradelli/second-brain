@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LabelFilter } from '../components/LabelFilter.js';
 import { ResourceForm } from '../components/ResourceForm.js';
 import {
   createResource,
@@ -42,6 +43,7 @@ export function LibraryPage() {
   const [error, setError] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [labelFilter, setLabelFilter] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -86,6 +88,10 @@ export function LibraryPage() {
     await editResource(resource.id, { stage: next });
     await reload();
   }
+
+  const visible = labelFilter
+    ? resources.filter((r) => r.labelIds.includes(labelFilter))
+    : resources;
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-5 pt-8 pb-24">
@@ -135,6 +141,9 @@ export function LibraryPage() {
         })}
       </div>
 
+      {/* Filtro por label */}
+      <LabelFilter value={labelFilter} onChange={setLabelFilter} />
+
       {loading && (
         <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
           {t('agenda.loading')}
@@ -147,7 +156,7 @@ export function LibraryPage() {
         </p>
       )}
 
-      {!loading && !error && resources.length === 0 && (
+      {!loading && !error && visible.length === 0 && (
         <EmptyState
           icon={<BookOpen size={20} strokeWidth={1.75} />}
           title={t('library.empty')}
@@ -155,9 +164,9 @@ export function LibraryPage() {
         />
       )}
 
-      {!loading && !error && resources.length > 0 && (
+      {!loading && !error && visible.length > 0 && (
         <div className="space-y-2.5" data-testid="library-list">
-          {resources.map((r) => (
+          {visible.map((r) => (
             <ResourceCard key={r.id} resource={r} onAdvance={advanceStage} />
           ))}
         </div>

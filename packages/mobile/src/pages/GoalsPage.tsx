@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { GoalForm } from '../components/GoalForm.js';
+import { LabelFilter } from '../components/LabelFilter.js';
 import {
   checkGoal,
   completeGoal,
@@ -31,6 +32,7 @@ export function GoalsPage() {
   const [error, setError] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [labelFilter, setLabelFilter] = useState<string | null>(null);
   const [valueFor, setValueFor] = useState<GoalResponse | null>(null);
   const [value, setValue] = useState('');
 
@@ -93,6 +95,10 @@ export function GoalsPage() {
     await load();
   }
 
+  const visible = labelFilter
+    ? goals.filter((g) => g.labelIds.includes(labelFilter))
+    : goals;
+
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-5 pt-8 pb-24">
       <div className="mb-5 flex items-center justify-between">
@@ -112,6 +118,8 @@ export function GoalsPage() {
         </Button>
       </div>
 
+      <LabelFilter value={labelFilter} onChange={setLabelFilter} />
+
       {loading && (
         <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
           {t('agenda.loading')}
@@ -124,16 +132,16 @@ export function GoalsPage() {
         </p>
       )}
 
-      {!loading && !error && goals.length === 0 && (
+      {!loading && !error && visible.length === 0 && (
         <EmptyState
           icon={<Target size={20} strokeWidth={1.75} />}
           title={t('goals.empty')}
         />
       )}
 
-      {!loading && !error && goals.length > 0 && (
+      {!loading && !error && visible.length > 0 && (
         <div className="space-y-2.5" data-testid="goals-list">
-          {goals.map((g) => (
+          {visible.map((g) => (
             <GoalCard
               key={g.id}
               goal={g}

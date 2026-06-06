@@ -66,6 +66,7 @@
   "labels.color.none": "Sem cor",
   "labels.pick": "Labels",
   "labels.pickEmpty": "Nenhuma label criada ainda (crie pelo ícone no topo).",
+  "labels.filterAll": "Todas",
   "editor.type.devotional": "Devocional",
   "editor.type.reflection": "Reflexão",
   "editor.type.study": "Fichamento",
