@@ -122,7 +122,7 @@ Hoje labels são invisíveis no app, apesar de existirem no banco.
 
 ---
 
-## Bloco B — Biblioteca **de verdade** (recurso → notas referenciadas) + filtros
+## Bloco B — Biblioteca **de verdade** (recurso → notas referenciadas) + filtros — **[x] FECHADO**
 
 **Dor (o centro do pedido).** "Uma biblioteca tem que ser realmente uma biblioteca: quando eu
 clico em algo, já aparecem **todas as notas referenciadas a ele** — é o que eu preciso." Mais:
@@ -163,7 +163,8 @@ filtros melhores, ordenar por tipo, e status **genérico** (o "Lendo" não serve
 - B1. **Tela de detalhe do recurso** + lista de notas + "novo fichamento daqui". **Front · M** — **[x] feito**
       (`ResourceDetailPage` em `/library/:id`; `GET /resources/:id` no backend; cards clicáveis).
 - B2. Status genérico (`resource.stage.*` → "A fazer / Em andamento / Concluído"). **Front · S** — **[x] feito**
-- B3. Filtro por tipo + ordenação na `LibraryPage`. **Front · S/M** — *a fazer*
+- B3. Filtro por tipo + ordenação na `LibraryPage`. **Front · S/M** — **[x] feito**
+      (selects de tipo + ordenação recentes/título/tipo, client-side).
 - B4. Filtro por label. **[x] feito** na A4.
 
 **Dependências.** B0/B1 (o "de verdade") são o coração e quase independentes — ótimo candidato a

@@ -158,6 +158,39 @@ describe('LibraryPage', () => {
     expect(screen.getByText('Com label')).toBeInTheDocument();
   });
 
+  it('filtra por tipo (client-side)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listResources).mockResolvedValue([
+      makeResource({ id: 'b', title: 'Um livro', type: 'book' }) as never,
+      makeResource({ id: 'c', title: 'Um curso', type: 'course' }) as never,
+    ]);
+    renderLibrary();
+    await waitFor(() => screen.getByText('Um livro'));
+
+    await user.selectOptions(screen.getByTestId('type-filter'), 'course');
+
+    await waitFor(() => expect(screen.queryByText('Um livro')).toBeNull());
+    expect(screen.getByText('Um curso')).toBeInTheDocument();
+  });
+
+  it('ordena por título', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listResources).mockResolvedValue([
+      makeResource({ id: 'z', title: 'Zebra' }) as never,
+      makeResource({ id: 'a', title: 'Abelha' }) as never,
+    ]);
+    renderLibrary();
+    await waitFor(() => screen.getByTestId('library-list'));
+
+    await user.selectOptions(screen.getByTestId('sort-by'), 'title');
+
+    await waitFor(() => {
+      const cards = screen.getAllByTestId(/^open-resource-/);
+      expect(cards[0]).toHaveAttribute('data-testid', 'open-resource-a');
+      expect(cards[1]).toHaveAttribute('data-testid', 'open-resource-z');
+    });
+  });
+
   it('tocar num recurso abre o detalhe', async () => {
     const user = userEvent.setup();
     vi.mocked(endpoints.listResources).mockResolvedValue([

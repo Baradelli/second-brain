@@ -23,9 +23,20 @@ import {
 } from '../lib/api/endpoints.js';
 
 type StageFilter = 'all' | ResourceStageInput;
+type TypeFilter = 'all' | ResourceResponse['type'];
+type SortBy = 'recent' | 'title' | 'type';
 
 const STAGE_FILTERS: StageFilter[] = ['all', 'backlog', 'in_progress', 'done'];
 const STAGE_CYCLE: ResourceStageInput[] = ['backlog', 'in_progress', 'done'];
+const TYPE_OPTIONS = [
+  'book',
+  'course',
+  'video',
+  'article',
+  'podcast',
+  'other',
+] as const;
+const SORT_OPTIONS: SortBy[] = ['recent', 'title', 'type'];
 
 const TYPE_ICON: Record<string, LucideIcon> = {
   book: BookOpen,
@@ -46,6 +57,8 @@ export function LibraryPage() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
+  const [sortBy, setSortBy] = useState<SortBy>('recent');
 
   useEffect(() => {
     let cancelled = false;
@@ -91,9 +104,16 @@ export function LibraryPage() {
     await reload();
   }
 
-  const visible = labelFilter
-    ? resources.filter((r) => r.labelIds.includes(labelFilter))
-    : resources;
+  const visible = resources
+    .filter((r) => typeFilter === 'all' || r.type === typeFilter)
+    .filter((r) => !labelFilter || r.labelIds.includes(labelFilter))
+    .slice()
+    .sort((a, b) => {
+      if (sortBy === 'title') return a.title.localeCompare(b.title);
+      if (sortBy === 'type')
+        return a.type.localeCompare(b.type) || a.title.localeCompare(b.title);
+      return b.createdAt.localeCompare(a.createdAt); // recent first
+    });
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-5 pt-8 pb-24">
@@ -145,6 +165,47 @@ export function LibraryPage() {
 
       {/* Filtro por label */}
       <LabelFilter value={labelFilter} onChange={setLabelFilter} />
+
+      {/* Tipo + ordenação */}
+      <div className="mb-5 flex gap-2">
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
+          data-testid="type-filter"
+          aria-label={t('library.filter.type')}
+          className="h-9 flex-1 rounded-full px-3 text-xs font-semibold outline-none"
+          style={{
+            backgroundColor: 'var(--cerebro-raised)',
+            color: 'var(--cerebro-fg)',
+            border: '1px solid var(--cerebro-border)',
+          }}
+        >
+          <option value="all">{t('library.type.all')}</option>
+          {TYPE_OPTIONS.map((tp) => (
+            <option key={tp} value={tp}>
+              {t(`resource.type.${tp}`)}
+            </option>
+          ))}
+        </select>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as SortBy)}
+          data-testid="sort-by"
+          aria-label={t('library.sort.label')}
+          className="h-9 flex-1 rounded-full px-3 text-xs font-semibold outline-none"
+          style={{
+            backgroundColor: 'var(--cerebro-raised)',
+            color: 'var(--cerebro-fg)',
+            border: '1px solid var(--cerebro-border)',
+          }}
+        >
+          {SORT_OPTIONS.map((s) => (
+            <option key={s} value={s}>
+              {t(`library.sort.${s}`)}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {loading && (
         <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
