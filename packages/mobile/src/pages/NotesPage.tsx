@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { LabelFilter } from '../components/LabelFilter.js';
 import { listNotes, listResources } from '../lib/api/endpoints.js';
 
 const NOTE_TYPES: { type: NoteType; labelKey: string; color: string }[] = [
@@ -58,6 +59,7 @@ export function NotesPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [addStep, setAddStep] = useState<'type' | 'resource'>('type');
   const [resources, setResources] = useState<ResourceResponse[]>([]);
+  const [labelFilter, setLabelFilter] = useState<string | null>(null);
 
   function openAdd() {
     setAddStep('type');
@@ -100,6 +102,10 @@ export function NotesPage() {
       cancelled = true;
     };
   }, [filter]);
+
+  const visible = labelFilter
+    ? notes.filter((n) => n.labelIds?.includes(labelFilter))
+    : notes;
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-5 pt-8 pb-24">
@@ -155,6 +161,9 @@ export function NotesPage() {
         })}
       </div>
 
+      {/* Filtro por label */}
+      <LabelFilter value={labelFilter} onChange={setLabelFilter} />
+
       {loading && (
         <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
           {t('agenda.loading')}
@@ -167,13 +176,13 @@ export function NotesPage() {
         </p>
       )}
 
-      {!loading && !error && notes.length === 0 && (
+      {!loading && !error && visible.length === 0 && (
         <EmptyState title={t('notes.empty')} />
       )}
 
-      {!loading && !error && notes.length > 0 && (
+      {!loading && !error && visible.length > 0 && (
         <div className="space-y-2.5" data-testid="notes-list">
-          {notes.map((note) => (
+          {visible.map((note) => (
             <button
               key={note.id}
               type="button"

@@ -5,7 +5,7 @@ import {
   type SuggestedQuestionsGroupResponse,
 } from '@cerebro/shared';
 import { BottomSheet, RichEditor } from '@cerebro/ui';
-import { ArrowLeft, Camera, HelpCircle, ImagePlus } from 'lucide-react';
+import { ArrowLeft, Camera, HelpCircle, ImagePlus, Tag } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -18,6 +18,7 @@ import {
   getTodayNote,
   uploadAttachmentFile,
 } from '../lib/api/endpoints.js';
+import { LabelPicker } from '../components/LabelPicker.js';
 import {
   persistNoteCreate,
   persistNoteEdit,
@@ -89,6 +90,7 @@ export function EditorPage() {
   const [attachments, setAttachments] = useState<AttachmentResponse[]>([]);
   const [questionsOpen, setQuestionsOpen] = useState(false);
   const [attachOpen, setAttachOpen] = useState(false);
+  const [labelsOpen, setLabelsOpen] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -201,6 +203,11 @@ export function EditorPage() {
     [],
   );
 
+  function handleLabelsChange(next: string[]) {
+    setLabelIds(next);
+    if (noteId) void persistNoteEdit(noteId, { labelIds: next });
+  }
+
   if (loading) {
     return (
       <div
@@ -268,6 +275,21 @@ export function EditorPage() {
               ? attachments.length
               : t('editor.attach.button')}
           </button>
+
+          <button
+            type="button"
+            aria-label={t('editor.labels.button')}
+            onClick={() => setLabelsOpen(true)}
+            data-testid="editor-labels-button"
+            className="flex h-9 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition-all duration-150 hover:bg-[var(--cerebro-accent-soft)] active:scale-95"
+            style={{
+              color: 'var(--cerebro-muted)',
+              border: '1px solid var(--cerebro-border)',
+            }}
+          >
+            <Tag size={15} strokeWidth={1.85} />
+            {labelIds.length > 0 ? labelIds.length : t('editor.labels.button')}
+          </button>
         </div>
 
         <SaveIndicator status={saveStatus} t={t} />
@@ -322,6 +344,22 @@ export function EditorPage() {
         attachments={attachments}
         onAttached={(att) => setAttachments((prev) => [...prev, att])}
       />
+
+      <BottomSheet open={labelsOpen} onClose={() => setLabelsOpen(false)}>
+        <h2
+          className="mb-4 font-display text-lg font-semibold"
+          style={{ color: 'var(--cerebro-fg)' }}
+        >
+          {t('editor.labels.title')}
+        </h2>
+        {noteId ? (
+          <LabelPicker value={labelIds} onChange={handleLabelsChange} />
+        ) : (
+          <p className="py-4 text-sm" style={{ color: 'var(--cerebro-muted)' }}>
+            {t('editor.labels.noNote')}
+          </p>
+        )}
+      </BottomSheet>
     </div>
   );
 }

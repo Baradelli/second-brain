@@ -42,6 +42,7 @@ export async function processQueue(
         await api.editNote(ref, {
           doc: cmd.payload.doc,
           title: cmd.payload.title,
+          labelIds: cmd.payload.labelIds,
         });
       }
       await queue.remove(cmd.seq);

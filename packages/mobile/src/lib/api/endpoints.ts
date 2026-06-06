@@ -156,7 +156,7 @@ export function createNote(body: {
 
 export function editNote(
   id: string,
-  body: { doc?: Record<string, unknown>; title?: string },
+  body: { doc?: Record<string, unknown>; title?: string; labelIds?: string[] },
 ): Promise<NoteResponse> {
   return patch(`/notes/${id}`, body, noteResponseSchema);
 }

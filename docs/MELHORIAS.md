@@ -51,7 +51,7 @@ tempo real, IA, e o template pronto — **nada disso é necessário** para o que
 
 ---
 
-## Bloco A — Labels (taxonomia que atravessa o app)
+## Bloco A — Labels (taxonomia que atravessa o app) — **[x] FECHADO** (exceto A6, futuro)
 
 > **Decisão revista (jun/2026): labels são PLANAS, sem hierarquia.** O dono observou que, se um
 > item já pode ter **muitas labels** (N–N), a **árvore** vira complexidade sem ganho. Então:
@@ -103,7 +103,10 @@ Hoje labels são invisíveis no app, apesar de existirem no banco.
       — **[x] feito** (`LabelPicker` + aplicado em `ResourceForm`/`GoalForm`).
 - A4. Tela "Labels" (CRUD + árvore). **Front · M** — **[x] feito** (`LabelsPage`, via ícone no header).
 - A5. Plugar `LabelPicker` nos forms (Resource, Goal, Note, Captura/promote). **Front · M**
-      — **[~] parcial**: Resource e Goal feitos; **falta Nota (editor) e Captura** (A3b).
+      — **[x] feito**: Resource, Goal e **Nota (editor)**. **Captura: fora de escopo de
+      propósito** (princípio "captura sem atrito" — labels entram na edição/promoção).
+- A3b. Labels no editor de nota + filtro por label nas Notas. **Front · M** — **[x] feito**
+      (botão "Labels" no editor persiste via `editNote(labelIds)`; `LabelFilter` na `NotesPage`).
 - A4. Filtro por label (simples, sem rollup) nas listas. **Front · M** — **[x] feito**
       (`LabelFilter` client-side em Biblioteca e Objetivos; Notas depende de A3b).
 - **A6 (novo) — Remover a árvore do schema** (migração tira `Label.parentId`; backend

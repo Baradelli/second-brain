@@ -94,6 +94,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
   uploadAttachmentFile: vi.fn(),
   attachFileToNote: vi.fn(),
   getNoteAttachments: vi.fn(),
+  listLabels: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -129,6 +130,7 @@ beforeEach(() => {
     'http://test.local/uploads/abc.png',
   );
   vi.mocked(endpoints.attachFileToNote).mockResolvedValue(STUB_ATTACHMENT());
+  vi.mocked(endpoints.listLabels).mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -323,6 +325,40 @@ describe('EditorPage — painel de perguntas sugeridas', () => {
     await userEvent.click(screen.getByRole('button', { name: /perguntas/i }));
 
     await waitFor(() => screen.getByText(/nenhuma pergunta para os labels/i));
+  });
+});
+
+// ── Labels da nota ────────────────────────────────────────────────────────────
+
+describe('EditorPage — labels da nota', () => {
+  it('marca uma label e persiste via editNote(labelIds)', async () => {
+    vi.mocked(endpoints.listLabels).mockResolvedValue([
+      {
+        id: 'l1',
+        userId: 'owner',
+        name: 'Tech',
+        parentId: null,
+        color: null,
+        status: 'ACTIVE',
+        archivedAt: null,
+        createdAt: new Date().toISOString(),
+        children: [],
+      } as never,
+    ]);
+
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderEditor('/editor/note-1');
+    await waitFor(() => screen.getByTestId('rich-editor'));
+
+    await user.click(screen.getByTestId('editor-labels-button'));
+    await waitFor(() => screen.getByTestId('pick-label-l1'));
+    await user.click(screen.getByTestId('pick-label-l1'));
+
+    await waitFor(() =>
+      expect(endpoints.editNote).toHaveBeenCalledWith('note-1', {
+        labelIds: ['l1'],
+      }),
+    );
   });
 });
 

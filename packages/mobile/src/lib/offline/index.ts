@@ -95,7 +95,7 @@ export async function persistNoteCreate(
 /** Edita a nota online; se offline/falha, enfileira (ref pode ser id real ou clientId). */
 export async function persistNoteEdit(
   ref: string,
-  body: { doc?: Record<string, unknown>; title?: string },
+  body: { doc?: Record<string, unknown>; title?: string; labelIds?: string[] },
 ): Promise<{ queued: boolean }> {
   if (!isOffline()) {
     try {

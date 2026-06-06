@@ -30,7 +30,12 @@ export interface EditNoteCommand {
   type: 'editNote';
   createdAt: string;
   // ref pode ser um id real do servidor OU um clientId de nota criada offline
-  payload: { ref: string; doc?: Record<string, unknown>; title?: string };
+  payload: {
+    ref: string;
+    doc?: Record<string, unknown>;
+    title?: string;
+    labelIds?: string[];
+  };
 }
 
 export type Command =
@@ -65,6 +70,6 @@ export interface OfflineApi {
   }): Promise<{ id: string }>;
   editNote(
     id: string,
-    body: { doc?: Record<string, unknown>; title?: string },
+    body: { doc?: Record<string, unknown>; title?: string; labelIds?: string[] },
   ): Promise<{ id: string }>;
 }
