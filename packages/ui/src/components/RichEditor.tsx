@@ -1,4 +1,5 @@
 import Color from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextStyle from '@tiptap/extension-text-style';
@@ -8,12 +9,22 @@ import {
   Bold,
   Heading1,
   Heading2,
+  Highlighter,
   Italic,
   List,
   ListOrdered,
   Quote,
 } from 'lucide-react';
 import { type ReactNode, useEffect } from 'react';
+
+// Cores de grifo com alpha → legíveis no tema claro e escuro.
+const HIGHLIGHT_COLORS = [
+  'rgba(250, 204, 21, 0.40)', // amarelo
+  'rgba(34, 197, 94, 0.35)', // verde
+  'rgba(249, 115, 22, 0.40)', // laranja
+  'rgba(59, 130, 246, 0.35)', // azul
+  'rgba(236, 72, 153, 0.35)', // rosa
+] as const;
 
 export interface RichEditorProps {
   doc?: Record<string, unknown>;
@@ -42,6 +53,7 @@ export function RichEditor({
       Link.configure({ openOnClick: false }),
       TextStyle,
       Color,
+      Highlight.configure({ multicolor: true }),
     ],
     content: doc as JSONContent | undefined,
     editable,
@@ -152,7 +164,74 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
       >
         <ListOrdered {...iconProps} />
       </ToolBtn>
+
+      <Divider />
+
+      {/* Grifar com cores */}
+      {HIGHLIGHT_COLORS.map((color, i) => (
+        <HighlightSwatch
+          key={color}
+          color={color}
+          active={editor.isActive('highlight', { color })}
+          title={`Grifar (${i + 1})`}
+          onPress={() =>
+            editor.chain().focus().toggleHighlight({ color }).run()
+          }
+        />
+      ))}
+      <ToolBtn
+        active={false}
+        title="Remover grifo"
+        onPress={() => editor.chain().focus().unsetHighlight().run()}
+      >
+        <Highlighter {...iconProps} />
+      </ToolBtn>
     </div>
+  );
+}
+
+function HighlightSwatch({
+  color,
+  active,
+  title,
+  onPress,
+}: {
+  color: string;
+  active: boolean;
+  title: string;
+  onPress: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      aria-pressed={active}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onPress();
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        onPress();
+      }}
+      className="flex shrink-0 items-center justify-center rounded-lg transition-all duration-100 active:scale-90"
+      style={{
+        width: '2.25rem',
+        height: '2.25rem',
+      }}
+    >
+      <span
+        className="h-5 w-5 rounded-full"
+        style={{
+          backgroundColor: color,
+          outline: active
+            ? '2px solid var(--cerebro-fg)'
+            : '1px solid var(--cerebro-border)',
+          outlineOffset: '1px',
+        }}
+      />
+    </button>
   );
 }
 

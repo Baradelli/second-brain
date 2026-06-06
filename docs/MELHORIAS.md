@@ -197,6 +197,7 @@ pronto — **não usamos**.
 
 - **C1 — Grifar com cores (o pedido imediato).** `@tiptap/extension-highlight` multicolor +
   botões com paleta (amarelo/verde/rosa/azul) legível nos 2 temas; opcional cor de texto. **S/M**
+  — **[x] feito** (swatches na toolbar do `RichEditor` + botão "remover grifo"; cores rgba c/ alpha).
 - **C2 — Sensação Notion básica.** Menu **"/"** para inserir blocos + **bubble menu** de
   formatação na seleção. **M**
 - **C3 — Mais blocos.** Checklist (TaskList), **toggle** (Details), divisória, callout, tabela. **M/G**
