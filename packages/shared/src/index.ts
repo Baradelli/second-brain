@@ -1,4 +1,5 @@
 export * from './attachment.js';
+export * from './calendar.js';
 export * from './capture.js';
 export * from './common.js';
 export * from './day-closing.js';

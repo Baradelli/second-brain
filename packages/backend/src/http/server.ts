@@ -14,6 +14,7 @@ import {
 
 import { agendaRoutes } from '../routes/agenda-routes.js';
 import { attachmentRoutes } from '../routes/attachment-routes.js';
+import { calendarRoutes } from '../routes/calendar-routes.js';
 import { captureRoutes } from '../routes/capture-routes.js';
 import { dayClosingRoutes } from '../routes/day-closing-routes.js';
 import { eventRoutes } from '../routes/event-routes.js';
@@ -66,6 +67,7 @@ export async function buildServer() {
   await app.register(goalRoutes, { prisma });
   await app.register(eventRoutes, { prisma });
   await app.register(dayClosingRoutes, { prisma });
+  await app.register(calendarRoutes, { prisma });
 
   return app;
 }

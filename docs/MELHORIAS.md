@@ -115,8 +115,7 @@ Hoje labels são invisíveis no app, apesar de existirem no banco.
   (botão "Labels" no editor persiste via `editNote(labelIds)`; `LabelFilter` na `NotesPage`).
 - A4. Filtro por label (simples, sem rollup) nas listas. **Front · M** — **[x] feito**
   (`LabelFilter` client-side em Biblioteca e Objetivos; Notas depende de A3b).
-- **A6 (novo) — Remover a árvore do schema** (migração tira `Label.parentId`; backend
-  `list-label-tree`→lista plana, remover reparent/ciclo do `editLabel`/`createLabel`). **Back · M** · _futuro_
+- **A6 — Remover a árvore do schema** → movido para **Melhorias futuras (F1)** no fim do arquivo. _futuro_
 
 **Dependências.** É **pré-requisito** do filtro por label do Bloco B. Bom começar por aqui.
 
@@ -209,8 +208,8 @@ pronto — **não usamos**.
   — **[x] feito**: `DragHandle` (alça de arraste por bloco). Transformar bloco já dá pelo menu "/".
 - **C5 — Links entre notas (menção `@`).** **[x] feito**: digitar `@` no editor busca notas
   (injetado via `noteSearch`) e insere uma **referência clicável** que navega pra nota
-  (`onOpenNoteLink`). Forward links prontos. *Falta (futuro): painel de **backlinks reversos***
-  ("quais notas apontam pra esta") — exige índice reverso dos docs.
+  (`onOpenNoteLink`). Forward links prontos. *Backlinks reversos* → movido para
+  **Melhorias futuras (F2)** no fim do arquivo.
 
 **Perguntas para decidir.**
 
@@ -225,7 +224,7 @@ momento. C5 (backlinks) toca dados (relação nota↔nota) — provavelmente um 
 
 ---
 
-## Bloco D — Calendário com **metas reais** / histórico
+## Bloco D — Calendário com **metas reais** / histórico — **[~] em andamento** (D1 feito)
 
 **Dor.** "Queria um visualizador em calendário **com metas reais**." (Não só notas — ver os
 objetivos e o que foi cumprido em cada dia.)
@@ -260,8 +259,11 @@ objetivos e o que foi cumprido em cada dia.)
 
 **Tarefas candidatas.**
 
-- D1. UseCase/endpoint agregador por mês (metas previstas/feitas + diário + notas/dia). **Back · M**
-- D2. Tela de calendário mensal + marcação por dia. **Front · M/G**
+- D1. UseCase/endpoint agregador por mês (metas previstas/feitas + selo de diário). **Back · M**
+  — **[x] feito** (`tasks/44-back-calendario-mensal.md`): `buildMonthCalendar` + `GET /calendar`;
+  helpers `localDayKey`/`monthDayKeys`; `calendar*Schema` em `shared/`. Decisão: notas/capturas
+  ficaram **fora** do agregador (só metas previstas×cumpridas + selo devocional/reflexão).
+- D2. Tela de calendário mensal + marcação por dia. **Front · M/G** — _próxima_
 - D3. Detalhe do dia (metas + notas) → navegação/ações. **Front · M**
 
 **Dependências.** Maior bloco. Reaproveita muito do Bloco K do MVP 2 (eventos/progresso). Encosta
@@ -346,3 +348,20 @@ Comparativos Notion × Obsidian (dono do dado, mobile, casos de uso):
 licença** (só os bundles de colaboração/IA são pagos, e não precisamos deles); (2) o diferencial
 do Obsidian é portabilidade do dado → manter export `.md` no radar; (3) nosso norte é a fluidez
 do Notion **mantendo nós donos do dado** (TipTap JSON no nosso Postgres).
+
+---
+
+## Melhorias futuras (anotadas, a analisar depois)
+
+> Itens **fechados como "futuro"** nos blocos acima, reunidos aqui pra decidirmos quando/se
+> entram. **Não são tarefas ainda.**
+
+- **F1 — Remover a árvore de labels do schema (ex-A6).** Migração tira `Label.parentId`; no
+  backend `list-label-tree` → lista plana, remover reparent/guarda-de-ciclo de
+  `editLabel`/`createLabel`. Hoje a UI já age como plana e o `parentId` fica inofensivo no banco;
+  é **limpeza de dívida**, sem ganho visível pro usuário. **Back · M** · _origem: Bloco A_
+- **F2 — Backlinks reversos no editor (ex-C5, parte 2).** Hoje temos os **forward links** (menção
+  `@` → referência clicável que navega). Falta o **reverso**: num painel da nota, "quais notas
+  apontam pra esta". Exige um **índice reverso** dos docs (varrer os `mention` nos docs ou manter
+  uma tabela de arestas nota↔nota atualizada na gravação) + endpoint + UI. É o que torna o
+  "cérebro" de fato interligado. **Back+Front · M/G** · _origem: Bloco C_
