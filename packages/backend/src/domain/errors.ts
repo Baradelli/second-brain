@@ -112,6 +112,27 @@ export class GoalHasActiveChildrenError extends Error {
   }
 }
 
+export class GoalNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`Goal '${id}' must be archived before it can be deleted.`);
+    this.name = 'GoalNotArchivedError';
+  }
+}
+
+export class GoalHasDoneHistoryError extends Error {
+  constructor(id: string) {
+    super(`Cannot delete goal '${id}': it has completion history.`);
+    this.name = 'GoalHasDoneHistoryError';
+  }
+}
+
+export class GoalHasChildrenError extends Error {
+  constructor(public readonly count: number) {
+    super(`Cannot delete goal: it has ${count} child goal(s).`);
+    this.name = 'GoalHasChildrenError';
+  }
+}
+
 export class EventNotFoundError extends Error {
   constructor(id: string) {
     super(`Event not found: ${id}`);

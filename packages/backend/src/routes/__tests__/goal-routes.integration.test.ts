@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 const USER_ID = 'owner'; // seeded user
 
 async function clearGoals() {
+  await prisma.event.deleteMany({ where: { userId: USER_ID } });
   await prisma.goal.deleteMany({ where: { userId: USER_ID } });
 }
 
@@ -196,6 +197,93 @@ describe('POST /goals/:id/archive', () => {
     const res = await app.inject({
       method: 'POST',
       url: `/goals/${umbId}/archive`,
+      payload: { userId: USER_ID },
+    });
+
+    expect(res.statusCode).toBe(409);
+  });
+});
+
+async function createArchivedGoal(): Promise<string> {
+  const created = await app.inject({
+    method: 'POST',
+    url: '/goals',
+    payload: { userId: USER_ID, title: 'Solo', type: 'HABIT', weekdays: [1] },
+  });
+  const id = created.json().id;
+  await app.inject({
+    method: 'POST',
+    url: `/goals/${id}/archive`,
+    payload: { userId: USER_ID },
+  });
+  return id;
+}
+
+describe('GET /goals/archived', () => {
+  it('lista arquivados com flag deletable', async () => {
+    await createArchivedGoal();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: `/goals/archived?userId=${USER_ID}`,
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body).toHaveLength(1);
+    expect(body[0].status).toBe('ARCHIVED');
+    expect(body[0].deletable).toBe(true);
+  });
+});
+
+describe('POST /goals/:id/unarchive', () => {
+  it('restaura objetivo arquivado → 200 ACTIVE', async () => {
+    const id = await createArchivedGoal();
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/goals/${id}/unarchive`,
+      payload: { userId: USER_ID },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().status).toBe('ACTIVE');
+    expect(res.json().archivedAt).toBeNull();
+  });
+});
+
+describe('POST /goals/:id/delete', () => {
+  it('exclui objetivo arquivado sem histórico → 200', async () => {
+    const id = await createArchivedGoal();
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/goals/${id}/delete`,
+      payload: { userId: USER_ID },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const list = await app.inject({
+      method: 'GET',
+      url: `/goals/archived?userId=${USER_ID}`,
+    });
+    expect(list.json()).toHaveLength(0);
+  });
+
+  it('recusa excluir objetivo com histórico de feito → 409', async () => {
+    const id = await createArchivedGoal();
+    await prisma.event.create({
+      data: {
+        userId: USER_ID,
+        goalId: id,
+        type: 'done',
+        occurredAt: new Date('2026-06-02T12:00:00.000Z'),
+      },
+    });
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `/goals/${id}/delete`,
       payload: { userId: USER_ID },
     });
 

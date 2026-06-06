@@ -12,4 +12,5 @@ export interface GoalRepository {
   byId(id: string): Promise<Goal | null>;
   find(filter: GoalFilter): Promise<Goal[]>;
   update(id: string, patch: Partial<Goal>): Promise<Goal>;
+  delete(id: string): Promise<void>; // hard delete — só objetivos sem histórico de 'done'
 }

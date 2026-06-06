@@ -129,4 +129,8 @@ export class PrismaGoalRepository implements GoalRepository {
     });
     return toDomain(record);
   }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.goal.delete({ where: { id } });
+  }
 }

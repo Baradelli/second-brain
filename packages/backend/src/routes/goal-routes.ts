@@ -1,4 +1,5 @@
 import {
+  archivedGoalSchema,
   archiveGoalSchema,
   completeGoalSchema,
   createGoalSchema,
@@ -13,16 +14,23 @@ import { z } from 'zod';
 
 import {
   GoalHasActiveChildrenError,
+  GoalHasChildrenError,
+  GoalHasDoneHistoryError,
+  GoalNotArchivedError,
   GoalNotFoundError,
   InvalidGoalError,
 } from '../domain/errors.js';
 import type { Goal } from '../domain/goal.js';
+import { PrismaEventRepository } from '../repositories/prisma-event-repository.js';
 import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
 import { ArchiveGoal } from '../usecases/archive-goal.js';
 import { CompleteGoal } from '../usecases/complete-goal.js';
 import { CreateGoal } from '../usecases/create-goal.js';
+import { DeleteGoal } from '../usecases/delete-goal.js';
 import { EditGoal } from '../usecases/edit-goal.js';
 import { ListActiveGoals } from '../usecases/list-active-goals.js';
+import { ListArchivedGoals } from '../usecases/list-archived-goals.js';
+import { UnarchiveGoal } from '../usecases/unarchive-goal.js';
 
 function toResponse(g: Goal): GoalResponse {
   return {
@@ -51,11 +59,17 @@ export const goalRoutes: FastifyPluginAsyncZod<{
   prisma: PrismaClient;
 }> = async (app, options) => {
   const repo = new PrismaGoalRepository(options.prisma);
+  const eventRepo = new PrismaEventRepository(options.prisma);
   const createGoal = new CreateGoal(repo);
   const editGoal = new EditGoal(repo);
   const listActiveGoals = new ListActiveGoals(repo);
   const completeGoal = new CompleteGoal(repo);
   const archiveGoal = new ArchiveGoal(repo);
+  const unarchiveGoal = new UnarchiveGoal(repo);
+  const deleteGoal = new DeleteGoal(repo, eventRepo);
+  const listArchivedGoals = new ListArchivedGoals(repo, eventRepo);
+
+  const userActionSchema = z.object({ userId: z.string().min(1) });
 
   app.post(
     '/goals',
@@ -96,6 +110,25 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     async (req) => {
       const goals = await listActiveGoals.execute(req.query);
       return goals.map(toResponse);
+    },
+  );
+
+  app.get(
+    '/goals/archived',
+    {
+      schema: {
+        querystring: userActionSchema,
+        response: { 200: z.array(archivedGoalSchema) },
+      },
+    },
+    async (req) => {
+      const items = await listArchivedGoals.execute({
+        userId: req.query.userId,
+      });
+      return items.map(({ goal, deletable }) => ({
+        ...toResponse(goal),
+        deletable,
+      }));
     },
   );
 
@@ -188,6 +221,70 @@ export const goalRoutes: FastifyPluginAsyncZod<{
           return reply.status(404).send({ error: error.message });
         }
         if (error instanceof GoalHasActiveChildrenError) {
+          return reply.status(409).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/goals/:id/unarchive',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: userActionSchema,
+        response: {
+          200: goalResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const goal = await unarchiveGoal.execute({
+          id: req.params.id,
+          userId: req.body.userId,
+        });
+        return toResponse(goal);
+      } catch (error) {
+        if (error instanceof GoalNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/goals/:id/delete',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: userActionSchema,
+        response: {
+          200: goalResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const goal = await deleteGoal.execute({
+          id: req.params.id,
+          userId: req.body.userId,
+        });
+        return toResponse(goal);
+      } catch (error) {
+        if (error instanceof GoalNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (
+          error instanceof GoalNotArchivedError ||
+          error instanceof GoalHasChildrenError ||
+          error instanceof GoalHasDoneHistoryError
+        ) {
           return reply.status(409).send({ error: error.message });
         }
         throw error;

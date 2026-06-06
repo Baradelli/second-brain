@@ -279,6 +279,38 @@ no MVP 3 (métricas) — manter escopo em navegação/histórico com **metas rea
 
 ---
 
+## Bloco F — Gerência de objetivos (editar / arquivar / restaurar / excluir) — **[~] em andamento**
+
+> Pedido do dono (jun/2026), **antes do Bloco E**: poder **editar** objetivos e **excluir** os
+> que não vingaram. Modelo: **arquivar** (soft delete) e, numa **área de arquivados**, **restaurar**
+> ou **excluir de vez** os que **nunca foram feitos em nenhum dia**. Recorta o item E4 para objetivos.
+
+**Decisões (fechadas com o dono).**
+
+- **Excluir (hard delete)** só quando o objetivo **não tem nenhum `done`** (nunca foi feito). Se
+  tiver só `skip`, esses eventos são apagados junto (o objetivo nunca aconteceu). Objetivo **com
+  histórico de `done`** → **não exclui**, só fica arquivado (respeita "Event = log imutável":
+  não destruímos histórico real de cumprimento). Também não exclui se tiver **filhos** (UMBRELLA).
+- **Tudo na tela de Objetivos**: tocar num objetivo abre **edição**; botão "ver arquivados"
+  mostra/oculta a seção de arquivados (com **restaurar** e **excluir** quando elegível). Espelha
+  o padrão das capturas.
+- **Restaurar** (desarquivar) incluído.
+
+**Estado atual.** Backend já tem `editGoal` (`PATCH /goals/:id`), `archiveGoal`
+(`POST /goals/:id/archive`, bloqueia se há filho ativo) e `completeGoal`. **Faltam**: listar
+arquivados, **excluir** e **desarquivar**; e no front, **nada** de editar/arquivar/arquivados.
+
+**Tarefas.**
+
+- F-back. `deleteGoal` (gates: arquivado + sem `done` + sem filhos → apaga skips e o goal) +
+  `unarchiveGoal` + `listArchivedGoals` (com flag `deletable`); `GoalRepository.delete`; rotas
+  `POST /goals/:id/delete`, `POST /goals/:id/unarchive`, `GET /goals/archived`. **Back · M** —
+  `tasks/47-back-gerencia-objetivos.md`.
+- F-front. Editar objetivo (toque → form preenchido, tipo travado), arquivar; seção "arquivados"
+  com restaurar/excluir (confirmação). **Front · M** — `tasks/48-tela-gerencia-objetivos.md`.
+
+---
+
 ## Bloco E — Melhorias transversais (sugestões minhas, a debater)
 
 Itens que percebi faltando e que valem entrar na conversa:

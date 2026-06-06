@@ -131,4 +131,10 @@ describe('PrismaGoalRepository', () => {
   it('update throws when goal does not exist', async () => {
     await expect(repo.update('ghost', { title: 'x' })).rejects.toThrow();
   });
+
+  it('delete removes the goal', async () => {
+    await repo.save(makeGoal({ id: 'g1' }));
+    await repo.delete('g1');
+    expect(await repo.byId('g1')).toBeNull();
+  });
 });

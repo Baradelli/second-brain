@@ -112,3 +112,9 @@ export const goalResponseSchema = z.object({
   labelIds: z.array(z.string()),
 });
 export type GoalResponse = z.infer<typeof goalResponseSchema>;
+
+// Objetivo arquivado + flag de elegibilidade para exclusão (sem histórico de 'done').
+export const archivedGoalSchema = goalResponseSchema.extend({
+  deletable: z.boolean(),
+});
+export type ArchivedGoalResponse = z.infer<typeof archivedGoalSchema>;
