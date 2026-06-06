@@ -7,13 +7,11 @@ import { CalendarPage } from '../pages/CalendarPage.js';
 
 vi.mock('@cerebro/ui', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  BottomSheet: ({
-    open,
-    children,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-  }) => (open ? <div role="dialog">{children}</div> : null),
+}));
+
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
 }));
 
 vi.mock('../lib/api/endpoints.js', () => ({
@@ -78,16 +76,14 @@ describe('CalendarPage', () => {
     expect(screen.getByText('1/2')).toBeInTheDocument();
   });
 
-  it('opens a summary sheet when a day is tapped', async () => {
+  it('navigates to the day detail when a day is tapped', async () => {
     const user = userEvent.setup();
     render(<CalendarPage />);
 
     await waitFor(() => screen.getByTestId('calendar-day-2026-06-03'));
     await user.click(screen.getByTestId('calendar-day-2026-06-03'));
 
-    const dialog = await screen.findByRole('dialog');
-    expect(dialog).toHaveTextContent('1 de 2 metas');
-    expect(dialog).toHaveTextContent('Devocional');
+    expect(mockNavigate).toHaveBeenCalledWith('/calendar/2026-06-03');
   });
 
   it('navigates to the previous and next month', async () => {

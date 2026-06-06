@@ -186,10 +186,13 @@
   "calendar.prevMonth": "Previous month",
   "calendar.nextMonth": "Next month",
   "calendar.today": "Today",
-  "calendar.day.goalsSummary": "{{done}} of {{planned}} goals",
-  "calendar.day.goalsDoneOnly": "{{done}} done",
+  "calendar.day.goalsSection": "Goals for the day",
+  "calendar.day.notesSection": "Notes from the day",
+  "calendar.day.status.done": "Done",
+  "calendar.day.status.skipped": "Skipped",
+  "calendar.day.status.pending": "Pending",
   "calendar.day.noGoals": "No goals planned",
-  "calendar.day.journal": "Journal",
-  "calendar.day.devotional": "Devotional",
-  "calendar.day.reflection": "Reflection"
+  "calendar.day.noNotes": "No notes on this day",
+  "calendar.day.closeDay": "Close the day",
+  "calendar.day.back": "Back"
 }

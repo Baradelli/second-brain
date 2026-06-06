@@ -1,8 +1,9 @@
 import type { CalendarDayResponse, CalendarMonthResponse } from '@cerebro/shared';
-import { BottomSheet, Card } from '@cerebro/ui';
-import { CalendarDays, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Card } from '@cerebro/ui';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { getCalendar } from '../lib/api/endpoints.js';
 
@@ -35,12 +36,12 @@ function monthParts(month: string): { year: number; monthIndex: number } {
 export function CalendarPage() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
+  const navigate = useNavigate();
 
   const [month, setMonth] = useState<string>(currentMonthKey);
   const [data, setData] = useState<CalendarMonthResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [selected, setSelected] = useState<CalendarDayResponse | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -155,16 +156,12 @@ export function CalendarPage() {
                 key={day.date}
                 day={day}
                 isToday={day.date === today}
-                onSelect={() => setSelected(day)}
+                onSelect={() => navigate(`/calendar/${day.date}`)}
               />
             ))}
           </div>
         </Card>
       )}
-
-      <BottomSheet open={selected !== null} onClose={() => setSelected(null)}>
-        {selected && <DaySummary day={selected} locale={locale} />}
-      </BottomSheet>
     </main>
   );
 }
@@ -221,91 +218,5 @@ function DayCell({
         />
       )}
     </button>
-  );
-}
-
-function DaySummary({
-  day,
-  locale,
-}: {
-  day: CalendarDayResponse;
-  locale: string;
-}) {
-  const { t } = useTranslation();
-  const [y, m, d] = day.date.split('-').map(Number);
-  const longDate = new Date(
-    y as number,
-    (m as number) - 1,
-    d as number,
-  ).toLocaleDateString(locale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
-
-  const goalsText =
-    day.goalsPlanned > 0
-      ? t('calendar.day.goalsSummary', {
-          done: day.goalsDone,
-          planned: day.goalsPlanned,
-        })
-      : day.goalsDone > 0
-        ? t('calendar.day.goalsDoneOnly', { done: day.goalsDone })
-        : t('calendar.day.noGoals');
-
-  return (
-    <div className="flex flex-col gap-4">
-      <h2
-        className="font-display text-lg font-semibold capitalize"
-        style={{ color: 'var(--cerebro-fg)' }}
-      >
-        {longDate}
-      </h2>
-
-      <div className="flex items-center gap-2">
-        <CalendarDays
-          size={18}
-          strokeWidth={1.75}
-          style={{ color: 'var(--cerebro-accent)' }}
-        />
-        <span className="text-sm" style={{ color: 'var(--cerebro-fg)' }}>
-          {goalsText}
-        </span>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <span
-          className="text-xs font-semibold uppercase tracking-wide"
-          style={{ color: 'var(--cerebro-faint)' }}
-        >
-          {t('calendar.day.journal')}
-        </span>
-        <Seal label={t('calendar.day.devotional')} done={day.journal.devotional} />
-        <Seal label={t('calendar.day.reflection')} done={day.journal.reflection} />
-      </div>
-    </div>
-  );
-}
-
-function Seal({ label, done }: { label: string; done: boolean }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span
-        className="flex h-5 w-5 items-center justify-center rounded-full"
-        style={{
-          backgroundColor: done ? 'var(--cerebro-accent)' : 'transparent',
-          border: done ? 'none' : '1px solid var(--cerebro-border)',
-          color: 'var(--cerebro-bg)',
-        }}
-      >
-        {done && <Check size={13} strokeWidth={3} />}
-      </span>
-      <span
-        className="text-sm"
-        style={{ color: done ? 'var(--cerebro-fg)' : 'var(--cerebro-muted)' }}
-      >
-        {label}
-      </span>
-    </div>
   );
 }

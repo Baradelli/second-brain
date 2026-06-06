@@ -186,10 +186,13 @@
   "calendar.prevMonth": "Mês anterior",
   "calendar.nextMonth": "Próximo mês",
   "calendar.today": "Hoje",
-  "calendar.day.goalsSummary": "{{done}} de {{planned}} metas",
-  "calendar.day.goalsDoneOnly": "{{done}} cumprida(s)",
+  "calendar.day.goalsSection": "Metas do dia",
+  "calendar.day.notesSection": "Notas do dia",
+  "calendar.day.status.done": "Feito",
+  "calendar.day.status.skipped": "Pulado",
+  "calendar.day.status.pending": "Pendente",
   "calendar.day.noGoals": "Nenhuma meta prevista",
-  "calendar.day.journal": "Diário",
-  "calendar.day.devotional": "Devocional",
-  "calendar.day.reflection": "Reflexão"
+  "calendar.day.noNotes": "Nenhuma nota neste dia",
+  "calendar.day.closeDay": "Fechar o dia",
+  "calendar.day.back": "Voltar"
 }

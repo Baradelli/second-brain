@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { noteType } from './note.js';
+
 /**
  * Calendário mensal — agregado por dia: metas previstas × cumpridas + selo de diário.
  * Só navegação/visualização (streaks/aderência são MVP 3).
@@ -29,3 +31,35 @@ export const calendarQuerySchema = z.object({
     .optional(), // ausente → mês corrente
 });
 export type CalendarQuery = z.infer<typeof calendarQuerySchema>;
+
+// ── Detalhe de um dia ─────────────────────────────────────────────────────────
+
+export const calendarDayGoalSchema = z.object({
+  goalId: z.string(),
+  title: z.string(),
+  kind: z.enum(['scheduled', 'invitation']),
+  status: z.enum(['done', 'skipped', 'pending']),
+});
+export type CalendarDayGoalResponse = z.infer<typeof calendarDayGoalSchema>;
+
+export const calendarDayNoteSchema = z.object({
+  id: z.string(),
+  type: noteType,
+  title: z.string().optional(),
+});
+export type CalendarDayNoteResponse = z.infer<typeof calendarDayNoteSchema>;
+
+export const calendarDayDetailResponseSchema = z.object({
+  date: z.string(), // 'YYYY-MM-DD'
+  goals: z.array(calendarDayGoalSchema),
+  notes: z.array(calendarDayNoteSchema),
+});
+export type CalendarDayDetailResponse = z.infer<
+  typeof calendarDayDetailResponseSchema
+>;
+
+export const calendarDayQuerySchema = z.object({
+  userId: z.string().min(1),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+export type CalendarDayQuery = z.infer<typeof calendarDayQuerySchema>;

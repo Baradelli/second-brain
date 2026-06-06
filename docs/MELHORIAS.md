@@ -224,7 +224,7 @@ momento. C5 (backlinks) toca dados (relação nota↔nota) — provavelmente um 
 
 ---
 
-## Bloco D — Calendário com **metas reais** / histórico — **[~] em andamento** (D1 feito)
+## Bloco D — Calendário com **metas reais** / histórico — **[x] FECHADO**
 
 **Dor.** "Queria um visualizador em calendário **com metas reais**." (Não só notas — ver os
 objetivos e o que foi cumprido em cada dia.)
@@ -268,7 +268,11 @@ objetivos e o que foi cumprido em cada dia.)
   metas previstas×cumpridas + ponto de diário, toque no dia → resumo em BottomSheet);
   `getCalendar` no client; aba "Assistente" → **"Calendário"** na tab bar. O resumo do dia é
   leve (do dado já carregado); o detalhe rico (metas individuais + notas + ações) é a D3.
-- D3. Detalhe do dia (metas + notas) → navegação/ações. **Front · M** — _próxima_
+- D3. Detalhe do dia (metas + notas) → navegação/ações. **Back+Front · M** — **[x] feito**
+  (`tasks/46-detalhe-do-dia.md`): agregador `buildDayDetail` + `GET /calendar/day` (metas do dia
+  com status **feito/pulado/pendente** + notas do dia); `DayDetailPage` em `/calendar/:date`
+  (toque no dia do calendário navega pra cá; abre nota no editor; CTA "Fechar o dia" quando é hoje
+  e há pendente). Decisão: **read-only** (registrar mora no "Fechar o dia").
 
 **Dependências.** Maior bloco. Reaproveita muito do Bloco K do MVP 2 (eventos/progresso). Encosta
 no MVP 3 (métricas) — manter escopo em navegação/histórico com **metas reais**, sem streaks.

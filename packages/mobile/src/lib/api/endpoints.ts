@@ -1,6 +1,8 @@
 import {
   type AttachmentResponse,
   attachmentResponseSchema,
+  type CalendarDayDetailResponse,
+  calendarDayDetailResponseSchema,
   type CalendarMonthResponse,
   calendarMonthResponseSchema,
   type CaptureResponse,
@@ -369,6 +371,12 @@ export function getCalendar(month?: string): Promise<CalendarMonthResponse> {
   const query = new URLSearchParams({ userId: CURRENT_USER_ID });
   if (month) query.set('month', month);
   return get(`/calendar?${query.toString()}`, calendarMonthResponseSchema);
+}
+
+/** Detalhe de um dia: metas (com status) + notas escritas no dia. */
+export function getDayDetail(date: string): Promise<CalendarDayDetailResponse> {
+  const query = new URLSearchParams({ userId: CURRENT_USER_ID, date });
+  return get(`/calendar/day?${query.toString()}`, calendarDayDetailResponseSchema);
 }
 
 // ── Labels ──────────────────────────────────────────────────────────────────

@@ -43,3 +43,26 @@ describe('GET /calendar', () => {
     expect(res.statusCode).toBe(400);
   });
 });
+
+describe('GET /calendar/day', () => {
+  it('returns 200 with date, goals and notes', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: `/calendar/day?userId=${USER_ID}&date=2026-06-03`,
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.date).toBe('2026-06-03');
+    expect(Array.isArray(body.goals)).toBe(true);
+    expect(Array.isArray(body.notes)).toBe(true);
+  });
+
+  it('rejects a malformed date (Zod) → 400', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: `/calendar/day?userId=${USER_ID}&date=2026-6-3`,
+    });
+    expect(res.statusCode).toBe(400);
+  });
+});

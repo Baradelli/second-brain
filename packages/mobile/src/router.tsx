@@ -6,6 +6,7 @@ import { AssistantPage } from './pages/AssistantPage.js';
 import { CalendarPage } from './pages/CalendarPage.js';
 import { CapturePage } from './pages/CapturePage.js';
 import { DayClosingPage } from './pages/DayClosingPage.js';
+import { DayDetailPage } from './pages/DayDetailPage.js';
 import { EditorPage } from './pages/EditorPage.js';
 import { GoalsPage } from './pages/GoalsPage.js';
 import { LabelsPage } from './pages/LabelsPage.js';
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { path: 'review', element: <ReviewPage /> },
       { path: 'notes', element: <NotesPage /> },
       { path: 'calendar', element: <CalendarPage /> },
+      { path: 'calendar/:date', element: <DayDetailPage /> },
       { path: 'labels', element: <LabelsPage /> },
       { path: 'editor', element: <EditorPage /> },
       { path: 'editor/:noteId', element: <EditorPage /> },
