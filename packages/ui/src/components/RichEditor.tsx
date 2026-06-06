@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { type ReactNode, useEffect } from 'react';
 
+import { SlashCommand } from './slash-command.js';
+
 // Cores de grifo com alpha → legíveis no tema claro e escuro.
 const HIGHLIGHT_COLORS = [
   'rgba(250, 204, 21, 0.40)', // amarelo
@@ -59,6 +61,7 @@ export function RichEditor({
       TextStyle,
       Color,
       Highlight.configure({ multicolor: true }),
+      SlashCommand,
     ],
     content: doc as JSONContent | undefined,
     editable,

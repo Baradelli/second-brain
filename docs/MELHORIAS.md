@@ -199,8 +199,9 @@ pronto — **não usamos**.
   botões com paleta (amarelo/verde/rosa/azul) legível nos 2 temas; opcional cor de texto. **S/M**
   — **[x] feito** (swatches na toolbar do `RichEditor` + botão "remover grifo"; cores rgba c/ alpha).
 - **C2 — Sensação Notion básica.** Menu **"/"** para inserir blocos + **bubble menu** de
-  formatação na seleção. **M** — **[~] parcial**: **bubble menu feito** (seleção → Negrito/Itálico
-  /grifos); **menu "/" pendente** (C2b — popup + `@tiptap/suggestion`).
+  formatação na seleção. **M** — **[x] feito**: bubble menu (seleção → Negrito/Itálico/grifos)
+  + menu **"/"** (`SlashCommand` via `@tiptap/suggestion` + tippy: Texto/Título 1-2/Lista/
+  Lista numerada/Citação, com busca e navegação por teclado).
 - **C3 — Mais blocos.** Checklist (TaskList), **toggle** (Details), divisória, callout, tabela. **M/G**
 - **C4 — Manipular blocos.** **Arrastar/reordenar** (DragHandle) + transformar bloco. **M**
 - **C5 (futuro / "segundo cérebro").** **Links entre notas** (menção `@`/`[[ ]]` → backlinks
