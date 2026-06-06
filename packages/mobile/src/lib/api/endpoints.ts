@@ -15,6 +15,8 @@ import {
   type GoalTypeInput,
   type LabelNodeResponse,
   labelNodeResponseSchema,
+  type LabelResponse,
+  labelResponseSchema,
   type NoteResponse,
   noteResponseSchema,
   type NoteType,
@@ -347,6 +349,28 @@ export function listLabels(): Promise<LabelNodeResponse[]> {
     `/labels?userId=${CURRENT_USER_ID}`,
     z.array(labelNodeResponseSchema),
   );
+}
+
+export interface LabelBody {
+  name: string;
+  color?: string | null;
+  parentId?: string | null;
+}
+
+export function createLabel(body: LabelBody): Promise<LabelResponse> {
+  return post('/labels', { ...body, userId: CURRENT_USER_ID }, labelResponseSchema);
+}
+
+export function editLabel(id: string, body: LabelBody): Promise<LabelResponse> {
+  return patch(
+    `/labels/${id}`,
+    { ...body, userId: CURRENT_USER_ID },
+    labelResponseSchema,
+  );
+}
+
+export function archiveLabel(id: string): Promise<LabelResponse> {
+  return post(`/labels/${id}/archive`, {}, labelResponseSchema);
 }
 
 /** Achata a árvore de labels para uma lista plana (id + name), p/ filtros simples. */

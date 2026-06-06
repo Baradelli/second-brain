@@ -92,7 +92,7 @@ Hoje labels são invisíveis no app, apesar de existirem no banco.
       — **[x] feito** (`tasks/43-back-editar-label.md`).
 - A2. (Se rollup no back) endpoint/serviço que expande subárvore para filtro. **Back · M**
 - A3. Componente `LabelPicker` (seleciona da árvore) + i18n. **Front · M**
-- A4. Tela "Labels" (CRUD + árvore). **Front · M**
+- A4. Tela "Labels" (CRUD + árvore). **Front · M** — **[x] feito** (`LabelsPage`, via ícone no header).
 - A5. Plugar `LabelPicker` nos forms (Resource, Goal, Note, Captura/promote). **Front · M**
 - A6. Filtro por label nas listas (Biblioteca, Notas, Objetivos), com rollup. **Front (+back?) · M**
 

@@ -4,16 +4,17 @@ import {
   ThemeProvider,
   ThemeToggle,
 } from '@cerebro/ui';
-import { BookOpen, Home, NotebookText, Plus, Sparkles } from 'lucide-react';
+import { BookOpen, Home, NotebookText, Plus, Sparkles, Tags } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { LanguageSwitcher } from './components/LanguageSwitcher.js';
 import { startOfflineSync } from './lib/offline/index.js';
 
 function AppShell() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Sincroniza a fila offline (captura/escrita) ao reconectar e ao abrir o app.
   useEffect(() => {
@@ -79,6 +80,16 @@ function AppShell() {
           {t('app.name')}
         </span>
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => navigate('/labels')}
+            aria-label={t('labels.title')}
+            data-testid="labels-nav"
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"
+            style={{ color: 'var(--cerebro-muted)' }}
+          >
+            <Tags size={18} strokeWidth={1.75} />
+          </button>
           <ThemeToggle />
           <LanguageSwitcher />
         </div>

@@ -7,6 +7,7 @@ import { CapturePage } from './pages/CapturePage.js';
 import { DayClosingPage } from './pages/DayClosingPage.js';
 import { EditorPage } from './pages/EditorPage.js';
 import { GoalsPage } from './pages/GoalsPage.js';
+import { LabelsPage } from './pages/LabelsPage.js';
 import { LibraryPage } from './pages/LibraryPage.js';
 import { NotesPage } from './pages/NotesPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: 'capture', element: <CapturePage /> },
       { path: 'review', element: <ReviewPage /> },
       { path: 'notes', element: <NotesPage /> },
+      { path: 'labels', element: <LabelsPage /> },
       { path: 'editor', element: <EditorPage /> },
       { path: 'editor/:noteId', element: <EditorPage /> },
       { path: 'assistant', element: <AssistantPage /> },
