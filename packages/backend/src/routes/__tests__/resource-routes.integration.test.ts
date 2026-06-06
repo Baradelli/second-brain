@@ -61,6 +61,33 @@ describe('POST /resources', () => {
   });
 });
 
+describe('GET /resources/:id', () => {
+  it('retorna o recurso por id → 200', async () => {
+    const created = await app.inject({
+      method: 'POST',
+      url: '/resources',
+      payload: baseBody,
+    });
+    const id = created.json().id;
+
+    const res = await app.inject({
+      method: 'GET',
+      url: `/resources/${id}?userId=${USER_ID}`,
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().id).toBe(id);
+  });
+
+  it('id inexistente → 404', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: `/resources/ghost?userId=${USER_ID}`,
+    });
+    expect(res.statusCode).toBe(404);
+  });
+});
+
 describe('GET /resources', () => {
   it('lista do usuário filtrando por stage', async () => {
     const created = await app.inject({

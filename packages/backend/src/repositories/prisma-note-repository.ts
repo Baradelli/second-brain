@@ -74,6 +74,7 @@ export class PrismaNoteRepository implements NoteRepository {
         userId: filter.userId,
         ...(filter.type ? { type: filter.type } : {}),
         ...(filter.scope ? { scope: filter.scope } : {}),
+        ...(filter.resourceId ? { resourceId: filter.resourceId } : {}),
         ...(filter.status ? { status: filter.status } : {}),
         ...(filter.from || filter.to
           ? {

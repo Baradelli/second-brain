@@ -69,6 +69,27 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
   );
 
   app.get(
+    '/resources/:id',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        querystring: z.object({ userId: z.string().min(1) }),
+        response: {
+          200: resourceResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      const resource = await repo.byId(req.params.id);
+      if (!resource || resource.userId !== req.query.userId) {
+        return reply.status(404).send({ error: 'Resource not found' });
+      }
+      return toResponse(resource);
+    },
+  );
+
+  app.get(
     '/resources',
     {
       schema: {

@@ -139,4 +139,28 @@ describe('PrismaNoteRepository', () => {
   it('update throws when note does not exist', async () => {
     await expect(repo.update('ghost', { plainText: 'x' })).rejects.toThrow();
   });
+
+  it('find filters by resourceId', async () => {
+    const resource = await prisma.resource.create({
+      data: {
+        id: 'res-notes',
+        userId: TEST_USER_ID,
+        title: 'DDD',
+        type: 'book',
+      },
+    });
+    try {
+      await repo.save(makeNote({ id: 'linked', resourceId: resource.id }));
+      await repo.save(makeNote({ id: 'free' }));
+
+      const result = await repo.find({
+        userId: TEST_USER_ID,
+        resourceId: resource.id,
+      });
+      expect(result.map((n) => n.id)).toEqual(['linked']);
+    } finally {
+      await prisma.note.deleteMany({ where: { userId: TEST_USER_ID } });
+      await prisma.resource.deleteMany({ where: { userId: TEST_USER_ID } });
+    }
+  });
 });

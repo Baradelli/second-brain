@@ -10,6 +10,7 @@ import { GoalsPage } from './pages/GoalsPage.js';
 import { LabelsPage } from './pages/LabelsPage.js';
 import { LibraryPage } from './pages/LibraryPage.js';
 import { NotesPage } from './pages/NotesPage.js';
+import { ResourceDetailPage } from './pages/ResourceDetailPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
 
 export const router = createBrowserRouter([
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AgendaPage /> },
       { path: 'library', element: <LibraryPage /> },
+      { path: 'library/:id', element: <ResourceDetailPage /> },
       { path: 'goals', element: <GoalsPage /> },
       { path: 'day-closing', element: <DayClosingPage /> },
       { path: 'capture', element: <CapturePage /> },

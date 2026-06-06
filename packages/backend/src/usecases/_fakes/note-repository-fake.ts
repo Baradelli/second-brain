@@ -23,6 +23,8 @@ export class NoteRepositoryFake implements NoteRepository {
       if (note.userId !== filter.userId) return false;
       if (filter.type && note.type !== filter.type) return false;
       if (filter.scope && note.scope !== filter.scope) return false;
+      if (filter.resourceId && note.resourceId !== filter.resourceId)
+        return false;
       if (filter.status && note.status !== filter.status) return false;
       if (filter.from && note.date < filter.from) return false;
       if (filter.to && note.date > filter.to) return false;

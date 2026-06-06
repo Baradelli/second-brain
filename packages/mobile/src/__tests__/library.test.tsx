@@ -1,10 +1,25 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { forwardRef } from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '../lib/i18n/index.js';
 import { LibraryPage } from '../pages/LibraryPage.js';
+
+function renderLibrary() {
+  return render(
+    <MemoryRouter initialEntries={['/library']}>
+      <Routes>
+        <Route path="/library" element={<LibraryPage />} />
+        <Route
+          path="/library/:id"
+          element={<div data-testid="resource-detail" />}
+        />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
 
 vi.mock('@cerebro/ui', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -81,19 +96,19 @@ describe('LibraryPage', () => {
     vi.mocked(endpoints.listResources).mockResolvedValue([
       makeResource() as never,
     ]);
-    render(<LibraryPage />);
+    renderLibrary();
     await waitFor(() => screen.getByText('Domain-Driven Design'));
     expect(screen.getByTestId('library-list')).toBeInTheDocument();
   });
 
   it('mostra estado vazio quando não há recursos', async () => {
-    render(<LibraryPage />);
+    renderLibrary();
     await waitFor(() => screen.getByText('Nada na biblioteca ainda'));
   });
 
   it('filtra por stage chamando listResources com o stage selecionado', async () => {
     const user = userEvent.setup();
-    render(<LibraryPage />);
+    renderLibrary();
     await waitFor(() => screen.getByTestId('stage-filter-done'));
 
     await user.click(screen.getByTestId('stage-filter-done'));
@@ -132,7 +147,7 @@ describe('LibraryPage', () => {
         children: [],
       } as never,
     ]);
-    render(<LibraryPage />);
+    renderLibrary();
 
     await waitFor(() => screen.getByText('Com label'));
     expect(screen.getByText('Sem label')).toBeInTheDocument();
@@ -143,12 +158,24 @@ describe('LibraryPage', () => {
     expect(screen.getByText('Com label')).toBeInTheDocument();
   });
 
+  it('tocar num recurso abre o detalhe', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listResources).mockResolvedValue([
+      makeResource() as never,
+    ]);
+    renderLibrary();
+    await waitFor(() => screen.getByTestId('open-resource-res-1'));
+
+    await user.click(screen.getByTestId('open-resource-res-1'));
+    await waitFor(() => screen.getByTestId('resource-detail'));
+  });
+
   it('cria um recurso e recarrega a lista', async () => {
     const user = userEvent.setup();
     vi.mocked(endpoints.createResource).mockResolvedValue(
       makeResource() as never,
     );
-    render(<LibraryPage />);
+    renderLibrary();
     await waitFor(() => screen.getByTestId('new-resource-button'));
 
     await user.click(screen.getByTestId('new-resource-button'));

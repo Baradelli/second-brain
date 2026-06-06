@@ -6,6 +6,7 @@ export interface NoteFilter {
   userId: string;
   type?: NoteType;
   scope?: NoteScope;
+  resourceId?: string;
   from?: Date;
   to?: Date;
   status?: 'ACTIVE' | 'ARCHIVED';

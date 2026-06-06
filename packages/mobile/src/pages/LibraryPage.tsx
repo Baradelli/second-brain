@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { LabelFilter } from '../components/LabelFilter.js';
 import { ResourceForm } from '../components/ResourceForm.js';
@@ -37,6 +38,7 @@ const TYPE_ICON: Record<string, LucideIcon> = {
 
 export function LibraryPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [resources, setResources] = useState<ResourceResponse[]>([]);
   const [stage, setStage] = useState<StageFilter>('all');
   const [loading, setLoading] = useState(true);
@@ -167,7 +169,12 @@ export function LibraryPage() {
       {!loading && !error && visible.length > 0 && (
         <div className="space-y-2.5" data-testid="library-list">
           {visible.map((r) => (
-            <ResourceCard key={r.id} resource={r} onAdvance={advanceStage} />
+            <ResourceCard
+              key={r.id}
+              resource={r}
+              onAdvance={advanceStage}
+              onOpen={() => navigate(`/library/${r.id}`)}
+            />
           ))}
         </div>
       )}
@@ -182,41 +189,50 @@ export function LibraryPage() {
 function ResourceCard({
   resource,
   onAdvance,
+  onOpen,
 }: {
   resource: ResourceResponse;
   onAdvance: (r: ResourceResponse) => void;
+  onOpen: () => void;
 }) {
   const { t } = useTranslation();
   const Icon = TYPE_ICON[resource.type] ?? BookOpen;
   return (
     <Card padding="sm">
       <div className="flex items-start gap-3">
-        <span
-          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-          style={{
-            backgroundColor: 'var(--cerebro-accent-soft)',
-            color: 'var(--cerebro-accent)',
-          }}
-          aria-hidden
+        <button
+          type="button"
+          onClick={onOpen}
+          data-testid={`open-resource-${resource.id}`}
+          className="flex min-w-0 flex-1 items-start gap-3 text-left transition-transform duration-150 active:scale-[0.99]"
         >
-          <Icon size={18} strokeWidth={1.75} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p
-            className="truncate text-sm font-semibold"
-            style={{ color: 'var(--cerebro-fg)' }}
+          <span
+            className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+            style={{
+              backgroundColor: 'var(--cerebro-accent-soft)',
+              color: 'var(--cerebro-accent)',
+            }}
+            aria-hidden
           >
-            {resource.title}
-          </p>
-          {resource.author && (
+            <Icon size={18} strokeWidth={1.75} />
+          </span>
+          <div className="min-w-0 flex-1">
             <p
-              className="truncate text-xs"
-              style={{ color: 'var(--cerebro-muted)' }}
+              className="truncate text-sm font-semibold"
+              style={{ color: 'var(--cerebro-fg)' }}
             >
-              {resource.author}
+              {resource.title}
             </p>
-          )}
-        </div>
+            {resource.author && (
+              <p
+                className="truncate text-xs"
+                style={{ color: 'var(--cerebro-muted)' }}
+              >
+                {resource.author}
+              </p>
+            )}
+          </div>
+        </button>
         <button
           type="button"
           onClick={() => onAdvance(resource)}

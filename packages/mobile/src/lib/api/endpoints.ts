@@ -166,11 +166,16 @@ export function getNoteById(id: string): Promise<NoteResponse> {
 }
 
 export function listNotes(
-  params: { type?: NoteType; status?: 'ACTIVE' | 'ARCHIVED' } = {},
+  params: {
+    type?: NoteType;
+    status?: 'ACTIVE' | 'ARCHIVED';
+    resourceId?: string;
+  } = {},
 ): Promise<NoteResponse[]> {
   const query = new URLSearchParams({ userId: CURRENT_USER_ID });
   query.set('status', params.status ?? 'ACTIVE');
   if (params.type) query.set('type', params.type);
+  if (params.resourceId) query.set('resourceId', params.resourceId);
   return get(`/notes?${query.toString()}`, z.array(noteResponseSchema));
 }
 
@@ -236,6 +241,13 @@ export function listResources(
   if (params.labelId) query.set('labelId', params.labelId);
   query.set('status', params.status ?? 'ACTIVE');
   return get(`/resources?${query.toString()}`, z.array(resourceResponseSchema));
+}
+
+export function getResource(id: string): Promise<ResourceResponse> {
+  return get(
+    `/resources/${id}?userId=${CURRENT_USER_ID}`,
+    resourceResponseSchema,
+  );
 }
 
 export interface CreateResourceBody {

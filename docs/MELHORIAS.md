@@ -159,11 +159,12 @@ filtros melhores, ordenar por tipo, e status **genérico** (o "Lendo" não serve
 
 **Tarefas candidatas.**
 
-- B0. `listNotes` aceitar `resourceId` (NoteFilter + rota + fake/contrato). **Back · S**
-- B1. **Tela de detalhe do recurso** + lista de notas + "novo fichamento daqui". **Front · M**
-- B2. Status genérico (`resource.stage.*`). **Front · S**
-- B3. Filtro por tipo + ordenação na `LibraryPage`. **Front · S/M**
-- B4. Filtro por label (depende do Bloco A). **Front · S**
+- B0. `listNotes` aceitar `resourceId` (NoteFilter + rota + fake/contrato). **Back · S** — **[x] feito**
+- B1. **Tela de detalhe do recurso** + lista de notas + "novo fichamento daqui". **Front · M** — **[x] feito**
+      (`ResourceDetailPage` em `/library/:id`; `GET /resources/:id` no backend; cards clicáveis).
+- B2. Status genérico (`resource.stage.*` → "A fazer / Em andamento / Concluído"). **Front · S** — **[x] feito**
+- B3. Filtro por tipo + ordenação na `LibraryPage`. **Front · S/M** — *a fazer*
+- B4. Filtro por label. **[x] feito** na A4.
 
 **Dependências.** B0/B1 (o "de verdade") são o coração e quase independentes — ótimo candidato a
 começar cedo. B4 depende do Bloco A.

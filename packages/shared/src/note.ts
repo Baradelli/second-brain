@@ -42,6 +42,7 @@ export const listNotesQuerySchema = z.object({
   userId: z.string().min(1),
   type: noteType.optional(),
   scope: noteScope.optional(),
+  resourceId: z.string().optional(),
   from: z.coerce.date().optional(),
   to: z.coerce.date().optional(),
   status: z.enum(['ACTIVE', 'ARCHIVED']).optional(),
