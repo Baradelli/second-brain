@@ -289,6 +289,7 @@ export interface CreateGoalBody {
   timesPerPeriod?: number | null;
   weekdays?: number[];
   parentId?: string | null;
+  labelIds?: string[];
 }
 
 export function createGoal(body: CreateGoalBody): Promise<GoalResponse> {

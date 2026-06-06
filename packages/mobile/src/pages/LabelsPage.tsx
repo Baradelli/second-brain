@@ -4,6 +4,7 @@ import { Archive, Pencil, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LabelForm } from '../components/LabelForm.js';
 import {
   type LabelBody,
   archiveLabel,
@@ -11,37 +12,32 @@ import {
   editLabel,
   listLabels,
 } from '../lib/api/endpoints.js';
-import { type ParentOption } from '../components/LabelForm.js';
-import { LabelForm } from '../components/LabelForm.js';
 
-function flatten(nodes: LabelNodeResponse[], depth = 0): ParentOption[] {
-  const out: ParentOption[] = [];
-  for (const n of nodes) {
-    out.push({ id: n.id, name: n.name, depth });
-    if (n.children.length) out.push(...flatten(n.children, depth + 1));
-  }
+interface FlatLabel {
+  id: string;
+  name: string;
+  color: string | null;
+}
+
+// Labels são planas — achatamos a árvore (compat. com dados antigos aninhados).
+function flatten(nodes: LabelNodeResponse[]): FlatLabel[] {
+  const out: FlatLabel[] = [];
+  const walk = (list: LabelNodeResponse[]) => {
+    for (const n of list) {
+      out.push({ id: n.id, name: n.name, color: n.color });
+      if (n.children.length) walk(n.children);
+    }
+  };
+  walk(nodes);
+  out.sort((a, b) => a.name.localeCompare(b.name));
   return out;
 }
 
-function selfAndDescendantIds(node: LabelNodeResponse): Set<string> {
-  const ids = new Set<string>([node.id]);
-  const walk = (n: LabelNodeResponse) => {
-    for (const c of n.children) {
-      ids.add(c.id);
-      walk(c);
-    }
-  };
-  walk(node);
-  return ids;
-}
-
-type Sheet =
-  | { mode: 'create'; parentId: string | null }
-  | { mode: 'edit'; node: LabelNodeResponse };
+type Sheet = { mode: 'create' } | { mode: 'edit'; label: FlatLabel };
 
 export function LabelsPage() {
   const { t } = useTranslation();
-  const [tree, setTree] = useState<LabelNodeResponse[]>([]);
+  const [labels, setLabels] = useState<FlatLabel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -50,7 +46,7 @@ export function LabelsPage() {
 
   async function load() {
     setError(false);
-    setTree(await listLabels());
+    setLabels(flatten(await listLabels()));
   }
 
   useEffect(() => {
@@ -73,9 +69,9 @@ export function LabelsPage() {
     setSaving(true);
     try {
       if (sheet.mode === 'create') {
-        await createLabel({ ...body, parentId: body.parentId ?? sheet.parentId });
+        await createLabel({ name: body.name, color: body.color });
       } else {
-        await editLabel(sheet.node.id, body);
+        await editLabel(sheet.label.id, { name: body.name, color: body.color });
       }
       setSheet(null);
       await load();
@@ -84,22 +80,15 @@ export function LabelsPage() {
     }
   }
 
-  async function handleArchive(node: LabelNodeResponse) {
+  async function handleArchive(id: string) {
     setArchiveError(false);
     try {
-      await archiveLabel(node.id);
+      await archiveLabel(id);
       await load();
     } catch {
       setArchiveError(true);
     }
   }
-
-  const parentOptions =
-    sheet?.mode === 'edit'
-      ? flatten(tree).filter(
-          (o) => !selfAndDescendantIds(sheet.node).has(o.id),
-        )
-      : flatten(tree);
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-5 pt-8 pb-24">
@@ -112,7 +101,7 @@ export function LabelsPage() {
         </h1>
         <Button
           size="sm"
-          onClick={() => setSheet({ mode: 'create', parentId: null })}
+          onClick={() => setSheet({ mode: 'create' })}
           data-testid="new-label-button"
         >
           <Plus size={16} strokeWidth={2.25} />
@@ -138,23 +127,51 @@ export function LabelsPage() {
         </p>
       )}
 
-      {!loading && !error && tree.length === 0 && (
+      {!loading && !error && labels.length === 0 && (
         <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
           {t('labels.empty')}
         </p>
       )}
 
-      {!loading && !error && tree.length > 0 && (
-        <div data-testid="labels-tree" className="flex flex-col gap-1">
-          {tree.map((node) => (
-            <LabelRow
-              key={node.id}
-              node={node}
-              depth={0}
-              onAddChild={(id) => setSheet({ mode: 'create', parentId: id })}
-              onEdit={(n) => setSheet({ mode: 'edit', node: n })}
-              onArchive={handleArchive}
-            />
+      {!loading && !error && labels.length > 0 && (
+        <div data-testid="labels-list" className="flex flex-col gap-1">
+          {labels.map((label) => (
+            <div
+              key={label.id}
+              className="flex items-center gap-2 rounded-[var(--radius-card)] py-2"
+              data-testid={`label-row-${label.id}`}
+            >
+              <span
+                className="h-3 w-3 shrink-0 rounded-full"
+                style={{
+                  backgroundColor: label.color ?? 'transparent',
+                  border: label.color
+                    ? 'none'
+                    : '1px solid var(--cerebro-border)',
+                }}
+                aria-hidden
+              />
+              <span
+                className="flex-1 truncate text-sm font-medium"
+                style={{ color: 'var(--cerebro-fg)' }}
+              >
+                {label.name}
+              </span>
+              <RowAction
+                label={t('labels.edit')}
+                testId={`edit-${label.id}`}
+                onClick={() => setSheet({ mode: 'edit', label })}
+              >
+                <Pencil size={15} strokeWidth={1.85} />
+              </RowAction>
+              <RowAction
+                label={t('common.archive')}
+                testId={`archive-${label.id}`}
+                onClick={() => handleArchive(label.id)}
+              >
+                <Archive size={15} strokeWidth={1.85} />
+              </RowAction>
+            </div>
           ))}
         </div>
       )}
@@ -162,93 +179,17 @@ export function LabelsPage() {
       <BottomSheet open={sheet !== null} onClose={() => setSheet(null)}>
         {sheet && (
           <LabelForm
-            parentOptions={parentOptions}
             submitting={saving}
             onSubmit={handleSubmit}
             initial={
               sheet.mode === 'edit'
-                ? {
-                    name: sheet.node.name,
-                    color: sheet.node.color,
-                    parentId: sheet.node.parentId,
-                  }
+                ? { name: sheet.label.name, color: sheet.label.color }
                 : undefined
             }
           />
         )}
       </BottomSheet>
     </main>
-  );
-}
-
-function LabelRow({
-  node,
-  depth,
-  onAddChild,
-  onEdit,
-  onArchive,
-}: {
-  node: LabelNodeResponse;
-  depth: number;
-  onAddChild: (id: string) => void;
-  onEdit: (node: LabelNodeResponse) => void;
-  onArchive: (node: LabelNodeResponse) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <>
-      <div
-        className="flex items-center gap-2 rounded-[var(--radius-card)] py-2"
-        style={{ paddingLeft: `${depth * 1.25}rem` }}
-        data-testid={`label-row-${node.id}`}
-      >
-        <span
-          className="h-3 w-3 shrink-0 rounded-full"
-          style={{
-            backgroundColor: node.color ?? 'transparent',
-            border: node.color ? 'none' : '1px solid var(--cerebro-border)',
-          }}
-          aria-hidden
-        />
-        <span
-          className="flex-1 truncate text-sm font-medium"
-          style={{ color: 'var(--cerebro-fg)' }}
-        >
-          {node.name}
-        </span>
-        <RowAction
-          label={t('labels.addChild')}
-          testId={`add-child-${node.id}`}
-          onClick={() => onAddChild(node.id)}
-        >
-          <Plus size={15} strokeWidth={2} />
-        </RowAction>
-        <RowAction
-          label={t('labels.edit')}
-          testId={`edit-${node.id}`}
-          onClick={() => onEdit(node)}
-        >
-          <Pencil size={15} strokeWidth={1.85} />
-        </RowAction>
-        <RowAction
-          label={t('common.archive')}
-          testId={`archive-${node.id}`}
-          onClick={() => onArchive(node)}
-        >
-          <Archive size={15} strokeWidth={1.85} />
-        </RowAction>
-      </div>
-      {node.children.map((child) => (
-        <LabelRow
-          key={child.id}
-          node={child}
-          depth={depth + 1}
-          onAddChild={onAddChild}
-          onEdit={onEdit}
-          onArchive={onArchive}
-        />
-      ))}
-    </>
   );
 }
 

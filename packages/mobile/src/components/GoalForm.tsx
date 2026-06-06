@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { LabelPicker } from './LabelPicker.js';
 import type { CreateGoalBody } from '../lib/api/endpoints.js';
 
 const GOAL_TYPES = ['HABIT', 'TARGET', 'PROJECT', 'UMBRELLA'] as const;
@@ -42,6 +43,7 @@ export function GoalForm({
   const { t, i18n } = useTranslation();
   const [cadence, setCadence] = useState<'weekdays' | 'period'>('weekdays');
   const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [labelIds, setLabelIds] = useState<string[]>([]);
 
   const {
     register,
@@ -70,6 +72,7 @@ export function GoalForm({
       base.targetValue = values.targetValue;
       base.unit = values.unit?.trim() || undefined;
     }
+    if (labelIds.length) base.labelIds = labelIds;
     onSubmit(base);
   });
 
@@ -181,6 +184,8 @@ export function GoalForm({
           <Input label={t('goal.field.unit')} {...register('unit')} />
         </div>
       )}
+
+      <LabelPicker value={labelIds} onChange={setLabelIds} />
 
       <Button type="submit" disabled={submitting} className="mt-1">
         {submitting ? t('capture.submitting') : t('common.save')}

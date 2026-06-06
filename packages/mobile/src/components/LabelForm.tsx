@@ -23,30 +23,16 @@ export const LABEL_COLORS = [
 const labelFormSchema = z.object({ name: z.string().trim().min(1) });
 type LabelFormValues = z.infer<typeof labelFormSchema>;
 
-export interface ParentOption {
-  id: string;
-  name: string;
-  depth: number;
-}
-
 interface LabelFormProps {
-  initial?: { name: string; color: string | null; parentId: string | null };
-  parentOptions: ParentOption[];
+  initial?: { name: string; color: string | null };
   onSubmit: (body: LabelBody) => void;
   submitting?: boolean;
 }
 
-export function LabelForm({
-  initial,
-  parentOptions,
-  onSubmit,
-  submitting,
-}: LabelFormProps) {
+// Labels são planas (sem hierarquia) — decisão do dono. parentId não é usado.
+export function LabelForm({ initial, onSubmit, submitting }: LabelFormProps) {
   const { t } = useTranslation();
   const [color, setColor] = useState<string | null>(initial?.color ?? null);
-  const [parentId, setParentId] = useState<string | null>(
-    initial?.parentId ?? null,
-  );
 
   const {
     register,
@@ -58,7 +44,7 @@ export function LabelForm({
   });
 
   const submit = handleSubmit((values) => {
-    onSubmit({ name: values.name.trim(), color, parentId });
+    onSubmit({ name: values.name.trim(), color });
   });
 
   return (
@@ -115,41 +101,11 @@ export function LabelForm({
                 outlineOffset: '2px',
               }}
             >
-              {color === c && (
-                <Check size={14} strokeWidth={3} color="#fff" />
-              )}
+              {color === c && <Check size={14} strokeWidth={3} color="#fff" />}
             </button>
           ))}
         </div>
       </div>
-
-      {/* Pai (cascata) */}
-      <label className="flex flex-col gap-1.5">
-        <span
-          className="text-xs font-medium"
-          style={{ color: 'var(--cerebro-fg)', opacity: 0.8 }}
-        >
-          {t('labels.field.parent')}
-        </span>
-        <select
-          value={parentId ?? ''}
-          onChange={(e) => setParentId(e.target.value || null)}
-          data-testid="label-parent-select"
-          className="h-11 w-full rounded-[var(--radius-card)] px-4 text-sm outline-none"
-          style={{
-            backgroundColor: 'var(--cerebro-raised)',
-            color: 'var(--cerebro-fg)',
-            border: '1px solid var(--cerebro-border)',
-          }}
-        >
-          <option value="">{t('labels.parent.none')}</option>
-          {parentOptions.map((o) => (
-            <option key={o.id} value={o.id}>
-              {`${'  '.repeat(o.depth)}${o.name}`}
-            </option>
-          ))}
-        </select>
-      </label>
 
       <Button type="submit" disabled={submitting} className="mt-1">
         {submitting ? t('capture.submitting') : t('common.save')}

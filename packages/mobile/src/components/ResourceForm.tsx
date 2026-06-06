@@ -1,9 +1,11 @@
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { LabelPicker } from './LabelPicker.js';
 import type { CreateResourceBody } from '../lib/api/endpoints.js';
 
 const RESOURCE_TYPES = [
@@ -37,6 +39,7 @@ export function ResourceForm({
   defaultTitle,
 }: ResourceFormProps) {
   const { t } = useTranslation();
+  const [labelIds, setLabelIds] = useState<string[]>([]);
   const {
     register,
     handleSubmit,
@@ -53,6 +56,7 @@ export function ResourceForm({
       url: values.url?.trim() || undefined,
       author: values.author?.trim() || undefined,
       description: values.description?.trim() || undefined,
+      labelIds: labelIds.length ? labelIds : undefined,
     });
   });
 
@@ -97,6 +101,8 @@ export function ResourceForm({
 
       <Input label={t('resource.field.author')} {...register('author')} />
       <Input label={t('resource.field.url')} {...register('url')} />
+
+      <LabelPicker value={labelIds} onChange={setLabelIds} />
 
       <Button type="submit" disabled={submitting} className="mt-1">
         {submitting ? t('capture.submitting') : t('common.save')}

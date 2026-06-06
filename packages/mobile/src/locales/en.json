@@ -64,6 +64,8 @@
   "labels.field.parent": "Parent label",
   "labels.parent.none": "None (root)",
   "labels.color.none": "No color",
+  "labels.pick": "Labels",
+  "labels.pickEmpty": "No labels created yet (create them via the top icon).",
   "editor.type.devotional": "Devotional",
   "editor.type.reflection": "Reflection",
   "editor.type.study": "Study note",

@@ -53,7 +53,15 @@ tempo real, IA, e o template pronto — **nada disso é necessário** para o que
 
 ## Bloco A — Labels (taxonomia que atravessa o app)
 
-**Dor.** "Não tem uma área onde eu crio a label, uso ela em cascata, e depois filtro por ela."
+> **Decisão revista (jun/2026): labels são PLANAS, sem hierarquia.** O dono observou que, se um
+> item já pode ter **muitas labels** (N–N), a **árvore** vira complexidade sem ganho. Então:
+> **cascata/rollup cai**, profundidade não se aplica. A UI já age como plana (sem pai/sub-label;
+> `LabelForm`/`LabelsPage` planos). `Label.parentId` continua no banco por ora (inofensivo) e
+> será **removido numa migração futura** (nova tarefa A6, abaixo), junto com o código de árvore
+> no backend (`list-label-tree` → lista plana, tirar reparent/ciclo). O filtro (A4) é **simples**
+> ("item tem esta label"), sem rollup.
+
+**Dor.** "Não tem uma área onde eu crio a label, marco nos itens, e depois filtro por ela."
 Hoje labels são invisíveis no app, apesar de existirem no banco.
 
 **Estado atual (já pronto no backend).**
@@ -92,9 +100,13 @@ Hoje labels são invisíveis no app, apesar de existirem no banco.
       — **[x] feito** (`tasks/43-back-editar-label.md`).
 - A2. (Se rollup no back) endpoint/serviço que expande subárvore para filtro. **Back · M**
 - A3. Componente `LabelPicker` (seleciona da árvore) + i18n. **Front · M**
+      — **[x] feito** (`LabelPicker` + aplicado em `ResourceForm`/`GoalForm`).
 - A4. Tela "Labels" (CRUD + árvore). **Front · M** — **[x] feito** (`LabelsPage`, via ícone no header).
 - A5. Plugar `LabelPicker` nos forms (Resource, Goal, Note, Captura/promote). **Front · M**
-- A6. Filtro por label nas listas (Biblioteca, Notas, Objetivos), com rollup. **Front (+back?) · M**
+      — **[~] parcial**: Resource e Goal feitos; **falta Nota (editor) e Captura** (A3b).
+- A6 (antigo). ~~Filtro por label com rollup~~ → vira **A4 simples** (sem rollup), pois labels são planas.
+- **A6 (novo) — Remover a árvore do schema** (migração tira `Label.parentId`; backend
+  `list-label-tree`→lista plana, remover reparent/ciclo do `editLabel`/`createLabel`). **Back · M** · *futuro*
 
 **Dependências.** É **pré-requisito** do filtro por label do Bloco B. Bom começar por aqui.
 
