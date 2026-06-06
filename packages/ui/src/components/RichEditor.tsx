@@ -2,6 +2,7 @@ import Color from '@tiptap/extension-color';
 import Details from '@tiptap/extension-details';
 import DetailsContent from '@tiptap/extension-details-content';
 import DetailsSummary from '@tiptap/extension-details-summary';
+import { DragHandle } from '@tiptap/extension-drag-handle-react';
 import Highlight from '@tiptap/extension-highlight';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -17,6 +18,7 @@ import {
 import StarterKit from '@tiptap/starter-kit';
 import {
   Bold,
+  GripVertical,
   Heading1,
   Heading2,
   Highlighter,
@@ -142,6 +144,17 @@ export function RichEditor({
             </ToolBtn>
           </div>
         </BubbleMenu>
+      )}
+      {editable && (
+        <DragHandle editor={editor}>
+          <span
+            className="flex h-6 w-5 cursor-grab items-center justify-center rounded active:cursor-grabbing"
+            style={{ color: 'var(--cerebro-faint)' }}
+            aria-label="Arrastar bloco"
+          >
+            <GripVertical size={16} strokeWidth={1.75} />
+          </span>
+        </DragHandle>
       )}
       <EditorContent editor={editor} className="flex-1" />
     </div>

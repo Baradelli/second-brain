@@ -206,6 +206,7 @@ pronto — **não usamos**.
   — **[~] parcial**: **checklist + toggle + divisória feitos** (via menu "/"); **tabela e callout
   pendentes** (C3b — tabela = 4 pacotes + UI de linhas/colunas, ruim no toque; callout = nó custom).
 - **C4 — Manipular blocos.** **Arrastar/reordenar** (DragHandle) + transformar bloco. **M**
+  — **[x] feito**: `DragHandle` (alça de arraste por bloco). Transformar bloco já dá pelo menu "/".
 - **C5 (futuro / "segundo cérebro").** **Links entre notas** (menção `@`/`[[ ]]` → backlinks
   nota↔nota). É o que aproxima de verdade do Obsidian/Notion como rede de conhecimento. **G**
 
