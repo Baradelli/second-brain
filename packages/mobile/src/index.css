@@ -178,6 +178,55 @@ body::before {
   font-size: 0.85em;
 }
 
+/* Divisória */
+.ProseMirror hr {
+  border: none;
+  border-top: 1px solid var(--cerebro-border);
+  margin: 1.5rem 0;
+}
+
+/* Checklist (taskList) */
+.ProseMirror ul[data-type='taskList'] {
+  list-style: none;
+  padding: 0;
+}
+.ProseMirror ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+.ProseMirror ul[data-type='taskList'] li > label {
+  margin-top: 0.2rem;
+  user-select: none;
+}
+.ProseMirror ul[data-type='taskList'] li > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.ProseMirror ul[data-type='taskList'] input[type='checkbox'] {
+  accent-color: var(--cerebro-accent);
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Alternável (details / toggle) */
+.ProseMirror [data-type='details'] {
+  border: 1px solid var(--cerebro-border);
+  border-radius: var(--radius-card);
+  padding: 0.5rem 0.85rem;
+  margin: 0.9rem 0;
+}
+.ProseMirror [data-type='details'] summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  color: var(--cerebro-fg);
+}
+.ProseMirror [data-type='detailsContent'] {
+  margin-top: 0.35rem;
+  color: var(--cerebro-fg);
+}
+
 /* Esconde a barra de rolagem da toolbar do editor */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

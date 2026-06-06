@@ -52,6 +52,21 @@ const ITEMS: SlashItem[] = [
     run: (editor, range) =>
       editor.chain().focus().deleteRange(range).toggleBlockquote().run(),
   },
+  {
+    title: 'Tarefas',
+    run: (editor, range) =>
+      editor.chain().focus().deleteRange(range).toggleTaskList().run(),
+  },
+  {
+    title: 'Alternável',
+    run: (editor, range) =>
+      editor.chain().focus().deleteRange(range).setDetails().run(),
+  },
+  {
+    title: 'Divisória',
+    run: (editor, range) =>
+      editor.chain().focus().deleteRange(range).setHorizontalRule().run(),
+  },
 ];
 
 export const SlashCommand = Extension.create({

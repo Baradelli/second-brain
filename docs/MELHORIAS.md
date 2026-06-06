@@ -203,6 +203,8 @@ pronto — **não usamos**.
   + menu **"/"** (`SlashCommand` via `@tiptap/suggestion` + tippy: Texto/Título 1-2/Lista/
   Lista numerada/Citação, com busca e navegação por teclado).
 - **C3 — Mais blocos.** Checklist (TaskList), **toggle** (Details), divisória, callout, tabela. **M/G**
+  — **[~] parcial**: **checklist + toggle + divisória feitos** (via menu "/"); **tabela e callout
+  pendentes** (C3b — tabela = 4 pacotes + UI de linhas/colunas, ruim no toque; callout = nó custom).
 - **C4 — Manipular blocos.** **Arrastar/reordenar** (DragHandle) + transformar bloco. **M**
 - **C5 (futuro / "segundo cérebro").** **Links entre notas** (menção `@`/`[[ ]]` → backlinks
   nota↔nota). É o que aproxima de verdade do Obsidian/Notion como rede de conhecimento. **G**

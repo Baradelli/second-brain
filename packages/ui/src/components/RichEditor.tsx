@@ -1,7 +1,12 @@
 import Color from '@tiptap/extension-color';
+import Details from '@tiptap/extension-details';
+import DetailsContent from '@tiptap/extension-details-content';
+import DetailsSummary from '@tiptap/extension-details-summary';
 import Highlight from '@tiptap/extension-highlight';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
 import TextStyle from '@tiptap/extension-text-style';
 import {
   BubbleMenu,
@@ -54,13 +59,17 @@ export function RichEditor({
         heading: { levels: [1, 2] },
         codeBlock: false,
         code: false,
-        horizontalRule: false,
       }),
       Placeholder.configure({ placeholder }),
       Link.configure({ openOnClick: false }),
       TextStyle,
       Color,
       Highlight.configure({ multicolor: true }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      Details.configure({ persist: true }),
+      DetailsSummary,
+      DetailsContent,
       SlashCommand,
     ],
     content: doc as JSONContent | undefined,
