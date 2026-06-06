@@ -1,6 +1,7 @@
 import {
   archiveLabelSchema,
   createLabelSchema,
+  editLabelSchema,
   type LabelNodeResponse,
   labelNodeResponseSchema,
   type LabelResponse,
@@ -11,6 +12,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 import {
+  LabelCycleError,
   LabelInUseError,
   LabelNotFoundError,
   LabelParentInvalidError,
@@ -19,6 +21,7 @@ import type { Label, LabelNode } from '../domain/label.js';
 import { PrismaLabelRepository } from '../repositories/prisma-label-repository.js';
 import { ArchiveLabel } from '../usecases/archive-label.js';
 import { CreateLabel } from '../usecases/create-label.js';
+import { EditLabel } from '../usecases/edit-label.js';
 import { ListLabelTree } from '../usecases/list-label-tree.js';
 
 function toResponse(label: Label): LabelResponse {
@@ -48,6 +51,7 @@ export const labelRoutes: FastifyPluginAsyncZod<{
   const createLabel = new CreateLabel(repo);
   const listLabelTree = new ListLabelTree(repo);
   const archiveLabel = new ArchiveLabel(repo);
+  const editLabel = new EditLabel(repo);
 
   app.post(
     '/labels',
@@ -87,6 +91,41 @@ export const labelRoutes: FastifyPluginAsyncZod<{
         status: 'ACTIVE',
       });
       return labels.map(toNodeResponse);
+    },
+  );
+
+  app.patch(
+    '/labels/:id',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: editLabelSchema,
+        response: {
+          200: labelResponseSchema,
+          400: z.object({ error: z.string() }),
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const label = await editLabel.execute({
+          id: req.params.id,
+          ...req.body,
+        });
+        return toResponse(label);
+      } catch (error) {
+        if (error instanceof LabelNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (
+          error instanceof LabelParentInvalidError ||
+          error instanceof LabelCycleError
+        ) {
+          return reply.status(400).send({ error: error.message });
+        }
+        throw error;
+      }
     },
   );
 

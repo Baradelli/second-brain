@@ -11,6 +11,15 @@ export const createLabelSchema = z.object({
 
 export type CreateLabelInput = z.infer<typeof createLabelSchema>;
 
+export const editLabelSchema = z.object({
+  userId: z.string().min(1),
+  name: z.string().min(1).optional(),
+  color: z.string().min(1).nullable().optional(),
+  parentId: z.string().min(1).nullable().optional(), // null = vira raiz; ausente = não muda
+});
+
+export type EditLabelInput = z.infer<typeof editLabelSchema>;
+
 export const archiveLabelSchema = z.object({});
 
 export type ArchiveLabelInput = z.infer<typeof archiveLabelSchema>;

@@ -97,6 +97,42 @@ describe('label routes', () => {
     expect(body[0].children[0].name).toBe('History');
   });
 
+  it('PATCH /labels/:id renomeia e troca cor → 200', async () => {
+    const created = await app.inject({
+      method: 'POST',
+      url: '/labels',
+      payload: { userId: USER_ID, name: 'Antigo' },
+    });
+    const id = created.json().id;
+
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/labels/${id}`,
+      payload: { userId: USER_ID, name: 'Novo', color: '#6D5DFC' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().name).toBe('Novo');
+    expect(res.json().color).toBe('#6D5DFC');
+  });
+
+  it('PATCH /labels/:id com dono errado → 404', async () => {
+    const created = await app.inject({
+      method: 'POST',
+      url: '/labels',
+      payload: { userId: USER_ID, name: 'Minha' },
+    });
+    const id = created.json().id;
+
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/labels/${id}`,
+      payload: { userId: 'intruder', name: 'hack' },
+    });
+
+    expect(res.statusCode).toBe(404);
+  });
+
   it('POST /labels/:id/archive arquiva label sem uso', async () => {
     const created = await app.inject({
       method: 'POST',
