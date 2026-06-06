@@ -15,11 +15,19 @@ vi.mock('@cerebro/ui', () => ({
   }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...rest}>{children}</button>
   ),
+  BottomSheet: ({
+    open,
+    children,
+  }: {
+    open: boolean;
+    children: React.ReactNode;
+  }) => (open ? <div>{children}</div> : null),
 }));
 
 vi.mock('../lib/api/endpoints.js', () => ({
   getResource: vi.fn(),
   listNotes: vi.fn(),
+  archiveNote: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -105,6 +113,24 @@ describe('ResourceDetailPage', () => {
 
     await user.click(screen.getByTestId('new-study-note'));
     await waitFor(() => screen.getByTestId('editor-new'));
+  });
+
+  it('exclui um fichamento após confirmação', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listNotes).mockResolvedValue([
+      note('n1', 'Capítulo 1') as never,
+    ]);
+    vi.mocked(endpoints.archiveNote).mockResolvedValue({} as never);
+    renderDetail();
+
+    await waitFor(() => screen.getByTestId('delete-note-n1'));
+    await user.click(screen.getByTestId('delete-note-n1'));
+    expect(endpoints.archiveNote).not.toHaveBeenCalled();
+
+    await user.click(screen.getByTestId('confirm-delete'));
+
+    await waitFor(() => expect(endpoints.archiveNote).toHaveBeenCalledWith('n1'));
+    await waitFor(() => expect(screen.queryByText('Capítulo 1')).toBeNull());
   });
 
   it('tocar numa nota abre o editor dela', async () => {

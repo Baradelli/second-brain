@@ -9,6 +9,12 @@ import { NotesPage } from '../pages/NotesPage.js';
 vi.mock('@cerebro/ui', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+  Button: ({
+    children,
+    ...rest
+  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <button {...rest}>{children}</button>
+  ),
   BottomSheet: ({
     open,
     children,
@@ -21,6 +27,7 @@ vi.mock('@cerebro/ui', () => ({
 vi.mock('../lib/api/endpoints.js', () => ({
   listNotes: vi.fn(),
   listResources: vi.fn(),
+  archiveNote: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -75,6 +82,26 @@ describe('NotesPage', () => {
     await waitFor(() => screen.getByText('Gratidão pela manhã'));
     await user.click(screen.getByTestId('note-n-1'));
     await waitFor(() => screen.getByTestId('editor-page'));
+  });
+
+  it('exclui uma nota após confirmação (arquiva e remove da lista)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listNotes).mockResolvedValue([
+      makeNote({ id: 'n1', plainText: 'Vai sair' }) as never,
+    ]);
+    vi.mocked(endpoints.archiveNote).mockResolvedValue({} as never);
+    renderNotesPage();
+
+    await waitFor(() => screen.getByText('Vai sair'));
+
+    // pede confirmação (não exclui direto)
+    await user.click(screen.getByTestId('delete-note-n1'));
+    expect(endpoints.archiveNote).not.toHaveBeenCalled();
+
+    await user.click(screen.getByTestId('confirm-delete'));
+
+    await waitFor(() => expect(endpoints.archiveNote).toHaveBeenCalledWith('n1'));
+    await waitFor(() => expect(screen.queryByText('Vai sair')).toBeNull());
   });
 
   it('estado vazio quando não há notas', async () => {

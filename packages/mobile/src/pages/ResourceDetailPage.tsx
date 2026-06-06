@@ -1,5 +1,5 @@
 import type { NoteResponse, NoteType, ResourceResponse } from '@cerebro/shared';
-import { Button, Card, EmptyState } from '@cerebro/ui';
+import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
 import {
   ArrowLeft,
   BookOpen,
@@ -8,13 +8,14 @@ import {
   type LucideIcon,
   Mic,
   Plus,
+  Trash2,
   Video,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { getResource, listNotes } from '../lib/api/endpoints.js';
+import { archiveNote, getResource, listNotes } from '../lib/api/endpoints.js';
 
 const TYPE_ICON: Record<string, LucideIcon> = {
   book: BookOpen,
@@ -46,6 +47,20 @@ export function ResourceDetailPage() {
   const [notes, setNotes] = useState<NoteResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<NoteResponse | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!confirmDelete) return;
+    setDeleting(true);
+    try {
+      await archiveNote(confirmDelete.id);
+      setNotes((prev) => prev.filter((n) => n.id !== confirmDelete.id));
+      setConfirmDelete(null);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -148,15 +163,14 @@ export function ResourceDetailPage() {
           ) : (
             <div className="space-y-2.5" data-testid="resource-notes">
               {notes.map((note) => (
-                <button
-                  key={note.id}
-                  type="button"
-                  onClick={() => navigate(`/editor/${note.id}`)}
-                  data-testid={`note-${note.id}`}
-                  className="w-full text-left transition-transform duration-150 active:scale-[0.99]"
-                >
-                  <Card padding="sm">
-                    <div className="flex items-start gap-3">
+                <Card key={note.id} padding="sm">
+                  <div className="flex items-start gap-3">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/editor/${note.id}`)}
+                      data-testid={`note-${note.id}`}
+                      className="flex min-w-0 flex-1 items-start gap-3 text-left transition-transform duration-150 active:scale-[0.99]"
+                    >
                       <span
                         className="mt-1 h-8 w-1 shrink-0 rounded-full"
                         style={{ backgroundColor: NOTE_COLOR[note.type] }}
@@ -179,14 +193,57 @@ export function ResourceDetailPage() {
                           )}
                         </p>
                       </div>
-                    </div>
-                  </Card>
-                </button>
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={t('notes.delete')}
+                      data-testid={`delete-note-${note.id}`}
+                      onClick={() => setConfirmDelete(note)}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+                      style={{ color: 'var(--cerebro-muted)' }}
+                    >
+                      <Trash2 size={15} strokeWidth={1.85} />
+                    </button>
+                  </div>
+                </Card>
               ))}
             </div>
           )}
         </>
       )}
+
+      <BottomSheet
+        open={confirmDelete !== null}
+        onClose={() => setConfirmDelete(null)}
+      >
+        <h2
+          className="mb-1 font-display text-lg font-semibold"
+          style={{ color: 'var(--cerebro-fg)' }}
+        >
+          {t('notes.deleteConfirm.title')}
+        </h2>
+        <p className="mb-4 text-sm" style={{ color: 'var(--cerebro-muted)' }}>
+          {t('notes.deleteConfirm.body')}
+        </p>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => setConfirmDelete(null)}
+            className="flex-1"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={() => void handleDelete()}
+            disabled={deleting}
+            data-testid="confirm-delete"
+            className="flex-1"
+            style={{ backgroundColor: 'var(--cerebro-error)' }}
+          >
+            {t('notes.deleteConfirm.confirm')}
+          </Button>
+        </div>
+      </BottomSheet>
     </main>
   );
 }

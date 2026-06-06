@@ -165,6 +165,11 @@ export function getNoteById(id: string): Promise<NoteResponse> {
   return get(`/notes/${id}`, noteResponseSchema);
 }
 
+/** Soft delete: arquiva a nota (sai da lista ACTIVE). */
+export function archiveNote(id: string): Promise<NoteResponse> {
+  return post(`/notes/${id}/archive`, {}, noteResponseSchema);
+}
+
 export function listNotes(
   params: {
     type?: NoteType;

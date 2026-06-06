@@ -128,4 +128,36 @@ describe('GET /notes', () => {
     expect(notes).toHaveLength(1);
     expect(notes[0].date).toBe('2026-06-03T00:00:00.000Z');
   });
+
+  it('POST /notes/:id/archive arquiva e some da lista ACTIVE', async () => {
+    const created = await app.inject({
+      method: 'POST',
+      url: '/notes',
+      payload: baseBody,
+    });
+    const id = created.json().id;
+
+    const archived = await app.inject({
+      method: 'POST',
+      url: `/notes/${id}/archive`,
+      payload: {},
+    });
+    expect(archived.statusCode).toBe(200);
+    expect(archived.json().status).toBe('ARCHIVED');
+
+    const active = await app.inject({
+      method: 'GET',
+      url: `/notes?userId=${USER_ID}&status=ACTIVE`,
+    });
+    expect(active.json().map((n: { id: string }) => n.id)).not.toContain(id);
+  });
+
+  it('POST /notes/:id/archive de id inexistente → 404', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/notes/ghost/archive',
+      payload: {},
+    });
+    expect(res.statusCode).toBe(404);
+  });
 });

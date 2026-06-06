@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { NoteNotFoundError } from '../domain/errors.js';
 import type { Note } from '../domain/note.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
+import { ArchiveNote } from '../usecases/archive-note.js';
 import { CreateNote } from '../usecases/create-note.js';
 import { EditNote } from '../usecases/edit-note.js';
 
@@ -41,6 +42,7 @@ export const noteRoutes: FastifyPluginAsyncZod<{
   const repo = new PrismaNoteRepository(options.prisma);
   const createNote = new CreateNote(repo);
   const editNote = new EditNote(repo);
+  const archiveNote = new ArchiveNote(repo);
 
   app.post(
     '/notes',
@@ -99,6 +101,31 @@ export const noteRoutes: FastifyPluginAsyncZod<{
     async (req, reply) => {
       try {
         const note = await editNote.execute({ id: req.params.id, ...req.body });
+        return reply.status(200).send(toResponse(note));
+      } catch (err) {
+        if (err instanceof NoteNotFoundError) {
+          return reply.status(404).send({ error: err.message });
+        }
+        throw err;
+      }
+    },
+  );
+
+  app.post(
+    '/notes/:id/archive',
+    {
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: z.object({}),
+        response: {
+          200: noteResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const note = await archiveNote.execute({ id: req.params.id });
         return reply.status(200).send(toResponse(note));
       } catch (err) {
         if (err instanceof NoteNotFoundError) {
