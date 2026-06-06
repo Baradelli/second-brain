@@ -6,6 +6,7 @@
   "nav.editor": "Write",
   "nav.notes": "Notes",
   "nav.library": "Library",
+  "nav.calendar": "Calendar",
   "nav.assistant": "Assistant",
   "lang.switch": "Português",
   "theme.toggle.dark": "Dark mode",
@@ -178,5 +179,17 @@
   "promote.destination.resource": "Resource",
   "promote.destination.goal": "Goal",
   "promote.error": "Couldn't promote. Check the fields.",
-  "assistant.comingSoonBody": "A helper to review and connect your ideas arrives in a later chapter."
+  "assistant.comingSoonBody": "A helper to review and connect your ideas arrives in a later chapter.",
+  "calendar.title": "Calendar",
+  "calendar.loading": "Loading...",
+  "calendar.error": "Couldn't load the calendar",
+  "calendar.prevMonth": "Previous month",
+  "calendar.nextMonth": "Next month",
+  "calendar.today": "Today",
+  "calendar.day.goalsSummary": "{{done}} of {{planned}} goals",
+  "calendar.day.goalsDoneOnly": "{{done}} done",
+  "calendar.day.noGoals": "No goals planned",
+  "calendar.day.journal": "Journal",
+  "calendar.day.devotional": "Devotional",
+  "calendar.day.reflection": "Reflection"
 }

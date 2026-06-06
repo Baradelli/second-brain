@@ -1,6 +1,8 @@
 import {
   type AttachmentResponse,
   attachmentResponseSchema,
+  type CalendarMonthResponse,
+  calendarMonthResponseSchema,
   type CaptureResponse,
   captureResponseSchema,
   type DayClosingResponse,
@@ -358,6 +360,15 @@ export function getDayClosing(): Promise<DayClosingResponse> {
     `/day-closing?userId=${CURRENT_USER_ID}&day=today`,
     dayClosingResponseSchema,
   );
+}
+
+// ── Calendário ──────────────────────────────────────────────────────────────
+
+/** Agregado mensal: por dia, metas previstas × cumpridas + selo de diário. */
+export function getCalendar(month?: string): Promise<CalendarMonthResponse> {
+  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  if (month) query.set('month', month);
+  return get(`/calendar?${query.toString()}`, calendarMonthResponseSchema);
 }
 
 // ── Labels ──────────────────────────────────────────────────────────────────

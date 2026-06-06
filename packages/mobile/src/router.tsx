@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { App } from './App.js';
 import { AgendaPage } from './pages/AgendaPage.js';
 import { AssistantPage } from './pages/AssistantPage.js';
+import { CalendarPage } from './pages/CalendarPage.js';
 import { CapturePage } from './pages/CapturePage.js';
 import { DayClosingPage } from './pages/DayClosingPage.js';
 import { EditorPage } from './pages/EditorPage.js';
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
       { path: 'capture', element: <CapturePage /> },
       { path: 'review', element: <ReviewPage /> },
       { path: 'notes', element: <NotesPage /> },
+      { path: 'calendar', element: <CalendarPage /> },
       { path: 'labels', element: <LabelsPage /> },
       { path: 'editor', element: <EditorPage /> },
       { path: 'editor/:noteId', element: <EditorPage /> },

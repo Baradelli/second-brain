@@ -263,8 +263,12 @@ objetivos e o que foi cumprido em cada dia.)
   — **[x] feito** (`tasks/44-back-calendario-mensal.md`): `buildMonthCalendar` + `GET /calendar`;
   helpers `localDayKey`/`monthDayKeys`; `calendar*Schema` em `shared/`. Decisão: notas/capturas
   ficaram **fora** do agregador (só metas previstas×cumpridas + selo devocional/reflexão).
-- D2. Tela de calendário mensal + marcação por dia. **Front · M/G** — _próxima_
-- D3. Detalhe do dia (metas + notas) → navegação/ações. **Front · M**
+- D2. Tela de calendário mensal + marcação por dia. **Front · M/G** — **[x] feito**
+  (`tasks/45-tela-calendario-mensal.md`): `CalendarPage` (grade mensal navegável, marcação
+  metas previstas×cumpridas + ponto de diário, toque no dia → resumo em BottomSheet);
+  `getCalendar` no client; aba "Assistente" → **"Calendário"** na tab bar. O resumo do dia é
+  leve (do dado já carregado); o detalhe rico (metas individuais + notas + ações) é a D3.
+- D3. Detalhe do dia (metas + notas) → navegação/ações. **Front · M** — _próxima_
 
 **Dependências.** Maior bloco. Reaproveita muito do Bloco K do MVP 2 (eventos/progresso). Encosta
 no MVP 3 (métricas) — manter escopo em navegação/histórico com **metas reais**, sem streaks.

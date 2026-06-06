@@ -6,6 +6,7 @@
   "nav.editor": "Escrever",
   "nav.notes": "Notas",
   "nav.library": "Biblioteca",
+  "nav.calendar": "Calendário",
   "nav.assistant": "Assistente",
   "lang.switch": "English",
   "theme.toggle.dark": "Modo escuro",
@@ -178,5 +179,17 @@
   "promote.destination.resource": "Recurso",
   "promote.destination.goal": "Objetivo",
   "promote.error": "Não foi possível transformar. Confira os campos.",
-  "assistant.comingSoonBody": "Um ajudante para revisar e conectar suas ideias chega num próximo capítulo."
+  "assistant.comingSoonBody": "Um ajudante para revisar e conectar suas ideias chega num próximo capítulo.",
+  "calendar.title": "Calendário",
+  "calendar.loading": "Carregando...",
+  "calendar.error": "Não foi possível carregar o calendário",
+  "calendar.prevMonth": "Mês anterior",
+  "calendar.nextMonth": "Próximo mês",
+  "calendar.today": "Hoje",
+  "calendar.day.goalsSummary": "{{done}} de {{planned}} metas",
+  "calendar.day.goalsDoneOnly": "{{done}} cumprida(s)",
+  "calendar.day.noGoals": "Nenhuma meta prevista",
+  "calendar.day.journal": "Diário",
+  "calendar.day.devotional": "Devocional",
+  "calendar.day.reflection": "Reflexão"
 }

@@ -6,10 +6,10 @@ import {
 } from '@cerebro/ui';
 import {
   BookOpen,
+  CalendarDays,
   Home,
   NotebookText,
   Plus,
-  Sparkles,
   Tags,
 } from 'lucide-react';
 import { useEffect } from 'react';
@@ -51,9 +51,9 @@ function AppShell() {
       label: t('nav.notes'),
     },
     {
-      to: '/assistant',
-      icon: <Sparkles size={20} strokeWidth={1.75} />,
-      label: t('nav.assistant'),
+      to: '/calendar',
+      icon: <CalendarDays size={20} strokeWidth={1.75} />,
+      label: t('nav.calendar'),
     },
   ];
 

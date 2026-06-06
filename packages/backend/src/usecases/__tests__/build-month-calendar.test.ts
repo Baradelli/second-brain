@@ -1,9 +1,9 @@
+import type { NoteType } from '@cerebro/shared';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Event } from '../../domain/event.js';
 import type { Goal } from '../../domain/goal.js';
 import type { Note } from '../../domain/note.js';
-import type { NoteType } from '@cerebro/shared';
 import { EventRepositoryFake } from '../_fakes/event-repository-fake.js';
 import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
