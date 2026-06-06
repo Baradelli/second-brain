@@ -6,6 +6,10 @@ import { DragHandle } from '@tiptap/extension-drag-handle-react';
 import Highlight from '@tiptap/extension-highlight';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import TextStyle from '@tiptap/extension-text-style';
@@ -27,8 +31,10 @@ import {
   ListOrdered,
   Quote,
 } from 'lucide-react';
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 
+import { Callout } from './callout.js';
+import { createNoteMention, type NoteSearch } from './note-mention.js';
 import { SlashCommand } from './slash-command.js';
 
 // Cores de grifo com alpha → legíveis no tema claro e escuro.
@@ -46,6 +52,10 @@ export interface RichEditorProps {
   onChange: (doc: Record<string, unknown>) => void;
   editable?: boolean;
   className?: string;
+  /** Busca notas para referenciar via "@" (injetada pelo consumidor). */
+  noteSearch?: NoteSearch;
+  /** Navega ao clicar numa referência de nota. */
+  onOpenNoteLink?: (id: string) => void;
 }
 
 export function RichEditor({
@@ -54,8 +64,22 @@ export function RichEditor({
   onChange,
   editable = true,
   className = '',
+  noteSearch,
+  onOpenNoteLink,
 }: RichEditorProps) {
+  const openRef = useRef(onOpenNoteLink);
+  openRef.current = onOpenNoteLink;
+
   const editor = useEditor({
+    editorProps: {
+      handleClickOn: (_view, _pos, node) => {
+        if (node.type.name === 'mention' && openRef.current) {
+          openRef.current(node.attrs['id'] as string);
+          return true;
+        }
+        return false;
+      },
+    },
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2] },
@@ -72,6 +96,12 @@ export function RichEditor({
       Details.configure({ persist: true }),
       DetailsSummary,
       DetailsContent,
+      ...(noteSearch ? [createNoteMention(noteSearch)] : []),
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Callout,
       SlashCommand,
     ],
     content: doc as JSONContent | undefined,

@@ -227,6 +227,54 @@ body::before {
   color: var(--cerebro-fg);
 }
 
+/* Tabela */
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid var(--cerebro-border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+.ProseMirror th {
+  background-color: var(--cerebro-raised);
+  font-weight: 600;
+}
+.ProseMirror .selectedCell {
+  background-color: var(--cerebro-accent-soft);
+}
+
+/* Aviso (callout) */
+.ProseMirror [data-type='callout'] {
+  border: 1px solid var(--cerebro-border);
+  border-left: 3px solid var(--cerebro-accent);
+  border-radius: var(--radius-card);
+  background-color: var(--cerebro-accent-soft);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+.ProseMirror [data-type='callout'] > *:first-child {
+  margin-top: 0;
+}
+
+/* Referência a outra nota (menção "@") */
+.ProseMirror [data-type='mention'],
+.ProseMirror .note-link {
+  color: var(--cerebro-accent);
+  background-color: var(--cerebro-accent-soft);
+  border-radius: 0.35rem;
+  padding: 0.05em 0.3em;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 /* Esconde a barra de rolagem da toolbar do editor */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

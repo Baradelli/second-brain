@@ -172,7 +172,7 @@ começar cedo. B4 depende do Bloco A.
 
 ---
 
-## Bloco C — Editor estilo Notion (TipTap)
+## Bloco C — Editor estilo Notion (TipTap) — **[x] FECHADO** (resta backlinks reversos, futuro)
 
 **Dor.** "Preciso de um editor mais complexo — começando por **grifar o texto com cores** —, no
 fim das contas algo **parecido com o Notion**."
@@ -203,12 +203,14 @@ pronto — **não usamos**.
   + menu **"/"** (`SlashCommand` via `@tiptap/suggestion` + tippy: Texto/Título 1-2/Lista/
   Lista numerada/Citação, com busca e navegação por teclado).
 - **C3 — Mais blocos.** Checklist (TaskList), **toggle** (Details), divisória, callout, tabela. **M/G**
-  — **[~] parcial**: **checklist + toggle + divisória feitos** (via menu "/"); **tabela e callout
-  pendentes** (C3b — tabela = 4 pacotes + UI de linhas/colunas, ruim no toque; callout = nó custom).
+  — **[x] feito**: checklist + toggle + divisória + **tabela** (insertTable 3×3) + **callout/aviso**
+  (nó custom), todos via menu "/".
 - **C4 — Manipular blocos.** **Arrastar/reordenar** (DragHandle) + transformar bloco. **M**
   — **[x] feito**: `DragHandle` (alça de arraste por bloco). Transformar bloco já dá pelo menu "/".
-- **C5 (futuro / "segundo cérebro").** **Links entre notas** (menção `@`/`[[ ]]` → backlinks
-  nota↔nota). É o que aproxima de verdade do Obsidian/Notion como rede de conhecimento. **G**
+- **C5 — Links entre notas (menção `@`).** **[x] feito**: digitar `@` no editor busca notas
+  (injetado via `noteSearch`) e insere uma **referência clicável** que navega pra nota
+  (`onOpenNoteLink`). Forward links prontos. *Falta (futuro): painel de **backlinks reversos***
+  ("quais notas apontam pra esta") — exige índice reverso dos docs.
 
 **Perguntas para decidir.**
 

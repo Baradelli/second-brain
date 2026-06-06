@@ -67,6 +67,21 @@ const ITEMS: SlashItem[] = [
     run: (editor, range) =>
       editor.chain().focus().deleteRange(range).setHorizontalRule().run(),
   },
+  {
+    title: 'Tabela',
+    run: (editor, range) =>
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+        .run(),
+  },
+  {
+    title: 'Aviso',
+    run: (editor, range) =>
+      editor.chain().focus().deleteRange(range).setCallout().run(),
+  },
 ];
 
 export const SlashCommand = Extension.create({

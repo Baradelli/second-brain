@@ -17,6 +17,7 @@ import {
   getNoteById,
   getSuggestedQuestions,
   getTodayNote,
+  listNotes,
   uploadAttachmentFile,
 } from '../lib/api/endpoints.js';
 import {
@@ -208,6 +209,26 @@ export function EditorPage() {
     if (noteId) void persistNoteEdit(noteId, { labelIds: next });
   }
 
+  // Referência a outra nota via "@": busca por título/texto (exclui a nota atual).
+  const searchNotes = useCallback(
+    async (query: string) => {
+      const all = await listNotes();
+      const q = query.toLowerCase();
+      return all
+        .filter((n) => n.id !== routeNoteId)
+        .map((n) => ({
+          id: n.id,
+          label:
+            n.title?.trim() ||
+            n.plainText.split('\n').find((l) => l.trim())?.trim() ||
+            '(sem título)',
+        }))
+        .filter((n) => n.label.toLowerCase().includes(q))
+        .slice(0, 8);
+    },
+    [routeNoteId],
+  );
+
   if (loading) {
     return (
       <div
@@ -327,6 +348,8 @@ export function EditorPage() {
           doc={doc}
           placeholder={t(ritual.placeholderKey)}
           onChange={handleChange}
+          noteSearch={searchNotes}
+          onOpenNoteLink={(id) => navigate(`/editor/${id}`)}
         />
       </div>
 
