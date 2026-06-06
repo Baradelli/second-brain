@@ -3,7 +3,12 @@ import Highlight from '@tiptap/extension-highlight';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextStyle from '@tiptap/extension-text-style';
-import { EditorContent, type JSONContent, useEditor } from '@tiptap/react';
+import {
+  BubbleMenu,
+  EditorContent,
+  type JSONContent,
+  useEditor,
+} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import {
   Bold,
@@ -81,6 +86,51 @@ export function RichEditor({
   return (
     <div className={`flex flex-col ${className}`}>
       {editable && <EditorToolbar editor={editor} />}
+      {editable && (
+        <BubbleMenu editor={editor} tippyOptions={{ duration: 120 }}>
+          <div
+            className="flex items-center gap-0.5 rounded-xl px-1 py-1"
+            style={{
+              backgroundColor: 'var(--cerebro-card)',
+              border: '1px solid var(--cerebro-border)',
+              boxShadow: 'var(--cerebro-shadow-lg)',
+            }}
+          >
+            <ToolBtn
+              active={editor.isActive('bold')}
+              title="Negrito"
+              onPress={() => editor.chain().focus().toggleBold().run()}
+            >
+              <Bold size={16} strokeWidth={1.85} />
+            </ToolBtn>
+            <ToolBtn
+              active={editor.isActive('italic')}
+              title="Itálico"
+              onPress={() => editor.chain().focus().toggleItalic().run()}
+            >
+              <Italic size={16} strokeWidth={1.85} />
+            </ToolBtn>
+            {HIGHLIGHT_COLORS.map((color, i) => (
+              <HighlightSwatch
+                key={color}
+                color={color}
+                active={editor.isActive('highlight', { color })}
+                title={`Grifar (${i + 1})`}
+                onPress={() =>
+                  editor.chain().focus().toggleHighlight({ color }).run()
+                }
+              />
+            ))}
+            <ToolBtn
+              active={false}
+              title="Remover grifo"
+              onPress={() => editor.chain().focus().unsetHighlight().run()}
+            >
+              <Highlighter size={16} strokeWidth={1.85} />
+            </ToolBtn>
+          </div>
+        </BubbleMenu>
+      )}
       <EditorContent editor={editor} className="flex-1" />
     </div>
   );
