@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import i18n from '../lib/i18n/index.js';
 import { LabelPicker } from '../components/LabelPicker.js';
+import i18n from '../lib/i18n/index.js';
 
 vi.mock('../lib/api/endpoints.js', () => ({
   listLabels: vi.fn(),
@@ -69,16 +69,12 @@ describe('LabelPicker', () => {
 
   it('mostra estado vazio quando não há labels', async () => {
     render(<Harness />);
-    await waitFor(() =>
-      screen.getByText(/Nenhuma label criada ainda/i),
-    );
+    await waitFor(() => screen.getByText(/Nenhuma label criada ainda/i));
   });
 
   it('degrada para vazio se o carregamento falhar', async () => {
     vi.mocked(endpoints.listLabels).mockRejectedValue(new Error('net'));
     render(<Harness />);
-    await waitFor(() =>
-      screen.getByText(/Nenhuma label criada ainda/i),
-    );
+    await waitFor(() => screen.getByText(/Nenhuma label criada ainda/i));
   });
 });

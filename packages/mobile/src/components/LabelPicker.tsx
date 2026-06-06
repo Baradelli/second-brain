@@ -48,7 +48,9 @@ export function LabelPicker({ value, onChange }: LabelPickerProps) {
   }, []);
 
   function toggle(id: string) {
-    onChange(value.includes(id) ? value.filter((x) => x !== id) : [...value, id]);
+    onChange(
+      value.includes(id) ? value.filter((x) => x !== id) : [...value, id],
+    );
   }
 
   return (

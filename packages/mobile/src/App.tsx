@@ -4,7 +4,14 @@ import {
   ThemeProvider,
   ThemeToggle,
 } from '@cerebro/ui';
-import { BookOpen, Home, NotebookText, Plus, Sparkles, Tags } from 'lucide-react';
+import {
+  BookOpen,
+  Home,
+  NotebookText,
+  Plus,
+  Sparkles,
+  Tags,
+} from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate } from 'react-router-dom';

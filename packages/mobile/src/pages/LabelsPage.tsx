@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 import { LabelForm } from '../components/LabelForm.js';
 import {
-  type LabelBody,
   archiveLabel,
   createLabel,
   editLabel,
+  type LabelBody,
   listLabels,
 } from '../lib/api/endpoints.js';
 

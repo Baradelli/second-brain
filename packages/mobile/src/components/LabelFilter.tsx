@@ -59,7 +59,9 @@ export function LabelFilter({ value, onChange }: LabelFilterProps) {
           ? '#fff'
           : 'var(--cerebro-accent)'
         : 'var(--cerebro-muted)',
-      border: active ? '1px solid transparent' : '1px solid var(--cerebro-border)',
+      border: active
+        ? '1px solid transparent'
+        : '1px solid var(--cerebro-border)',
     };
   }
 

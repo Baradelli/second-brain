@@ -41,7 +41,13 @@ const LABEL_BY_TYPE: Record<NoteType, string> = {
 };
 
 type TypeFilter = 'all' | NoteType;
-const FILTERS: TypeFilter[] = ['all', 'DEVOTIONAL', 'REFLECTION', 'STUDY_NOTE', 'NOTE'];
+const FILTERS: TypeFilter[] = [
+  'all',
+  'DEVOTIONAL',
+  'REFLECTION',
+  'STUDY_NOTE',
+  'NOTE',
+];
 
 function preview(note: NoteResponse): string {
   if (note.title?.trim()) return note.title.trim();
@@ -281,7 +287,10 @@ export function NotesPage() {
             </p>
             {resources.length === 0 ? (
               <div className="flex flex-col gap-3">
-                <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
+                <p
+                  className="text-sm"
+                  style={{ color: 'var(--cerebro-muted)' }}
+                >
                   {t('notes.noResources')}
                 </p>
                 <button

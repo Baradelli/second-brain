@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { LabelPicker } from './LabelPicker.js';
 import type { CreateGoalBody } from '../lib/api/endpoints.js';
+import { LabelPicker } from './LabelPicker.js';
 
 const GOAL_TYPES = ['HABIT', 'TARGET', 'PROJECT', 'UMBRELLA'] as const;
 const PERIODS = ['day', 'week', 'month'] as const;

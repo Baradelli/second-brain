@@ -108,8 +108,16 @@ describe('LibraryPage', () => {
   it('filtra por label (client-side, mostra só os que têm a label)', async () => {
     const user = userEvent.setup();
     vi.mocked(endpoints.listResources).mockResolvedValue([
-      makeResource({ id: 'with', title: 'Com label', labelIds: ['l1'] }) as never,
-      makeResource({ id: 'without', title: 'Sem label', labelIds: [] }) as never,
+      makeResource({
+        id: 'with',
+        title: 'Com label',
+        labelIds: ['l1'],
+      }) as never,
+      makeResource({
+        id: 'without',
+        title: 'Sem label',
+        labelIds: [],
+      }) as never,
     ]);
     vi.mocked(endpoints.listLabels).mockResolvedValue([
       {

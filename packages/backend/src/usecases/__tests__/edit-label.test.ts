@@ -6,8 +6,8 @@ import {
   LabelParentInvalidError,
 } from '../../domain/errors.js';
 import type { Label } from '../../domain/label.js';
-import { EditLabel } from '../edit-label.js';
 import { LabelRepositoryFake } from '../_fakes/label-repository-fake.js';
+import { EditLabel } from '../edit-label.js';
 
 const USER = 'user-1';
 
@@ -34,7 +34,9 @@ describe('EditLabel', () => {
   });
 
   it('renomeia e troca cor (patch parcial não mexe no resto)', async () => {
-    await repo.save(makeLabel({ id: 'l1', name: 'Antigo', color: null, parentId: null }));
+    await repo.save(
+      makeLabel({ id: 'l1', name: 'Antigo', color: null, parentId: null }),
+    );
 
     const result = await useCase.execute({
       id: 'l1',
@@ -51,7 +53,11 @@ describe('EditLabel', () => {
 
   it('cor: null limpa a cor', async () => {
     await repo.save(makeLabel({ id: 'l1', color: '#fff' }));
-    const result = await useCase.execute({ id: 'l1', userId: USER, color: null });
+    const result = await useCase.execute({
+      id: 'l1',
+      userId: USER,
+      color: null,
+    });
     expect(result.color).toBeNull();
   });
 
@@ -71,7 +77,11 @@ describe('EditLabel', () => {
     await repo.save(makeLabel({ id: 'parent' }));
     await repo.save(makeLabel({ id: 'l1', parentId: 'parent' }));
 
-    const result = await useCase.execute({ id: 'l1', userId: USER, parentId: null });
+    const result = await useCase.execute({
+      id: 'l1',
+      userId: USER,
+      parentId: null,
+    });
     expect(result.parentId).toBeNull();
   });
 
@@ -113,7 +123,9 @@ describe('EditLabel', () => {
   });
 
   it('não altera status/archivedAt', async () => {
-    await repo.save(makeLabel({ id: 'l1', status: 'ACTIVE', archivedAt: null }));
+    await repo.save(
+      makeLabel({ id: 'l1', status: 'ACTIVE', archivedAt: null }),
+    );
     const result = await useCase.execute({ id: 'l1', userId: USER, name: 'x' });
     expect(result.status).toBe('ACTIVE');
     expect(result.archivedAt).toBeNull();

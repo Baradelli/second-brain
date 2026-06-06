@@ -62,6 +62,7 @@ export interface EditLabelInput {
 ## Rota
 
 `PATCH /labels/:id` em `label-routes.ts`:
+
 - params `{ id }`, body `editLabelSchema`; response `200: labelResponseSchema`.
 - Erros: `LabelNotFoundError`→404, `LabelParentInvalidError`/`LabelCycleError`→400.
 - Handler chama `editLabel.execute({ id: req.params.id, ...req.body })`.

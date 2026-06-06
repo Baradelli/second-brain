@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
+import { LabelPicker } from '../components/LabelPicker.js';
 import {
   attachFileToNote,
   getNoteAttachments,
@@ -18,7 +19,6 @@ import {
   getTodayNote,
   uploadAttachmentFile,
 } from '../lib/api/endpoints.js';
-import { LabelPicker } from '../components/LabelPicker.js';
 import {
   persistNoteCreate,
   persistNoteEdit,

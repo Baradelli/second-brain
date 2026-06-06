@@ -10,12 +10,17 @@ vi.mock('@cerebro/ui', () => ({
   Button: ({
     children,
     ...rest
-  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  }: {
+    children: React.ReactNode;
+  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...rest}>{children}</button>
   ),
   Input: forwardRef<
     HTMLInputElement,
-    { label?: string; error?: string } & React.InputHTMLAttributes<HTMLInputElement>
+    {
+      label?: string;
+      error?: string;
+    } & React.InputHTMLAttributes<HTMLInputElement>
   >(({ label, error, ...props }, ref) => (
     <label>
       {label}

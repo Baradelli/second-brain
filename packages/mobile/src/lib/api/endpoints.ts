@@ -359,7 +359,11 @@ export interface LabelBody {
 }
 
 export function createLabel(body: LabelBody): Promise<LabelResponse> {
-  return post('/labels', { ...body, userId: CURRENT_USER_ID }, labelResponseSchema);
+  return post(
+    '/labels',
+    { ...body, userId: CURRENT_USER_ID },
+    labelResponseSchema,
+  );
 }
 
 export function editLabel(id: string, body: LabelBody): Promise<LabelResponse> {

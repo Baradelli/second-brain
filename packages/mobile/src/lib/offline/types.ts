@@ -70,6 +70,10 @@ export interface OfflineApi {
   }): Promise<{ id: string }>;
   editNote(
     id: string,
-    body: { doc?: Record<string, unknown>; title?: string; labelIds?: string[] },
+    body: {
+      doc?: Record<string, unknown>;
+      title?: string;
+      labelIds?: string[];
+    },
   ): Promise<{ id: string }>;
 }
