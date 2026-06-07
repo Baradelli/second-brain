@@ -13,7 +13,9 @@ vi.mock('@cerebro/ui', () => ({
   Button: ({
     children,
     ...rest
-  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  }: {
+    children: React.ReactNode;
+  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...rest}>{children}</button>
   ),
   Input: forwardRef<
@@ -114,9 +116,7 @@ describe('ResourceDetailPage', () => {
 
   it('estado vazio quando não há fichamentos', async () => {
     renderDetail();
-    await waitFor(() =>
-      screen.getByText(/Nenhum fichamento ainda/i),
-    );
+    await waitFor(() => screen.getByText(/Nenhum fichamento ainda/i));
   });
 
   it('"Novo" abre o editor de fichamento já com o recurso', async () => {
@@ -142,7 +142,9 @@ describe('ResourceDetailPage', () => {
 
     await user.click(screen.getByTestId('confirm-delete'));
 
-    await waitFor(() => expect(endpoints.archiveNote).toHaveBeenCalledWith('n1'));
+    await waitFor(() =>
+      expect(endpoints.archiveNote).toHaveBeenCalledWith('n1'),
+    );
     await waitFor(() => expect(screen.queryByText('Capítulo 1')).toBeNull());
   });
 

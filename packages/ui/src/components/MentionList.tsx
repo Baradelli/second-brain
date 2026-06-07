@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 export interface MentionItem {
   id: string;

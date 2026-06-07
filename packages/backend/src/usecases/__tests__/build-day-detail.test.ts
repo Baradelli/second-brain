@@ -176,7 +176,8 @@ describe('BuildDayDetail', () => {
       new SettingsReaderFake(),
     );
     await goals.save(makeGoal({ id: 'w', weekdays: [3] }));
-    expect((await noSettings.execute({ userId: USER, date: DATE })).goals)
-      .toHaveLength(1);
+    expect(
+      (await noSettings.execute({ userId: USER, date: DATE })).goals,
+    ).toHaveLength(1);
   });
 });

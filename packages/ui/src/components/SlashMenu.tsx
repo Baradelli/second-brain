@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 import type { SlashItem } from './slash-command.js';
 

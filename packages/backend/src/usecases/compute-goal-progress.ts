@@ -45,9 +45,7 @@ function todayDone(
   const day = dayRange(reference, timezone, 'DAY');
   const todays = events.filter(
     (e) =>
-      e.type === 'done' &&
-      e.occurredAt >= day.from &&
-      e.occurredAt <= day.to,
+      e.type === 'done' && e.occurredAt >= day.from && e.occurredAt <= day.to,
   );
   if (todays.length === 0) return { doneToday: false, todayEventId: null };
   const latest = todays.reduce((a, b) =>

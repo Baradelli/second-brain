@@ -1,4 +1,4 @@
-import { type Editor, type Range, Extension } from '@tiptap/core';
+import { type Editor, Extension,type Range } from '@tiptap/core';
 import { ReactRenderer } from '@tiptap/react';
 import Suggestion from '@tiptap/suggestion';
 import tippy, { type Instance } from 'tippy.js';
@@ -109,8 +109,7 @@ export const SlashCommand = Extension.create({
               });
               if (!props.clientRect) return;
               popup = tippy('body', {
-                getReferenceClientRect:
-                  props.clientRect as () => DOMRect,
+                getReferenceClientRect: props.clientRect as () => DOMRect,
                 appendTo: () => document.body,
                 content: component.element,
                 showOnCreate: true,

@@ -78,7 +78,9 @@ describe('SearchAll', () => {
 
   it('matches notes by title and plainText (case-insensitive)', async () => {
     await notes.save(makeNote({ id: 'n1', title: 'Sobre Clareza' }));
-    await notes.save(makeNote({ id: 'n2', plainText: 'um texto com clareza no meio' }));
+    await notes.save(
+      makeNote({ id: 'n2', plainText: 'um texto com clareza no meio' }),
+    );
     await notes.save(makeNote({ id: 'n3', title: 'outra coisa' }));
 
     const r = await useCase.execute({ userId: USER, query: 'clareza' });

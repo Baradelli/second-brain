@@ -113,7 +113,10 @@ export function SettingsPage() {
 
       {settings && !loading && !error && (
         <div className="space-y-5">
-          <Field label={t('settings.timezone')} help={t('settings.timezone.help')}>
+          <Field
+            label={t('settings.timezone')}
+            help={t('settings.timezone.help')}
+          >
             <select
               className={selectClass}
               style={fieldStyle}
@@ -171,7 +174,10 @@ export function SettingsPage() {
             </select>
           </Field>
 
-          <Field label={t('settings.devotionalTime')} help={t('settings.times.help')}>
+          <Field
+            label={t('settings.devotionalTime')}
+            help={t('settings.times.help')}
+          >
             <input
               type="time"
               className={selectClass}

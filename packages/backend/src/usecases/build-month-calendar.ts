@@ -124,7 +124,8 @@ export class BuildMonthCalendar {
       timezone,
     );
     return habits.filter((g) => {
-      if (g.weekdays.length === 0 || !g.weekdays.includes(weekday)) return false;
+      if (g.weekdays.length === 0 || !g.weekdays.includes(weekday))
+        return false;
       const start = localDayKey(g.startAt ?? g.createdAt, timezone);
       if (date < start) return false;
       if (g.completedAt && date > localDayKey(g.completedAt, timezone)) {

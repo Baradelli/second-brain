@@ -30,7 +30,9 @@
 ## UseCases (TDD com fakes)
 
 ### `DeleteGoal` (deps: GoalRepository, EventRepository)
+
 `execute({ id, userId }): Promise<Goal>` (devolve o snapshot do que foi excluído)
+
 1. `byId`; inexistente ou de outro user → `GoalNotFoundError`.
 2. `status !== 'ARCHIVED'` → `GoalNotArchivedError`.
 3. filhos (`find({ userId, parentId: id })`, qualquer status) > 0 → `GoalHasChildrenError`.
@@ -39,11 +41,14 @@
 6. `goals.delete(id)`; retorna o snapshot.
 
 ### `UnarchiveGoal` (deps: GoalRepository)
+
 `execute({ id, userId }): Promise<Goal>` — `byId`/owner senão `GoalNotFoundError`;
 `update(id, { status: 'ACTIVE', archivedAt: null })`. Idempotente se já ativo.
 
 ### `ListArchivedGoals` (deps: GoalRepository, EventRepository)
+
 `execute({ userId }): Promise<{ goal: Goal; deletable: boolean }[]>`
+
 - `find({ userId, status: 'ARCHIVED' })`; `deletable = ` sem evento `done`. Para eficiência,
   buscar os `done` do user uma vez (`find({ userId, type: 'done' })`) e montar um Set de goalIds.
 - Ordena por `archivedAt` desc.

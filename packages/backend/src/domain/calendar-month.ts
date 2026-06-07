@@ -5,7 +5,9 @@ import { DateTime } from 'luxon';
  * instante↔dia do calendário (regra do projeto: Luxon, num lugar só).
  */
 export function localDayKey(instant: Date, timezone: string): string {
-  return DateTime.fromJSDate(instant, { zone: timezone }).toFormat('yyyy-MM-dd');
+  return DateTime.fromJSDate(instant, { zone: timezone }).toFormat(
+    'yyyy-MM-dd',
+  );
 }
 
 /**

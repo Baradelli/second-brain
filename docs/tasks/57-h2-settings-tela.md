@@ -7,8 +7,8 @@
 
 - Client: `getSettings()` e `updateSettings(patch)`.
 - **`SettingsPage`** (`/settings`): carrega o Settings e edita:
-  - **Fuso horário** (select; usa `Intl.supportedValuesOf('timeZone')` com fallback) — *afeta todo
-    cálculo de dia/semana/mês*.
+  - **Fuso horário** (select; usa `Intl.supportedValuesOf('timeZone')` com fallback) — _afeta todo
+    cálculo de dia/semana/mês_.
   - **Dia de revisar capturas** (`reviewWeekday`) — dia pro qual a captura é agendada.
   - **Início da semana (recap)** (`recapWeekday`).
   - **Horário do devocional/reflexão** — com aviso de que ainda não são usados (futuros lembretes).

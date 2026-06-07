@@ -54,7 +54,10 @@ describe('UpdateSettings', () => {
   it('preserves fields not present in the patch', async () => {
     const update = new UpdateSettings(repo);
     await update.execute({ userId: USER, patch: { timezone: 'UTC' } });
-    const s = await update.execute({ userId: USER, patch: { reviewWeekday: 5 } });
+    const s = await update.execute({
+      userId: USER,
+      patch: { reviewWeekday: 5 },
+    });
     expect(s.timezone).toBe('UTC'); // mantém o que foi setado antes
     expect(s.reviewWeekday).toBe(5);
   });

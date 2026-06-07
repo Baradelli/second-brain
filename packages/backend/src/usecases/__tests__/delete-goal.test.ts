@@ -71,7 +71,9 @@ describe('DeleteGoal', () => {
     expect(result.id).toBe('g');
     expect(await goals.byId('g')).toBeNull();
     expect(await events.find({ userId: USER, goalId: 'g' })).toHaveLength(0);
-    expect(await events.find({ userId: USER, goalId: 'other' })).toHaveLength(1);
+    expect(await events.find({ userId: USER, goalId: 'other' })).toHaveLength(
+      1,
+    );
   });
 
   it('refuses to delete a goal with done history (keeps goal and events)', async () => {

@@ -15,7 +15,10 @@ import { getSearch } from '../lib/api/endpoints.js';
 function noteLabel(n: NoteResponse): string {
   return (
     n.title?.trim() ||
-    n.plainText.split('\n').find((l) => l.trim())?.trim() ||
+    n.plainText
+      .split('\n')
+      .find((l) => l.trim())
+      ?.trim() ||
     ''
   );
 }
@@ -191,7 +194,12 @@ function Row({
   testId: string;
 }) {
   return (
-    <button type="button" onClick={onClick} data-testid={testId} className="w-full text-left">
+    <button
+      type="button"
+      onClick={onClick}
+      data-testid={testId}
+      className="w-full text-left"
+    >
       <Card padding="sm">
         <div className="flex items-center gap-3">
           <span

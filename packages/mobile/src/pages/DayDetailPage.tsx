@@ -185,7 +185,11 @@ function GoalRow({ goal }: { goal: CalendarDayGoalResponse }) {
   );
 }
 
-function StatusBadge({ status }: { status: CalendarDayGoalResponse['status'] }) {
+function StatusBadge({
+  status,
+}: {
+  status: CalendarDayGoalResponse['status'];
+}) {
   const { t } = useTranslation();
   const map = {
     done: {
@@ -214,8 +218,7 @@ function StatusBadge({ status }: { status: CalendarDayGoalResponse['status'] }) 
       style={{
         backgroundColor:
           status === 'done' ? 'var(--cerebro-accent-soft)' : 'transparent',
-        border:
-          status === 'done' ? 'none' : '1px solid var(--cerebro-border)',
+        border: status === 'done' ? 'none' : '1px solid var(--cerebro-border)',
         color: s.color,
       }}
       data-testid={`goal-status-${status}`}

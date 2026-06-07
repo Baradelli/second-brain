@@ -117,10 +117,7 @@ export function createCapture(text: string): Promise<CaptureResponse> {
 export function listCaptures(
   status: 'PENDING' | 'ARCHIVED',
 ): Promise<CaptureResponse[]> {
-  return get(
-    `/captures?status=${status}`,
-    z.array(captureResponseSchema),
-  );
+  return get(`/captures?status=${status}`, z.array(captureResponseSchema));
 }
 
 export function archiveCapture(
@@ -400,16 +397,16 @@ export function getCalendar(month?: string): Promise<CalendarMonthResponse> {
   const query = new URLSearchParams();
   if (month) query.set('month', month);
   const qs = query.toString();
-  return get(
-    `/calendar${qs ? `?${qs}` : ''}`,
-    calendarMonthResponseSchema,
-  );
+  return get(`/calendar${qs ? `?${qs}` : ''}`, calendarMonthResponseSchema);
 }
 
 /** Detalhe de um dia: metas (com status) + notas escritas no dia. */
 export function getDayDetail(date: string): Promise<CalendarDayDetailResponse> {
   const query = new URLSearchParams({ date });
-  return get(`/calendar/day?${query.toString()}`, calendarDayDetailResponseSchema);
+  return get(
+    `/calendar/day?${query.toString()}`,
+    calendarDayDetailResponseSchema,
+  );
 }
 
 // ── Busca ─────────────────────────────────────────────────────────────────────

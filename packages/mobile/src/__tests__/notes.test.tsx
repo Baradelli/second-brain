@@ -12,7 +12,9 @@ vi.mock('@cerebro/ui', () => ({
   Button: ({
     children,
     ...rest
-  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  }: {
+    children: React.ReactNode;
+  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...rest}>{children}</button>
   ),
   BottomSheet: ({
@@ -100,7 +102,9 @@ describe('NotesPage', () => {
 
     await user.click(screen.getByTestId('confirm-delete'));
 
-    await waitFor(() => expect(endpoints.archiveNote).toHaveBeenCalledWith('n1'));
+    await waitFor(() =>
+      expect(endpoints.archiveNote).toHaveBeenCalledWith('n1'),
+    );
     await waitFor(() => expect(screen.queryByText('Vai sair')).toBeNull());
   });
 

@@ -22,7 +22,7 @@
 - `SelectTodaysGoals` / `computeGoalProgress` mostram como classificar HABIT por `weekdays`
   e por período, e como contar `done` numa janela.
 - `EventRepository.find({ userId, type, from, to })` e `NoteRepository.find({ userId, type,
-  scope, from, to, status })` já existem (fakes idem). `Note.date` é a data lógica do dia.
+scope, from, to, status })` já existem (fakes idem). `Note.date` é a data lógica do dia.
 - Diário = existência de uma `Note` `DEVOTIONAL` / `REFLECTION` no dia (ver `buildTodayAgenda`).
 - Fuso: `settings.getByUserId(userId)?.timezone ?? 'America/Sao_Paulo'` (igual a
   `buildDayClosing`/`computeGoalProgress`).
@@ -47,18 +47,21 @@ export function monthDayKeys(month: string, timezone: string): string[] { … }
 
 ```ts
 export const calendarDaySchema = z.object({
-  date: z.string(),                          // 'YYYY-MM-DD' (dia local)
+  date: z.string(), // 'YYYY-MM-DD' (dia local)
   goalsPlanned: z.number().int().nonnegative(),
   goalsDone: z.number().int().nonnegative(),
   journal: z.object({ devotional: z.boolean(), reflection: z.boolean() }),
 });
 export const calendarMonthResponseSchema = z.object({
-  month: z.string(),                         // 'YYYY-MM'
+  month: z.string(), // 'YYYY-MM'
   days: z.array(calendarDaySchema),
 });
 export const calendarQuerySchema = z.object({
   userId: z.string().min(1),
-  month: z.string().regex(/^\d{4}-\d{2}$/).optional(), // ausente → mês corrente
+  month: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .optional(), // ausente → mês corrente
 });
 ```
 
@@ -67,8 +70,8 @@ export const calendarQuerySchema = z.object({
 ```ts
 export interface BuildMonthCalendarInput {
   userId: string;
-  month?: string;    // 'YYYY-MM'; ausente → mês de `reference`
-  reference?: Date;  // default new Date() (resolve o mês corrente)
+  month?: string; // 'YYYY-MM'; ausente → mês de `reference`
+  reference?: Date; // default new Date() (resolve o mês corrente)
 }
 export interface CalendarDay {
   date: string;
@@ -76,7 +79,10 @@ export interface CalendarDay {
   goalsDone: number;
   journal: { devotional: boolean; reflection: boolean };
 }
-export interface MonthCalendar { month: string; days: CalendarDay[] }
+export interface MonthCalendar {
+  month: string;
+  days: CalendarDay[];
+}
 // deps: GoalRepository, EventRepository, NoteRepository, SettingsReader
 ```
 

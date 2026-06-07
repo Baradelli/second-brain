@@ -60,7 +60,11 @@ function AppShell() {
 
   // Demais seções moram no sidebar (cresce conforme o app ganha páginas).
   const menuItems: SidebarItem[] = [
-    { to: '/', icon: <Home size={18} strokeWidth={1.75} />, label: t('nav.home') },
+    {
+      to: '/',
+      icon: <Home size={18} strokeWidth={1.75} />,
+      label: t('nav.home'),
+    },
     {
       to: '/search',
       icon: <Search size={18} strokeWidth={1.75} />,

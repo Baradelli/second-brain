@@ -17,7 +17,7 @@ metas/eventos. Então D3 ganha um **agregador de um dia** (espelha a D1, reusa `
 - `SelectTodaysGoals.execute({ userId, reference, timezone })` → metas relevantes de um dia
   (agendadas no weekday + convites de período aberto) com `resolvedToday`, `kind`, `title`, `goalId`.
 - `EventRepository.find({ userId, from, to })` (eventos do dia) e `NoteRepository.find({ userId,
-  status, from, to })` (notas do dia) já existem (fakes idem). `dayRange(ref, tz, 'DAY')` dá a janela.
+status, from, to })` (notas do dia) já existem (fakes idem). `dayRange(ref, tz, 'DAY')` dá a janela.
 - `localDayKey` / fuso: `settings...timezone ?? 'America/Sao_Paulo'` (igual D1).
 - Frontend: `CalendarPage` (D2) já navega o mês; hoje o toque abre um BottomSheet de resumo
   (será trocado por navegação para esta página). Padrão de página: `ResourceDetailPage`
@@ -34,11 +34,11 @@ export const calendarDayGoalSchema = z.object({
 });
 export const calendarDayNoteSchema = z.object({
   id: z.string(),
-  type: noteType,          // reusa o enum de note
+  type: noteType, // reusa o enum de note
   title: z.string().optional(),
 });
 export const calendarDayDetailResponseSchema = z.object({
-  date: z.string(),        // 'YYYY-MM-DD'
+  date: z.string(), // 'YYYY-MM-DD'
   goals: z.array(calendarDayGoalSchema),
   notes: z.array(calendarDayNoteSchema),
 });
@@ -51,17 +51,33 @@ export const calendarDayQuerySchema = z.object({
 ## UseCase (`backend/src/usecases/build-day-detail.ts`)
 
 ```ts
-export interface BuildDayDetailInput { userId: string; date: string; /* 'YYYY-MM-DD' */ }
-export interface DayDetailGoal { goalId; title; kind; status: 'done'|'skipped'|'pending' }
-export interface DayDetailNote { id; type; title? }
-export interface DayDetail { date; goals: DayDetailGoal[]; notes: DayDetailNote[] }
+export interface BuildDayDetailInput {
+  userId: string;
+  date: string; /* 'YYYY-MM-DD' */
+}
+export interface DayDetailGoal {
+  goalId;
+  title;
+  kind;
+  status: 'done' | 'skipped' | 'pending';
+}
+export interface DayDetailNote {
+  id;
+  type;
+  title?;
+}
+export interface DayDetail {
+  date;
+  goals: DayDetailGoal[];
+  notes: DayDetailNote[];
+}
 // deps: GoalRepository, EventRepository, NoteRepository, SettingsReader
 ```
 
 ### Regras (o que os testes provam)
 
 1. **Referência do dia**: monta um instante ao **meio-dia** do dia local (`DateTime.fromFormat(date,
-   'yyyy-MM-dd',{zone}).set({hour:12})`) para evitar borda de fuso; daí `dayRange(ref, tz, 'DAY')`.
+'yyyy-MM-dd',{zone}).set({hour:12})`) para evitar borda de fuso; daí `dayRange(ref, tz, 'DAY')`.
 2. **Metas**: vêm de `SelectTodaysGoals` (mesma classificação agendada/convite do app). Ordenadas
    agendadas antes de convites, depois por título (igual `buildDayClosing`).
 3. **Status** de cada meta, a partir dos **eventos do dia** (uma busca, agrupada por `goalId`):

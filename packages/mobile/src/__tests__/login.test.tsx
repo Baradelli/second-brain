@@ -10,7 +10,9 @@ vi.mock('@cerebro/ui', () => ({
   Button: ({
     children,
     ...rest
-  }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  }: {
+    children: React.ReactNode;
+  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...rest}>{children}</button>
   ),
   Input: forwardRef<
@@ -70,9 +72,7 @@ describe('LoginPage', () => {
     await user.type(screen.getByLabelText('Senha'), 'errada');
     await user.click(screen.getByTestId('login-submit'));
 
-    await waitFor(() =>
-      screen.getByText('Email ou senha incorretos'),
-    );
+    await waitFor(() => screen.getByText('Email ou senha incorretos'));
     expect(auth.setToken).not.toHaveBeenCalled();
   });
 });

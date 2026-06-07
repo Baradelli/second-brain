@@ -2,7 +2,11 @@ import Mention from '@tiptap/extension-mention';
 import { ReactRenderer } from '@tiptap/react';
 import tippy, { type Instance } from 'tippy.js';
 
-import { MentionList, type MentionItem, type MentionListRef } from './MentionList.js';
+import {
+  type MentionItem,
+  MentionList,
+  type MentionListRef,
+} from './MentionList.js';
 
 export type NoteSearch = (query: string) => Promise<MentionItem[]>;
 

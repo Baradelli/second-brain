@@ -43,7 +43,12 @@ const NOTE_COLOR: Record<NoteType, string> = {
 
 function notePreview(note: NoteResponse): string {
   if (note.title?.trim()) return note.title.trim();
-  return note.plainText.split('\n').find((l) => l.trim())?.trim() ?? '';
+  return (
+    note.plainText
+      .split('\n')
+      .find((l) => l.trim())
+      ?.trim() ?? ''
+  );
 }
 
 export function ResourceDetailPage() {

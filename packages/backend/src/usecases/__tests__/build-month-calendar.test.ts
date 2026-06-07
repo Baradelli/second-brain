@@ -120,16 +120,19 @@ describe('BuildMonthCalendar', () => {
     await goals.save(makeGoal({ id: 'w', weekdays: [3] })); // quartas
 
     const { days } = await june();
-    for (const wed of ['2026-06-03', '2026-06-10', '2026-06-17', '2026-06-24']) {
+    for (const wed of [
+      '2026-06-03',
+      '2026-06-10',
+      '2026-06-17',
+      '2026-06-24',
+    ]) {
       expect(dayOf(days, wed).goalsPlanned).toBe(1);
     }
     expect(dayOf(days, '2026-06-04').goalsPlanned).toBe(0);
   });
 
   it('does NOT count period habits (no weekdays) as planned', async () => {
-    await goals.save(
-      makeGoal({ id: 'p', period: 'week', timesPerPeriod: 3 }),
-    );
+    await goals.save(makeGoal({ id: 'p', period: 'week', timesPerPeriod: 3 }));
     const { days } = await june();
     expect(days.every((d) => d.goalsPlanned === 0)).toBe(true);
   });
@@ -148,8 +151,9 @@ describe('BuildMonthCalendar', () => {
     await events.save(event('w', '2026-06-03T10:00:00.000Z'));
     await events.save(event('w', '2026-06-03T20:00:00.000Z'));
 
-    expect((await june()).days.find((d) => d.date === '2026-06-03')?.goalsDone)
-      .toBe(1);
+    expect(
+      (await june()).days.find((d) => d.date === '2026-06-03')?.goalsDone,
+    ).toBe(1);
   });
 
   it('counts dones on different days separately', async () => {
@@ -245,7 +249,10 @@ describe('BuildMonthCalendar', () => {
 
   it('isolates data from other users', async () => {
     await goals.save(makeGoal({ id: 'w', userId: 'other', weekdays: [3] }));
-    await events.save({ ...event('w', '2026-06-03T10:00:00.000Z'), userId: 'other' });
+    await events.save({
+      ...event('w', '2026-06-03T10:00:00.000Z'),
+      userId: 'other',
+    });
     await notes.save(
       makeNote('d', 'DEVOTIONAL', '2026-06-04T12:00:00.000Z', {
         userId: 'other',
@@ -269,7 +276,10 @@ describe('BuildMonthCalendar', () => {
       new SettingsReaderFake(),
     );
     await goals.save(makeGoal({ id: 'w', weekdays: [3] }));
-    const { days } = await noSettings.execute({ userId: USER, month: '2026-06' });
+    const { days } = await noSettings.execute({
+      userId: USER,
+      month: '2026-06',
+    });
     expect(dayOf(days, '2026-06-03').goalsPlanned).toBe(1);
   });
 });

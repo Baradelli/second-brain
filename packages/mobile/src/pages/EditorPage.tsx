@@ -242,7 +242,10 @@ export function EditorPage() {
           id: n.id,
           label:
             n.title?.trim() ||
-            n.plainText.split('\n').find((l) => l.trim())?.trim() ||
+            n.plainText
+              .split('\n')
+              .find((l) => l.trim())
+              ?.trim() ||
             '(sem título)',
         }))
         .filter((n) => n.label.toLowerCase().includes(q))

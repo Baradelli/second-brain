@@ -6,7 +6,10 @@ import type { EventRepository } from './ports/event-repository.js';
 import type { GoalRepository } from './ports/goal-repository.js';
 import type { NoteRepository } from './ports/note-repository.js';
 import type { SettingsReader } from './ports/settings-reader.js';
-import { SelectTodaysGoals, type TodaysGoalKind } from './select-todays-goals.js';
+import {
+  SelectTodaysGoals,
+  type TodaysGoalKind,
+} from './select-todays-goals.js';
 
 const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
 

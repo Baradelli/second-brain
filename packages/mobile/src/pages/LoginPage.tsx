@@ -43,7 +43,10 @@ export function LoginPage() {
   return (
     <main
       className="flex min-h-dvh items-center justify-center px-6"
-      style={{ backgroundColor: 'var(--cerebro-bg)', color: 'var(--cerebro-fg)' }}
+      style={{
+        backgroundColor: 'var(--cerebro-bg)',
+        color: 'var(--cerebro-fg)',
+      }}
     >
       <form
         onSubmit={onSubmit}

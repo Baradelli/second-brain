@@ -16,7 +16,10 @@ function recapPeriodLabel(
   weekOf: (d: string) => string,
 ): string {
   const d = new Date(note.date);
-  if (scope === 'WEEK') return weekOf(d.toLocaleDateString(locale, { day: 'numeric', month: 'short' }));
+  if (scope === 'WEEK')
+    return weekOf(
+      d.toLocaleDateString(locale, { day: 'numeric', month: 'short' }),
+    );
   if (scope === 'MONTH')
     return d.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
   return d.toLocaleDateString(locale, { year: 'numeric' });

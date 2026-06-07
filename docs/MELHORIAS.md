@@ -160,10 +160,10 @@ filtros melhores, ordenar por tipo, e status **genérico** (o "Lendo" não serve
 
 - B0. `listNotes` aceitar `resourceId` (NoteFilter + rota + fake/contrato). **Back · S** — **[x] feito**
 - B1. **Tela de detalhe do recurso** + lista de notas + "novo fichamento daqui". **Front · M** — **[x] feito**
-      (`ResourceDetailPage` em `/library/:id`; `GET /resources/:id` no backend; cards clicáveis).
+  (`ResourceDetailPage` em `/library/:id`; `GET /resources/:id` no backend; cards clicáveis).
 - B2. Status genérico (`resource.stage.*` → "A fazer / Em andamento / Concluído"). **Front · S** — **[x] feito**
 - B3. Filtro por tipo + ordenação na `LibraryPage`. **Front · S/M** — **[x] feito**
-      (selects de tipo + ordenação recentes/título/tipo, client-side).
+  (selects de tipo + ordenação recentes/título/tipo, client-side).
 - B4. Filtro por label. **[x] feito** na A4.
 
 **Dependências.** B0/B1 (o "de verdade") são o coração e quase independentes — ótimo candidato a
@@ -199,8 +199,8 @@ pronto — **não usamos**.
   — **[x] feito** (swatches na toolbar do `RichEditor` + botão "remover grifo"; cores rgba c/ alpha).
 - **C2 — Sensação Notion básica.** Menu **"/"** para inserir blocos + **bubble menu** de
   formatação na seleção. **M** — **[x] feito**: bubble menu (seleção → Negrito/Itálico/grifos)
-  + menu **"/"** (`SlashCommand` via `@tiptap/suggestion` + tippy: Texto/Título 1-2/Lista/
-  Lista numerada/Citação, com busca e navegação por teclado).
+  - menu **"/"** (`SlashCommand` via `@tiptap/suggestion` + tippy: Texto/Título 1-2/Lista/
+    Lista numerada/Citação, com busca e navegação por teclado).
 - **C3 — Mais blocos.** Checklist (TaskList), **toggle** (Details), divisória, callout, tabela. **M/G**
   — **[x] feito**: checklist + toggle + divisória + **tabela** (insertTable 3×3) + **callout/aviso**
   (nó custom), todos via menu "/".
@@ -208,7 +208,7 @@ pronto — **não usamos**.
   — **[x] feito**: `DragHandle` (alça de arraste por bloco). Transformar bloco já dá pelo menu "/".
 - **C5 — Links entre notas (menção `@`).** **[x] feito**: digitar `@` no editor busca notas
   (injetado via `noteSearch`) e insere uma **referência clicável** que navega pra nota
-  (`onOpenNoteLink`). Forward links prontos. *Backlinks reversos* → movido para
+  (`onOpenNoteLink`). Forward links prontos. _Backlinks reversos_ → movido para
   **Melhorias futuras (F2)** no fim do arquivo.
 
 **Perguntas para decidir.**

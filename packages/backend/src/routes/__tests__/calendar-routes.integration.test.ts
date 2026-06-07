@@ -47,12 +47,18 @@ describe('GET /calendar', () => {
       date: '2026-06-01',
       goalsPlanned: expect.any(Number),
       goalsDone: expect.any(Number),
-      journal: { devotional: expect.any(Boolean), reflection: expect.any(Boolean) },
+      journal: {
+        devotional: expect.any(Boolean),
+        reflection: expect.any(Boolean),
+      },
     });
   });
 
   it('rejects a request without a token → 401', async () => {
-    const res = await app.inject({ method: 'GET', url: '/calendar?month=2026-06' });
+    const res = await app.inject({
+      method: 'GET',
+      url: '/calendar?month=2026-06',
+    });
     expect(res.statusCode).toBe(401);
   });
 });

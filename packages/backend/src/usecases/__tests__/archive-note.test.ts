@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { NoteNotFoundError } from '../../domain/errors.js';
 import type { Note } from '../../domain/note.js';
-import { ArchiveNote } from '../archive-note.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
+import { ArchiveNote } from '../archive-note.js';
 
 function makeNote(overrides?: Partial<Note>): Note {
   return {

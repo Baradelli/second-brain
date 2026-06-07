@@ -14,7 +14,7 @@
   e em edição o `labelIds` é sempre enviado (permite limpar).
 - **`GoalsPage`**:
   - Card do objetivo: a área título/anel vira botão → abre **edição** (BottomSheet com `GoalForm`
-    + botão **Arquivar**); o botão de check/concluir continua à direita.
+    - botão **Arquivar**); o botão de check/concluir continua à direita.
   - Botão **"ver arquivados"** → seção com cada arquivado (título + **Restaurar**; **Excluir** só
     quando `deletable`). Excluir abre **confirmação** (microcopy anti-erro).
 - **i18n** pt/en (`goals.edit.*`, `goals.archive*`, `goals.archived.*`, `goals.restore`,

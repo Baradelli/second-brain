@@ -1,4 +1,7 @@
-import type { CalendarDayResponse, CalendarMonthResponse } from '@cerebro/shared';
+import type {
+  CalendarDayResponse,
+  CalendarMonthResponse,
+} from '@cerebro/shared';
 import { Card } from '@cerebro/ui';
 import { CalendarRange, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';

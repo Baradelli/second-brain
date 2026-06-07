@@ -13,8 +13,7 @@ export class SettingsRepositoryFake implements SettingsRepository {
   }
 
   async upsert(userId: string, patch: SettingsPatch): Promise<Settings> {
-    const current =
-      this.store.get(userId) ?? { userId, ...DEFAULT_SETTINGS };
+    const current = this.store.get(userId) ?? { userId, ...DEFAULT_SETTINGS };
     const updated: Settings = { ...current, ...patch, userId };
     this.store.set(userId, updated);
     return { ...updated };

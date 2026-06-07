@@ -20,13 +20,7 @@ interface SidebarProps {
  * Drawer lateral (esquerda) com a navegação secundária. O footer flutuante guarda só os
  * atalhos principais; o resto das seções mora aqui e cresce conforme o app ganha páginas.
  */
-export function Sidebar({
-  open,
-  onClose,
-  items,
-  title,
-  footer,
-}: SidebarProps) {
+export function Sidebar({ open, onClose, items, title, footer }: SidebarProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {

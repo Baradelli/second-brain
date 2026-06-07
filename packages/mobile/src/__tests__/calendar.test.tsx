@@ -23,9 +23,7 @@ import * as endpoints from '../lib/api/endpoints.js';
 function makeMonth(month: string, days: Partial<MonthDay>[] = []) {
   const [y, m] = month.split('-').map(Number) as [number, number];
   const total = new Date(y, m, 0).getDate();
-  const byDate = new Map(
-    days.map((d) => [d.date, d] as const),
-  );
+  const byDate = new Map(days.map((d) => [d.date, d] as const));
   return {
     month,
     days: Array.from({ length: total }, (_, i) => {

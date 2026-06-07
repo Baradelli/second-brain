@@ -13,7 +13,12 @@ const items = [
 function renderSidebar(open: boolean, onClose = vi.fn()) {
   render(
     <MemoryRouter>
-      <Sidebar open={open} onClose={onClose} items={items} title="Segundo Cérebro" />
+      <Sidebar
+        open={open}
+        onClose={onClose}
+        items={items}
+        title="Segundo Cérebro"
+      />
     </MemoryRouter>,
   );
   return onClose;

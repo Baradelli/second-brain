@@ -13,10 +13,7 @@ function authHeaders(): Record<string, string> {
 /** Token inválido/expirado → limpa e manda pro login (sem loop na própria tela). */
 function handleUnauthorized(): void {
   clearToken();
-  if (
-    typeof window !== 'undefined' &&
-    window.location.pathname !== '/login'
-  ) {
+  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
     window.location.href = '/login';
   }
 }
