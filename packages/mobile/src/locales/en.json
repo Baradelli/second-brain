@@ -116,6 +116,8 @@
   "library.empty": "Nothing in the library yet",
   "library.create.title": "New resource",
   "library.create.titleRequired": "Give the resource a title",
+  "library.edit": "Edit",
+  "library.edit.title": "Edit resource",
   "library.filter.type": "Filter by type",
   "library.type.all": "All types",
   "library.sort.label": "Sort",

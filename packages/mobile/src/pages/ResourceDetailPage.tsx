@@ -7,6 +7,7 @@ import {
   GraduationCap,
   type LucideIcon,
   Mic,
+  Pencil,
   Plus,
   Trash2,
   Video,
@@ -15,7 +16,14 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { archiveNote, getResource, listNotes } from '../lib/api/endpoints.js';
+import { ResourceForm } from '../components/ResourceForm.js';
+import {
+  archiveNote,
+  type CreateResourceBody,
+  editResource,
+  getResource,
+  listNotes,
+} from '../lib/api/endpoints.js';
 
 const TYPE_ICON: Record<string, LucideIcon> = {
   book: BookOpen,
@@ -49,6 +57,19 @@ export function ResourceDetailPage() {
   const [error, setError] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<NoteResponse | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  async function handleEditSubmit(body: CreateResourceBody) {
+    setSavingEdit(true);
+    try {
+      const updated = await editResource(id, body);
+      setResource(updated);
+      setEditOpen(false);
+    } finally {
+      setSavingEdit(false);
+    }
+  }
 
   async function handleDelete() {
     if (!confirmDelete) return;
@@ -88,16 +109,29 @@ export function ResourceDetailPage() {
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-5 pt-4 pb-24">
-      <button
-        type="button"
-        aria-label={t('common.back')}
-        onClick={() => navigate(-1)}
-        data-testid="back"
-        className="mb-2 flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"
-        style={{ color: 'var(--cerebro-fg)' }}
-      >
-        <ArrowLeft size={20} strokeWidth={1.75} />
-      </button>
+      <div className="mb-2 flex items-center justify-between">
+        <button
+          type="button"
+          aria-label={t('common.back')}
+          onClick={() => navigate(-1)}
+          data-testid="back"
+          className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"
+          style={{ color: 'var(--cerebro-fg)' }}
+        >
+          <ArrowLeft size={20} strokeWidth={1.75} />
+        </button>
+        {resource && !loading && !error && (
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setEditOpen(true)}
+            data-testid="edit-resource"
+          >
+            <Pencil size={15} strokeWidth={1.85} />
+            {t('library.edit')}
+          </Button>
+        )}
+      </div>
 
       {loading && (
         <p className="text-sm" style={{ color: 'var(--cerebro-muted)' }}>
@@ -243,6 +277,18 @@ export function ResourceDetailPage() {
             {t('notes.deleteConfirm.confirm')}
           </Button>
         </div>
+      </BottomSheet>
+
+      {/* Editar recurso */}
+      <BottomSheet open={editOpen} onClose={() => setEditOpen(false)}>
+        {resource && (
+          <ResourceForm
+            key={resource.id}
+            initial={resource}
+            onSubmit={handleEditSubmit}
+            submitting={savingEdit}
+          />
+        )}
       </BottomSheet>
     </main>
   );

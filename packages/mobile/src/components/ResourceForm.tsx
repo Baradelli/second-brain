@@ -1,3 +1,4 @@
+import type { ResourceResponse } from '@cerebro/shared';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -31,22 +32,32 @@ interface ResourceFormProps {
   onSubmit: (body: CreateResourceBody) => void;
   submitting?: boolean;
   defaultTitle?: string;
+  /** Quando presente, o form entra em modo edição (campos preenchidos). */
+  initial?: ResourceResponse;
 }
 
 export function ResourceForm({
   onSubmit,
   submitting,
   defaultTitle,
+  initial,
 }: ResourceFormProps) {
   const { t } = useTranslation();
-  const [labelIds, setLabelIds] = useState<string[]>([]);
+  const editing = initial != null;
+  const [labelIds, setLabelIds] = useState<string[]>(initial?.labelIds ?? []);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ResourceFormValues>({
     resolver: zodResolver(resourceFormSchema),
-    defaultValues: { type: 'book', title: defaultTitle ?? '' },
+    defaultValues: {
+      type: initial?.type ?? 'book',
+      title: initial?.title ?? defaultTitle ?? '',
+      url: initial?.url ?? undefined,
+      author: initial?.author ?? undefined,
+      description: initial?.description ?? undefined,
+    },
   });
 
   const submit = handleSubmit((values) => {
@@ -56,7 +67,8 @@ export function ResourceForm({
       url: values.url?.trim() || undefined,
       author: values.author?.trim() || undefined,
       description: values.description?.trim() || undefined,
-      labelIds: labelIds.length ? labelIds : undefined,
+      // Em edição envia labelIds sempre (inclusive vazio) para permitir limpar.
+      labelIds: editing || labelIds.length ? labelIds : undefined,
     });
   });
 
@@ -66,7 +78,7 @@ export function ResourceForm({
         className="font-display text-lg font-semibold"
         style={{ color: 'var(--cerebro-fg)' }}
       >
-        {t('library.create.title')}
+        {editing ? t('library.edit.title') : t('library.create.title')}
       </h2>
 
       <Input

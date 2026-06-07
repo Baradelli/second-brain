@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { forwardRef } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -15,6 +16,15 @@ vi.mock('@cerebro/ui', () => ({
   }: { children: React.ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
     <button {...rest}>{children}</button>
   ),
+  Input: forwardRef<
+    HTMLInputElement,
+    { label?: string } & React.InputHTMLAttributes<HTMLInputElement>
+  >(({ label, ...props }, ref) => (
+    <label>
+      {label}
+      <input aria-label={label} ref={ref} {...props} />
+    </label>
+  )),
   BottomSheet: ({
     open,
     children,
@@ -28,6 +38,8 @@ vi.mock('../lib/api/endpoints.js', () => ({
   getResource: vi.fn(),
   listNotes: vi.fn(),
   archiveNote: vi.fn(),
+  editResource: vi.fn(),
+  listLabels: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -81,6 +93,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(endpoints.getResource).mockResolvedValue(RESOURCE as never);
   vi.mocked(endpoints.listNotes).mockResolvedValue([]);
+  vi.mocked(endpoints.listLabels).mockResolvedValue([]);
 });
 
 afterEach(async () => {
@@ -131,6 +144,29 @@ describe('ResourceDetailPage', () => {
 
     await waitFor(() => expect(endpoints.archiveNote).toHaveBeenCalledWith('n1'));
     await waitFor(() => expect(screen.queryByText('Capítulo 1')).toBeNull());
+  });
+
+  it('edita o recurso: abre o form preenchido e salva via editResource', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.editResource).mockResolvedValue({
+      ...RESOURCE,
+      title: 'DDD revisado',
+    } as never);
+    renderDetail();
+
+    await waitFor(() => screen.getByTestId('edit-resource'));
+    await user.click(screen.getByTestId('edit-resource'));
+
+    const input = await screen.findByLabelText('Título');
+    expect(input).toHaveValue('Domain-Driven Design'); // preenchido
+    await user.clear(input);
+    await user.type(input, 'DDD revisado');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(endpoints.editResource).toHaveBeenCalled());
+    const [calledId, body] = vi.mocked(endpoints.editResource).mock.calls[0]!;
+    expect(calledId).toBe('res-1');
+    expect(body).toMatchObject({ title: 'DDD revisado', type: 'book' });
   });
 
   it('tocar numa nota abre o editor dela', async () => {

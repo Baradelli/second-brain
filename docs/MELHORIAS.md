@@ -324,8 +324,10 @@ Itens que percebi faltando e que valem entrar na conversa:
   `listResources`) e no cabeçalho do editor (`getResource`); de quebra, o editor passou a refletir
   o **tipo real** da nota ao abrir por id.
 - **E3. Notas de um recurso** — na Biblioteca, abrir um recurso e ver seus fichamentos. **M**
-- **E4. Editar/arquivar pela UI** — hoje não dá para **arquivar** nota/recurso/objetivo nem
-  **editar** um recurso (só avançar stage) pela interface. Faltam ações de gerência. **M**
+- **E4. Editar/arquivar pela UI** — **[x] feito** (objetivos no Bloco F; nota tem excluir;
+  **editar recurso** em `tasks/50-e4-editar-recurso.md`: botão "Editar" na detail page →
+  `ResourceForm` preenchido → `editResource`). _Pendência menor: arquivar um **recurso** pela UI
+  ainda não existe — anotar se o dono quiser._
 - **E5. Busca simples** (texto) em notas/recursos/capturas — ganho rápido; a busca **semântica**
   é MVP 4, mas um "buscar por palavra" simples ajuda já. **M**
 - **E6. Aba "Assistente"** é só placeholder (MVP 5) ocupando um slot da tab bar — pode ceder

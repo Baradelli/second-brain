@@ -116,6 +116,8 @@
   "library.empty": "Nada na biblioteca ainda",
   "library.create.title": "Novo recurso",
   "library.create.titleRequired": "Dê um título ao recurso",
+  "library.edit": "Editar",
+  "library.edit.title": "Editar recurso",
   "library.filter.type": "Filtrar por tipo",
   "library.type.all": "Todos os tipos",
   "library.sort.label": "Ordenar",
