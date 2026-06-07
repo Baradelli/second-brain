@@ -34,13 +34,13 @@ export const calendarRoutes: FastifyPluginAsyncZod<{
     '/calendar',
     {
       schema: {
-        querystring: calendarQuerySchema,
+        querystring: calendarQuerySchema.omit({ userId: true }),
         response: { 200: calendarMonthResponseSchema },
       },
     },
     async (req) => {
       return buildMonthCalendar.execute({
-        userId: req.query.userId,
+        userId: req.user.sub,
         month: req.query.month,
       });
     },
@@ -50,13 +50,13 @@ export const calendarRoutes: FastifyPluginAsyncZod<{
     '/calendar/day',
     {
       schema: {
-        querystring: calendarDayQuerySchema,
+        querystring: calendarDayQuerySchema.omit({ userId: true }),
         response: { 200: calendarDayDetailResponseSchema },
       },
     },
     async (req) => {
       return buildDayDetail.execute({
-        userId: req.query.userId,
+        userId: req.user.sub,
         date: req.query.date,
       });
     },

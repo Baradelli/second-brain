@@ -14,6 +14,19 @@ const baseBody = { userId: USER_ID, text: 'ideia de teste' };
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -31,7 +44,7 @@ afterAll(async () => {
 
 describe('POST /captures', () => {
   it('cria captura válida → 201, status PENDING', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: baseBody,
@@ -46,7 +59,7 @@ describe('POST /captures', () => {
   });
 
   it('calcula reviewAt quando ausente no body', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: baseBody,
@@ -59,7 +72,7 @@ describe('POST /captures', () => {
   });
 
   it('text vazio → 400', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: { userId: USER_ID, text: '' },
@@ -72,7 +85,7 @@ describe('POST /captures', () => {
 describe('GET /captures', () => {
   it('status=PENDING retorna capturas a revisar (sem reviewAt aparecem sempre)', async () => {
     // Capture with explicit past reviewAt — always due
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: {
@@ -86,7 +99,7 @@ describe('GET /captures', () => {
       data: { userId: USER_ID, text: 'sem data', reviewAt: null },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/captures?userId=${USER_ID}&status=PENDING`,
     });
@@ -111,7 +124,7 @@ describe('GET /captures', () => {
       },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/captures?userId=${USER_ID}&status=ARCHIVED`,
     });

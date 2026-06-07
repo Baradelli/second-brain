@@ -8,6 +8,19 @@ const USER_ID = 'owner';
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -20,7 +33,7 @@ afterAll(async () => {
 
 describe('GET /search', () => {
   it('returns the three result groups', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/search?userId=${USER_ID}&q=zzz`,
     });
@@ -33,7 +46,7 @@ describe('GET /search', () => {
   });
 
   it('rejects an empty query (Zod) → 400', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/search?userId=${USER_ID}&q=`,
     });

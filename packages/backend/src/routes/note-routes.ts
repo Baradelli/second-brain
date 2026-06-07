@@ -48,12 +48,15 @@ export const noteRoutes: FastifyPluginAsyncZod<{
     '/notes',
     {
       schema: {
-        body: createNoteSchema,
+        body: createNoteSchema.omit({ userId: true }),
         response: { 201: noteResponseSchema },
       },
     },
     async (req, reply) => {
-      const note = await createNote.execute(req.body);
+      const note = await createNote.execute({
+        ...req.body,
+        userId: req.user.sub,
+      });
       return reply.status(201).send(toResponse(note));
     },
   );
@@ -62,12 +65,12 @@ export const noteRoutes: FastifyPluginAsyncZod<{
     '/notes',
     {
       schema: {
-        querystring: listNotesQuerySchema,
+        querystring: listNotesQuerySchema.omit({ userId: true }),
         response: { 200: z.array(noteResponseSchema) },
       },
     },
     async (req) => {
-      const notes = await repo.find(req.query);
+      const notes = await repo.find({ ...req.query, userId: req.user.sub });
       return notes.map(toResponse);
     },
   );

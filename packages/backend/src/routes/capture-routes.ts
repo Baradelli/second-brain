@@ -46,12 +46,15 @@ export const captureRoutes: FastifyPluginAsyncZod<{
     '/captures',
     {
       schema: {
-        body: createCaptureSchema,
+        body: createCaptureSchema.omit({ userId: true }),
         response: { 201: captureResponseSchema },
       },
     },
     async (req, reply) => {
-      const capture = await createCapture.execute(req.body);
+      const capture = await createCapture.execute({
+        ...req.body,
+        userId: req.user.sub,
+      });
       return reply.status(201).send(toResponse(capture));
     },
   );
@@ -60,12 +63,13 @@ export const captureRoutes: FastifyPluginAsyncZod<{
     '/captures',
     {
       schema: {
-        querystring: listCapturesQuerySchema,
+        querystring: listCapturesQuerySchema.omit({ userId: true }),
         response: { 200: z.array(captureResponseSchema) },
       },
     },
     async (req) => {
-      const { userId, status } = req.query;
+      const userId = req.user.sub;
+      const { status } = req.query;
 
       if (status === 'ARCHIVED') {
         const captures = await listArchived.execute({ userId });

@@ -48,7 +48,7 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
     '/resources',
     {
       schema: {
-        body: createResourceSchema,
+        body: createResourceSchema.omit({ userId: true }),
         response: {
           201: resourceResponseSchema,
           400: z.object({ error: z.string() }),
@@ -57,7 +57,10 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
     },
     async (req, reply) => {
       try {
-        const resource = await createResource.execute(req.body);
+        const resource = await createResource.execute({
+          ...req.body,
+          userId: req.user.sub,
+        });
         return reply.status(201).send(toResponse(resource));
       } catch (error) {
         if (error instanceof InvalidResourceError) {
@@ -73,7 +76,6 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        querystring: z.object({ userId: z.string().min(1) }),
         response: {
           200: resourceResponseSchema,
           404: z.object({ error: z.string() }),
@@ -82,7 +84,7 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
     },
     async (req, reply) => {
       const resource = await repo.byId(req.params.id);
-      if (!resource || resource.userId !== req.query.userId) {
+      if (!resource || resource.userId !== req.user.sub) {
         return reply.status(404).send({ error: 'Resource not found' });
       }
       return toResponse(resource);
@@ -93,12 +95,15 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
     '/resources',
     {
       schema: {
-        querystring: listResourcesQuerySchema,
+        querystring: listResourcesQuerySchema.omit({ userId: true }),
         response: { 200: z.array(resourceResponseSchema) },
       },
     },
     async (req) => {
-      const resources = await listResources.execute(req.query);
+      const resources = await listResources.execute({
+        ...req.query,
+        userId: req.user.sub,
+      });
       return resources.map(toResponse);
     },
   );
@@ -108,7 +113,7 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: editResourceSchema,
+        body: editResourceSchema.omit({ userId: true }),
         response: {
           200: resourceResponseSchema,
           400: z.object({ error: z.string() }),
@@ -121,6 +126,7 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
         const resource = await editResource.execute({
           id: req.params.id,
           ...req.body,
+          userId: req.user.sub,
         });
         return toResponse(resource);
       } catch (error) {

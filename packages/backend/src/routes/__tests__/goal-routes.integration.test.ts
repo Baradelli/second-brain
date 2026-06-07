@@ -13,6 +13,19 @@ async function clearGoals() {
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -30,7 +43,7 @@ afterAll(async () => {
 
 describe('POST /goals', () => {
   it('cria HABIT válido → 201, status ACTIVE', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: {
@@ -50,7 +63,7 @@ describe('POST /goals', () => {
   });
 
   it('rejeita HABIT com duas cadências → 400', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: {
@@ -69,13 +82,13 @@ describe('POST /goals', () => {
 
 describe('GET /goals', () => {
   it('lista ativos do usuário', async () => {
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: { userId: USER_ID, title: 'A', type: 'HABIT', weekdays: [2] },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/goals?userId=${USER_ID}`,
     });
@@ -89,7 +102,7 @@ describe('GET /goals', () => {
 
 describe('PATCH /goals/:id', () => {
   it('edita título → 200', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: {
@@ -101,7 +114,7 @@ describe('PATCH /goals/:id', () => {
     });
     const id = created.json().id;
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'PATCH',
       url: `/goals/${id}`,
       payload: { userId: USER_ID, title: 'Novo' },
@@ -111,18 +124,19 @@ describe('PATCH /goals/:id', () => {
     expect(res.json().title).toBe('Novo');
   });
 
-  it('editar com userId ≠ dono → 404', async () => {
-    const created = await app.inject({
+  it('editar como outro usuário (token ≠ dono) → 404', async () => {
+    const created = await injectAuth({
       method: 'POST',
       url: '/goals',
-      payload: { userId: USER_ID, title: 'X', type: 'HABIT', weekdays: [1] },
+      payload: { title: 'X', type: 'HABIT', weekdays: [1] },
     });
     const id = created.json().id;
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'PATCH',
       url: `/goals/${id}`,
-      payload: { userId: 'intruder', title: 'hack' },
+      payload: { title: 'hack' },
+      headers: { authorization: `Bearer ${app.jwt.sign({ sub: 'intruder' })}` },
     });
 
     expect(res.statusCode).toBe(404);
@@ -131,7 +145,7 @@ describe('PATCH /goals/:id', () => {
 
 describe('POST /goals/:id/complete', () => {
   it('completa o goal → 200 com completedAt preenchido', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: {
@@ -143,7 +157,7 @@ describe('POST /goals/:id/complete', () => {
     });
     const id = created.json().id;
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/complete`,
       payload: { userId: USER_ID },
@@ -158,14 +172,14 @@ describe('POST /goals/:id/complete', () => {
 
 describe('POST /goals/:id/archive', () => {
   it('arquiva goal sem filhos → 200 ARCHIVED', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: { userId: USER_ID, title: 'Solo', type: 'HABIT', weekdays: [1] },
     });
     const id = created.json().id;
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/archive`,
       payload: { userId: USER_ID },
@@ -176,13 +190,13 @@ describe('POST /goals/:id/archive', () => {
   });
 
   it('arquivar UMBRELLA com filho ativo → 409', async () => {
-    const umb = await app.inject({
+    const umb = await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: { userId: USER_ID, title: 'Saúde', type: 'UMBRELLA' },
     });
     const umbId = umb.json().id;
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/goals',
       payload: {
@@ -194,7 +208,7 @@ describe('POST /goals/:id/archive', () => {
       },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${umbId}/archive`,
       payload: { userId: USER_ID },
@@ -205,13 +219,13 @@ describe('POST /goals/:id/archive', () => {
 });
 
 async function createArchivedGoal(): Promise<string> {
-  const created = await app.inject({
+  const created = await injectAuth({
     method: 'POST',
     url: '/goals',
     payload: { userId: USER_ID, title: 'Solo', type: 'HABIT', weekdays: [1] },
   });
   const id = created.json().id;
-  await app.inject({
+  await injectAuth({
     method: 'POST',
     url: `/goals/${id}/archive`,
     payload: { userId: USER_ID },
@@ -223,7 +237,7 @@ describe('GET /goals/archived', () => {
   it('lista arquivados com flag deletable', async () => {
     await createArchivedGoal();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/goals/archived?userId=${USER_ID}`,
     });
@@ -240,7 +254,7 @@ describe('POST /goals/:id/unarchive', () => {
   it('restaura objetivo arquivado → 200 ACTIVE', async () => {
     const id = await createArchivedGoal();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/unarchive`,
       payload: { userId: USER_ID },
@@ -256,14 +270,14 @@ describe('POST /goals/:id/delete', () => {
   it('exclui objetivo arquivado sem histórico → 200', async () => {
     const id = await createArchivedGoal();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/delete`,
       payload: { userId: USER_ID },
     });
 
     expect(res.statusCode).toBe(200);
-    const list = await app.inject({
+    const list = await injectAuth({
       method: 'GET',
       url: `/goals/archived?userId=${USER_ID}`,
     });
@@ -281,7 +295,7 @@ describe('POST /goals/:id/delete', () => {
       },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/delete`,
       payload: { userId: USER_ID },

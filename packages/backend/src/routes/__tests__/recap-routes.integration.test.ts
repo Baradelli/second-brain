@@ -12,6 +12,19 @@ async function clearNotes() {
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -29,7 +42,7 @@ afterAll(async () => {
 
 describe('POST /recaps', () => {
   it('cria o recap do período (scope/type corretos)', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/recaps',
       payload: { userId: USER_ID, type: 'REFLECTION', scope: 'WEEK' },
@@ -43,12 +56,12 @@ describe('POST /recaps', () => {
   });
 
   it('é idempotente no período (devolve o mesmo recap)', async () => {
-    const first = await app.inject({
+    const first = await injectAuth({
       method: 'POST',
       url: '/recaps',
       payload: { userId: USER_ID, type: 'DEVOTIONAL', scope: 'MONTH' },
     });
-    const second = await app.inject({
+    const second = await injectAuth({
       method: 'POST',
       url: '/recaps',
       payload: { userId: USER_ID, type: 'DEVOTIONAL', scope: 'MONTH' },
@@ -58,7 +71,7 @@ describe('POST /recaps', () => {
   });
 
   it('rejeita scope inválido (Zod) → 400', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/recaps',
       payload: { userId: USER_ID, type: 'REFLECTION', scope: 'DAY' },

@@ -15,6 +15,19 @@ async function clearData() {
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -32,7 +45,7 @@ afterAll(async () => {
 
 describe('GET /agenda', () => {
   it('retorna 200 com journal e capturesToReview', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/agenda?userId=${USER_ID}&day=today`,
     });
@@ -49,14 +62,14 @@ describe('GET /agenda', () => {
 
 describe('POST /captures/:id/archive', () => {
   it('arquiva captura → 200, some da fila PENDING', async () => {
-    const createRes = await app.inject({
+    const createRes = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: { userId: USER_ID, text: 'captura para arquivar' },
     });
     const { id } = createRes.json<{ id: string }>();
 
-    const archiveRes = await app.inject({
+    const archiveRes = await injectAuth({
       method: 'POST',
       url: `/captures/${id}/archive`,
       payload: { reason: 'já não faz sentido' },
@@ -67,7 +80,7 @@ describe('POST /captures/:id/archive', () => {
     expect(archived.status).toBe('ARCHIVED');
     expect(archived.archiveReason).toBe('já não faz sentido');
 
-    const listRes = await app.inject({
+    const listRes = await injectAuth({
       method: 'GET',
       url: `/captures?userId=${USER_ID}&status=PENDING`,
     });
@@ -77,14 +90,14 @@ describe('POST /captures/:id/archive', () => {
 
 describe('POST /captures/:id/promote', () => {
   it('promove captura para Note → 201 com note e capture PROCESSED', async () => {
-    const createRes = await app.inject({
+    const createRes = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: { userId: USER_ID, text: 'estudar Stoicismo' },
     });
     const { id } = createRes.json<{ id: string }>();
 
-    const promoteRes = await app.inject({
+    const promoteRes = await injectAuth({
       method: 'POST',
       url: `/captures/${id}/promote`,
       payload: { destination: 'note', type: 'NOTE' },
@@ -98,14 +111,14 @@ describe('POST /captures/:id/promote', () => {
   });
 
   it('type inválido → 400 (Zod)', async () => {
-    const createRes = await app.inject({
+    const createRes = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: { userId: USER_ID, text: 'captura' },
     });
     const { id } = createRes.json<{ id: string }>();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/captures/${id}/promote`,
       payload: { destination: 'note', type: 'INVALIDO' },
@@ -115,14 +128,14 @@ describe('POST /captures/:id/promote', () => {
   });
 
   it('promove captura para Resource → 201', async () => {
-    const createRes = await app.inject({
+    const createRes = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: { userId: USER_ID, text: 'Domain-Driven Design' },
     });
     const { id } = createRes.json<{ id: string }>();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/captures/${id}/promote`,
       payload: { destination: 'resource', type: 'book' },
@@ -136,14 +149,14 @@ describe('POST /captures/:id/promote', () => {
   });
 
   it('promove captura para Goal → 201', async () => {
-    const createRes = await app.inject({
+    const createRes = await injectAuth({
       method: 'POST',
       url: '/captures',
       payload: { userId: USER_ID, text: 'Ler todo dia' },
     });
     const { id } = createRes.json<{ id: string }>();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/captures/${id}/promote`,
       payload: { destination: 'goal', type: 'HABIT', weekdays: [1, 3, 5] },

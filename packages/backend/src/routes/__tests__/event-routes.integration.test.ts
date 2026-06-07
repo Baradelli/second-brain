@@ -12,11 +12,24 @@ async function clearAll() {
 }
 
 async function createGoal(payload: Record<string, unknown>): Promise<string> {
-  const res = await app.inject({ method: 'POST', url: '/goals', payload });
+  const res = await injectAuth({ method: 'POST', url: '/goals', payload });
   return res.json().id;
 }
 
 let app: Awaited<ReturnType<typeof buildServer>>;
+
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
 
 beforeAll(async () => {
   app = await buildServer();
@@ -42,7 +55,7 @@ describe('POST /goals/:id/check', () => {
       targetValue: 100,
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/check`,
       payload: { userId: USER_ID, value: 10 },
@@ -61,7 +74,7 @@ describe('POST /goals/:id/check', () => {
       type: 'UMBRELLA',
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/check`,
       payload: { userId: USER_ID },
@@ -80,7 +93,7 @@ describe('POST /goals/:id/skip', () => {
       weekdays: [1],
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/skip`,
       payload: { userId: USER_ID },
@@ -97,7 +110,7 @@ describe('POST /goals/:id/skip', () => {
       weekdays: [1],
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/skip`,
       payload: { userId: USER_ID, reason: 'estava viajando' },
@@ -118,14 +131,14 @@ describe('DELETE /events/:id', () => {
       type: 'TARGET',
       targetValue: 100,
     });
-    const checked = await app.inject({
+    const checked = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/check`,
       payload: { userId: USER_ID, value: 5 },
     });
     const eventId = checked.json().id;
 
-    const del = await app.inject({
+    const del = await injectAuth({
       method: 'DELETE',
       url: `/events/${eventId}`,
       payload: { userId: USER_ID },
@@ -133,7 +146,7 @@ describe('DELETE /events/:id', () => {
     expect(del.statusCode).toBe(204);
 
     // gone — progress should be back to 0
-    const progress = await app.inject({
+    const progress = await injectAuth({
       method: 'GET',
       url: `/goals/${id}/progress?userId=${USER_ID}`,
     });
@@ -147,14 +160,14 @@ describe('DELETE /events/:id', () => {
       type: 'HABIT',
       weekdays: [1],
     });
-    const skipped = await app.inject({
+    const skipped = await injectAuth({
       method: 'POST',
       url: `/goals/${id}/skip`,
       payload: { userId: USER_ID, reason: 'x' },
     });
     const eventId = skipped.json().id;
 
-    const del = await app.inject({
+    const del = await injectAuth({
       method: 'DELETE',
       url: `/events/${eventId}`,
       payload: { userId: USER_ID },
@@ -171,13 +184,13 @@ describe('GET /goals/:id/progress', () => {
       type: 'TARGET',
       targetValue: 100,
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: `/goals/${id}/check`,
       payload: { userId: USER_ID, value: 40 },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/goals/${id}/progress?userId=${USER_ID}`,
     });

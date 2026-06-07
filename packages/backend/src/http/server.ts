@@ -29,6 +29,14 @@ import { resourceRoutes } from '../routes/resource-routes.js';
 import { searchRoutes } from '../routes/search-routes.js';
 import { uploadRoutes } from '../routes/upload-routes.js';
 
+// O payload do JWT carrega o id do usuário em `sub`; após `jwtVerify`, vira `req.user`.
+declare module '@fastify/jwt' {
+  interface FastifyJWT {
+    payload: { sub: string };
+    user: { sub: string };
+  }
+}
+
 export async function buildServer() {
   const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
   const prisma = new PrismaClient();
@@ -64,22 +72,34 @@ export async function buildServer() {
     root: uploadDir,
     prefix: '/uploads/',
   });
-  await app.register(uploadRoutes, { uploadDir });
-
+  // Login é público.
   await app.register(authRoutes, { prisma });
-  await app.register(noteRoutes, { prisma });
-  await app.register(attachmentRoutes, { prisma });
-  await app.register(captureRoutes, { prisma });
-  await app.register(labelRoutes, { prisma });
-  await app.register(guideQuestionRoutes, { prisma });
-  await app.register(agendaRoutes, { prisma });
-  await app.register(resourceRoutes, { prisma });
-  await app.register(goalRoutes, { prisma });
-  await app.register(eventRoutes, { prisma });
-  await app.register(dayClosingRoutes, { prisma });
-  await app.register(calendarRoutes, { prisma });
-  await app.register(searchRoutes, { prisma });
-  await app.register(recapRoutes, { prisma });
+
+  // Tudo o mais exige um JWT válido (Bearer). Escopo encapsulado: o hook vale só aqui.
+  await app.register(async (api) => {
+    api.addHook('onRequest', async (req, reply) => {
+      try {
+        await req.jwtVerify();
+      } catch {
+        return reply.status(401).send({ error: 'Unauthorized' });
+      }
+    });
+
+    await api.register(uploadRoutes, { uploadDir });
+    await api.register(noteRoutes, { prisma });
+    await api.register(attachmentRoutes, { prisma });
+    await api.register(captureRoutes, { prisma });
+    await api.register(labelRoutes, { prisma });
+    await api.register(guideQuestionRoutes, { prisma });
+    await api.register(agendaRoutes, { prisma });
+    await api.register(resourceRoutes, { prisma });
+    await api.register(goalRoutes, { prisma });
+    await api.register(eventRoutes, { prisma });
+    await api.register(dayClosingRoutes, { prisma });
+    await api.register(calendarRoutes, { prisma });
+    await api.register(searchRoutes, { prisma });
+    await api.register(recapRoutes, { prisma });
+  });
 
   return app;
 }

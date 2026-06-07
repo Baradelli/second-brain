@@ -10,6 +10,19 @@ async function clearResources() {
   await prisma.resource.deleteMany({ where: { userId: USER_ID } });
 }
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 const baseBody = {
   userId: USER_ID,
   title: 'Domain-Driven Design',
@@ -35,7 +48,7 @@ afterAll(async () => {
 
 describe('POST /resources', () => {
   it('cria recurso válido → 201, stage=backlog, status=ACTIVE', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/resources',
       payload: baseBody,
@@ -51,7 +64,7 @@ describe('POST /resources', () => {
   });
 
   it('rejeita body inválido (type fora do enum) → 400', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/resources',
       payload: { userId: USER_ID, title: 'X', type: 'magazine' },
@@ -63,14 +76,14 @@ describe('POST /resources', () => {
 
 describe('GET /resources/:id', () => {
   it('retorna o recurso por id → 200', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/resources',
       payload: baseBody,
     });
     const id = created.json().id;
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/resources/${id}?userId=${USER_ID}`,
     });
@@ -80,7 +93,7 @@ describe('GET /resources/:id', () => {
   });
 
   it('id inexistente → 404', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/resources/ghost?userId=${USER_ID}`,
     });
@@ -90,24 +103,24 @@ describe('GET /resources/:id', () => {
 
 describe('GET /resources', () => {
   it('lista do usuário filtrando por stage', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/resources',
       payload: baseBody,
     });
     const id = created.json().id;
-    await app.inject({
+    await injectAuth({
       method: 'PATCH',
       url: `/resources/${id}`,
       payload: { userId: USER_ID, stage: 'done' },
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/resources',
       payload: { userId: USER_ID, title: 'Outro', type: 'course' },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/resources?userId=${USER_ID}&stage=done`,
     });
@@ -122,14 +135,14 @@ describe('GET /resources', () => {
 
 describe('PATCH /resources/:id', () => {
   it('edita stage e title → 200', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/resources',
       payload: baseBody,
     });
     const id = created.json().id;
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'PATCH',
       url: `/resources/${id}`,
       payload: { userId: USER_ID, title: 'Novo título', stage: 'in_progress' },
@@ -142,17 +155,18 @@ describe('PATCH /resources/:id', () => {
   });
 
   it('editar com userId ≠ dono → 404 (não vaza existência)', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/resources',
       payload: baseBody,
     });
     const id = created.json().id;
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'PATCH',
       url: `/resources/${id}`,
-      payload: { userId: 'intruder', title: 'hack' },
+      payload: { title: 'hack' },
+      headers: { authorization: `Bearer ${app.jwt.sign({ sub: 'intruder' })}` },
     });
 
     expect(res.statusCode).toBe(404);

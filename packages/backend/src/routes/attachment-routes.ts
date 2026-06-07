@@ -38,7 +38,7 @@ export const attachmentRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string() }),
-        body: attachFileSchema.omit({ noteId: true }),
+        body: attachFileSchema.omit({ noteId: true, userId: true }),
         response: { 201: attachmentResponseSchema },
       },
     },
@@ -46,6 +46,7 @@ export const attachmentRoutes: FastifyPluginAsyncZod<{
       const attachment = await attachFile.execute({
         ...req.body,
         noteId: req.params.id,
+        userId: req.user.sub,
       });
       return reply.status(201).send(toResponse(attachment));
     },

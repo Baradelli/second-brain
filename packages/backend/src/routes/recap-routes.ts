@@ -49,14 +49,15 @@ export const recapRoutes: FastifyPluginAsyncZod<{
     '/recaps',
     {
       schema: {
-        body: createRecapSchema,
+        body: createRecapSchema.omit({ userId: true }),
         response: { 200: noteResponseSchema },
       },
     },
     async (req) => {
-      const userSettings = await settings.getByUserId(req.body.userId);
+      const userId = req.user.sub;
+      const userSettings = await settings.getByUserId(userId);
       const { note } = await upsertRecap.execute({
-        userId: req.body.userId,
+        userId,
         type: req.body.type,
         scope: req.body.scope,
         reference: new Date(),

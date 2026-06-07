@@ -9,6 +9,19 @@ const OTHER_USER_ID = 'guide-question-route-other';
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 async function clearData() {
   await prisma.guideQuestion.deleteMany({
     where: { label: { userId: { in: [USER_ID, OTHER_USER_ID] } } },
@@ -18,7 +31,7 @@ async function clearData() {
 }
 
 async function createLabel(name: string, parentId?: string) {
-  const res = await app.inject({
+  const res = await injectAuth({
     method: 'POST',
     url: '/labels',
     payload: { userId: USER_ID, name, parentId },
@@ -56,7 +69,7 @@ describe('guide question routes', () => {
   it('POST /labels/:id/questions cria pergunta em label do usuário', async () => {
     const label = await createLabel('Book');
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/labels/${label.id}/questions`,
       payload: { userId: USER_ID, text: 'Was it an easy read?', order: 1 },
@@ -76,7 +89,7 @@ describe('guide question routes', () => {
       data: { userId: OTHER_USER_ID, name: 'Private' },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/labels/${other.id}/questions`,
       payload: { userId: USER_ID, text: 'Nope' },
@@ -90,23 +103,23 @@ describe('guide question routes', () => {
     const history = await createLabel('History');
     const empty = await createLabel('Empty');
 
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: `/labels/${book.id}/questions`,
       payload: { userId: USER_ID, text: 'Second', order: 2 },
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: `/labels/${book.id}/questions`,
       payload: { userId: USER_ID, text: 'First', order: 1 },
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: `/labels/${history.id}/questions`,
       payload: { userId: USER_ID, text: 'History question' },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/notes/suggested-questions?labelIds=${book.id},${history.id},${empty.id}`,
     });
@@ -124,19 +137,19 @@ describe('guide question routes', () => {
 
   it('POST /guide-questions/:id/toggle desativa sem apagar e remove das sugestões', async () => {
     const label = await createLabel('Book');
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: `/labels/${label.id}/questions`,
       payload: { userId: USER_ID, text: 'Question' },
     });
     const questionId = created.json().id;
 
-    const toggle = await app.inject({
+    const toggle = await injectAuth({
       method: 'POST',
       url: `/guide-questions/${questionId}/toggle`,
       payload: { active: false },
     });
-    const suggestions = await app.inject({
+    const suggestions = await injectAuth({
       method: 'GET',
       url: `/notes/suggested-questions?labelIds=${label.id}`,
     });
@@ -149,13 +162,13 @@ describe('guide question routes', () => {
   it('não herda pela árvore: pergunta do pai não aparece quando só o filho é pedido', async () => {
     const parent = await createLabel('Book');
     const child = await createLabel('History', parent.id);
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: `/labels/${parent.id}/questions`,
       payload: { userId: USER_ID, text: 'Parent question' },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/notes/suggested-questions?labelIds=${child.id}`,
     });

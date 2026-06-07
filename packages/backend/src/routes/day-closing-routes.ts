@@ -22,7 +22,6 @@ export const dayClosingRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         querystring: z.object({
-          userId: z.string().min(1),
           day: z.enum(['today']).default('today'),
         }),
         response: { 200: dayClosingResponseSchema },
@@ -30,7 +29,7 @@ export const dayClosingRoutes: FastifyPluginAsyncZod<{
     },
     async (req) => {
       return buildDayClosing.execute({
-        userId: req.query.userId,
+        userId: req.user.sub,
         reference: new Date(),
       });
     },

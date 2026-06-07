@@ -57,7 +57,7 @@ export const labelRoutes: FastifyPluginAsyncZod<{
     '/labels',
     {
       schema: {
-        body: createLabelSchema,
+        body: createLabelSchema.omit({ userId: true }),
         response: {
           201: labelResponseSchema,
           400: z.object({ error: z.string() }),
@@ -66,7 +66,10 @@ export const labelRoutes: FastifyPluginAsyncZod<{
     },
     async (req, reply) => {
       try {
-        const label = await createLabel.execute(req.body);
+        const label = await createLabel.execute({
+          ...req.body,
+          userId: req.user.sub,
+        });
         return reply.status(201).send(toResponse(label));
       } catch (error) {
         if (error instanceof LabelParentInvalidError) {
@@ -81,13 +84,13 @@ export const labelRoutes: FastifyPluginAsyncZod<{
     '/labels',
     {
       schema: {
-        querystring: z.object({ userId: z.string().min(1) }),
+        querystring: z.object({}),
         response: { 200: z.array(labelNodeResponseSchema) },
       },
     },
     async (req) => {
       const labels = await listLabelTree.execute({
-        userId: req.query.userId,
+        userId: req.user.sub,
         status: 'ACTIVE',
       });
       return labels.map(toNodeResponse);
@@ -99,7 +102,7 @@ export const labelRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: editLabelSchema,
+        body: editLabelSchema.omit({ userId: true }),
         response: {
           200: labelResponseSchema,
           400: z.object({ error: z.string() }),
@@ -112,6 +115,7 @@ export const labelRoutes: FastifyPluginAsyncZod<{
         const label = await editLabel.execute({
           id: req.params.id,
           ...req.body,
+          userId: req.user.sub,
         });
         return toResponse(label);
       } catch (error) {

@@ -69,13 +69,11 @@ export const goalRoutes: FastifyPluginAsyncZod<{
   const deleteGoal = new DeleteGoal(repo, eventRepo);
   const listArchivedGoals = new ListArchivedGoals(repo, eventRepo);
 
-  const userActionSchema = z.object({ userId: z.string().min(1) });
-
   app.post(
     '/goals',
     {
       schema: {
-        body: createGoalSchema,
+        body: createGoalSchema.omit({ userId: true }),
         response: {
           201: goalResponseSchema,
           400: z.object({ error: z.string() }),
@@ -84,7 +82,10 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     },
     async (req, reply) => {
       try {
-        const goal = await createGoal.execute(req.body);
+        const goal = await createGoal.execute({
+          ...req.body,
+          userId: req.user.sub,
+        });
         return reply.status(201).send(toResponse(goal));
       } catch (error) {
         // parent inexistente/inválido também é erro de input → 400
@@ -103,12 +104,15 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     '/goals',
     {
       schema: {
-        querystring: listGoalsQuerySchema,
+        querystring: listGoalsQuerySchema.omit({ userId: true }),
         response: { 200: z.array(goalResponseSchema) },
       },
     },
     async (req) => {
-      const goals = await listActiveGoals.execute(req.query);
+      const goals = await listActiveGoals.execute({
+        ...req.query,
+        userId: req.user.sub,
+      });
       return goals.map(toResponse);
     },
   );
@@ -117,13 +121,13 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     '/goals/archived',
     {
       schema: {
-        querystring: userActionSchema,
+        querystring: z.object({}),
         response: { 200: z.array(archivedGoalSchema) },
       },
     },
     async (req) => {
       const items = await listArchivedGoals.execute({
-        userId: req.query.userId,
+        userId: req.user.sub,
       });
       return items.map(({ goal, deletable }) => ({
         ...toResponse(goal),
@@ -137,7 +141,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: editGoalSchema,
+        body: editGoalSchema.omit({ userId: true }),
         response: {
           200: goalResponseSchema,
           400: z.object({ error: z.string() }),
@@ -150,6 +154,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
         const goal = await editGoal.execute({
           id: req.params.id,
           ...req.body,
+          userId: req.user.sub,
         });
         return toResponse(goal);
       } catch (error) {
@@ -169,7 +174,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: completeGoalSchema,
+        body: completeGoalSchema.omit({ userId: true }),
         response: {
           200: goalResponseSchema,
           400: z.object({ error: z.string() }),
@@ -182,6 +187,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
         const goal = await completeGoal.execute({
           id: req.params.id,
           ...req.body,
+          userId: req.user.sub,
         });
         return toResponse(goal);
       } catch (error) {
@@ -201,7 +207,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: archiveGoalSchema,
+        body: archiveGoalSchema.omit({ userId: true }),
         response: {
           200: goalResponseSchema,
           404: z.object({ error: z.string() }),
@@ -214,6 +220,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
         const goal = await archiveGoal.execute({
           id: req.params.id,
           ...req.body,
+          userId: req.user.sub,
         });
         return toResponse(goal);
       } catch (error) {
@@ -233,7 +240,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: userActionSchema,
+        body: z.object({}),
         response: {
           200: goalResponseSchema,
           404: z.object({ error: z.string() }),
@@ -244,7 +251,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
       try {
         const goal = await unarchiveGoal.execute({
           id: req.params.id,
-          userId: req.body.userId,
+          userId: req.user.sub,
         });
         return toResponse(goal);
       } catch (error) {
@@ -261,7 +268,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: userActionSchema,
+        body: z.object({}),
         response: {
           200: goalResponseSchema,
           404: z.object({ error: z.string() }),
@@ -273,7 +280,7 @@ export const goalRoutes: FastifyPluginAsyncZod<{
       try {
         const goal = await deleteGoal.execute({
           id: req.params.id,
-          userId: req.body.userId,
+          userId: req.user.sub,
         });
         return toResponse(goal);
       } catch (error) {

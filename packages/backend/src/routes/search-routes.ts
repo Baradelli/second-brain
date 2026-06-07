@@ -81,13 +81,13 @@ export const searchRoutes: FastifyPluginAsyncZod<{
     '/search',
     {
       schema: {
-        querystring: searchQuerySchema,
+        querystring: searchQuerySchema.omit({ userId: true }),
         response: { 200: searchResultSchema },
       },
     },
     async (req) => {
       const result = await searchAll.execute({
-        userId: req.query.userId,
+        userId: req.user.sub,
         query: req.query.q,
       });
       return {

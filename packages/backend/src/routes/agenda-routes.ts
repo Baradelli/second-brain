@@ -73,7 +73,6 @@ function noteToResponse(n: Note): NoteResponse {
 }
 
 const agendaQuerySchema = z.object({
-  userId: z.string().min(1),
   day: z.enum(['today']).default('today'),
 });
 
@@ -192,7 +191,7 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
     },
     async (req) => {
       const agenda = await buildTodayAgenda.execute({
-        userId: req.query.userId,
+        userId: req.user.sub,
         reference: new Date(),
       });
       return {

@@ -8,6 +8,19 @@ const USER_ID = 'owner';
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -20,7 +33,7 @@ afterAll(async () => {
 
 describe('GET /calendar', () => {
   it('returns 200 with the month and one entry per day', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/calendar?userId=${USER_ID}&month=2026-06`,
     });
@@ -38,15 +51,15 @@ describe('GET /calendar', () => {
     });
   });
 
-  it('rejects a request without userId (Zod) → 400', async () => {
+  it('rejects a request without a token → 401', async () => {
     const res = await app.inject({ method: 'GET', url: '/calendar?month=2026-06' });
-    expect(res.statusCode).toBe(400);
+    expect(res.statusCode).toBe(401);
   });
 });
 
 describe('GET /calendar/day', () => {
   it('returns 200 with date, goals and notes', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/calendar/day?userId=${USER_ID}&date=2026-06-03`,
     });
@@ -59,7 +72,7 @@ describe('GET /calendar/day', () => {
   });
 
   it('rejects a malformed date (Zod) → 400', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/calendar/day?userId=${USER_ID}&date=2026-6-3`,
     });

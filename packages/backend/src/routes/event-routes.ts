@@ -74,7 +74,7 @@ export const eventRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: checkGoalSchema,
+        body: checkGoalSchema.omit({ userId: true }),
         response: {
           201: eventResponseSchema,
           400: z.object({ error: z.string() }),
@@ -87,6 +87,7 @@ export const eventRoutes: FastifyPluginAsyncZod<{
         const event = await checkGoal.execute({
           goalId: req.params.id,
           ...req.body,
+          userId: req.user.sub,
         });
         return reply.status(201).send(toResponse(event));
       } catch (error) {
@@ -106,7 +107,7 @@ export const eventRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: skipGoalSchema,
+        body: skipGoalSchema.omit({ userId: true }),
         response: {
           201: eventResponseSchema,
           400: z.object({ error: z.string() }),
@@ -119,6 +120,7 @@ export const eventRoutes: FastifyPluginAsyncZod<{
         const event = await skipGoal.execute({
           goalId: req.params.id,
           ...req.body,
+          userId: req.user.sub,
         });
         return reply.status(201).send(toResponse(event));
       } catch (error) {
@@ -138,7 +140,7 @@ export const eventRoutes: FastifyPluginAsyncZod<{
     {
       schema: {
         params: z.object({ id: z.string().min(1) }),
-        body: undoCheckSchema,
+        body: undoCheckSchema.omit({ userId: true }),
         response: {
           204: z.null(),
           400: z.object({ error: z.string() }),
@@ -150,7 +152,7 @@ export const eventRoutes: FastifyPluginAsyncZod<{
       try {
         await undoCheck.execute({
           eventId: req.params.id,
-          userId: req.body.userId,
+          userId: req.user.sub,
         });
         return reply.status(204).send();
       } catch (error) {
@@ -171,7 +173,6 @@ export const eventRoutes: FastifyPluginAsyncZod<{
       schema: {
         params: z.object({ id: z.string().min(1) }),
         querystring: z.object({
-          userId: z.string().min(1),
           reference: z.coerce.date().optional(),
         }),
         response: {
@@ -184,7 +185,7 @@ export const eventRoutes: FastifyPluginAsyncZod<{
       try {
         const progress = await computeProgress.execute({
           goalId: req.params.id,
-          userId: req.query.userId,
+          userId: req.user.sub,
           reference: req.query.reference,
         });
         return toProgress(progress);

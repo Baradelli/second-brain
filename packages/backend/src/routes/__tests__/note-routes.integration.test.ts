@@ -24,6 +24,19 @@ const baseBody = {
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -41,7 +54,7 @@ afterAll(async () => {
 
 describe('POST /notes', () => {
   it('creates a note and returns 201 with id, plainText, status ACTIVE', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: baseBody,
@@ -57,7 +70,7 @@ describe('POST /notes', () => {
   });
 
   it('returns 400 when type is invalid', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: { ...baseBody, type: 'INVALID_TYPE' },
@@ -67,7 +80,7 @@ describe('POST /notes', () => {
   });
 
   it('returns 400 when required fields are missing', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: { userId: USER_ID },
@@ -79,18 +92,18 @@ describe('POST /notes', () => {
 
 describe('GET /notes', () => {
   it('returns only notes matching type filter', async () => {
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: { ...baseBody, type: 'NOTE' },
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: { ...baseBody, type: 'DEVOTIONAL' },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/notes?userId=${USER_ID}&type=DEVOTIONAL`,
     });
@@ -102,23 +115,23 @@ describe('GET /notes', () => {
   });
 
   it('respects from/to date range filter', async () => {
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: { ...baseBody, date: '2026-06-01T00:00:00.000Z' },
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: { ...baseBody, date: '2026-06-03T00:00:00.000Z' },
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: { ...baseBody, date: '2026-06-05T00:00:00.000Z' },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/notes?userId=${USER_ID}&from=2026-06-02T00:00:00.000Z&to=2026-06-04T00:00:00.000Z`,
     });
@@ -130,14 +143,14 @@ describe('GET /notes', () => {
   });
 
   it('POST /notes/:id/archive arquiva e some da lista ACTIVE', async () => {
-    const created = await app.inject({
+    const created = await injectAuth({
       method: 'POST',
       url: '/notes',
       payload: baseBody,
     });
     const id = created.json().id;
 
-    const archived = await app.inject({
+    const archived = await injectAuth({
       method: 'POST',
       url: `/notes/${id}/archive`,
       payload: {},
@@ -145,7 +158,7 @@ describe('GET /notes', () => {
     expect(archived.statusCode).toBe(200);
     expect(archived.json().status).toBe('ARCHIVED');
 
-    const active = await app.inject({
+    const active = await injectAuth({
       method: 'GET',
       url: `/notes?userId=${USER_ID}&status=ACTIVE`,
     });
@@ -153,7 +166,7 @@ describe('GET /notes', () => {
   });
 
   it('POST /notes/:id/archive de id inexistente → 404', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: '/notes/ghost/archive',
       payload: {},

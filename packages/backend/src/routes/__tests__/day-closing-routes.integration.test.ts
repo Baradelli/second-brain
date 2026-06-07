@@ -13,6 +13,20 @@ async function clearGoals() {
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+// Injeta o header de auth (JWT do usuário de teste) em toda chamada.
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 beforeAll(async () => {
   app = await buildServer();
   await app.ready();
@@ -30,7 +44,7 @@ afterAll(async () => {
 
 describe('GET /day-closing', () => {
   it('returns 200 with date and pending array', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/day-closing?userId=${USER_ID}&day=today`,
     });

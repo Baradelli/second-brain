@@ -9,6 +9,19 @@ const OTHER_USER_ID = 'att-route-other';
 
 let app: Awaited<ReturnType<typeof buildServer>>;
 
+function injectAuth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  opts: any,
+) {
+  return app.inject({
+    ...opts,
+    headers: {
+      authorization: `Bearer ${app.jwt.sign({ sub: USER_ID })}`,
+      ...opts.headers,
+    },
+  });
+}
+
 async function clearData() {
   await prisma.attachment.deleteMany({
     where: { userId: { in: [USER_ID, OTHER_USER_ID] } },
@@ -19,15 +32,16 @@ async function clearData() {
 }
 
 async function createNote(userId = USER_ID) {
-  const res = await app.inject({
+  const res = await injectAuth({
     method: 'POST',
     url: '/notes',
     payload: {
-      userId,
       type: 'NOTE',
       date: '2026-06-02T00:00:00.000Z',
       doc: { type: 'doc', content: [] },
     },
+    // a nota nasce do dono do token
+    headers: { authorization: `Bearer ${app.jwt.sign({ sub: userId })}` },
   });
   expect(res.statusCode).toBe(201);
   return res.json() as { id: string };
@@ -73,7 +87,7 @@ describe('POST /notes/:id/attachments', () => {
   it('creates an attachment and returns 201 with null transcription/ocrStatus', async () => {
     const note = await createNote();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/notes/${note.id}/attachments`,
       payload: {
@@ -103,7 +117,7 @@ describe('POST /notes/:id/attachments', () => {
   it('returns 400 when url is invalid', async () => {
     const note = await createNote();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/notes/${note.id}/attachments`,
       payload: {
@@ -119,7 +133,7 @@ describe('POST /notes/:id/attachments', () => {
   it('returns 400 when type is invalid', async () => {
     const note = await createNote();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/notes/${note.id}/attachments`,
       payload: {
@@ -133,7 +147,7 @@ describe('POST /notes/:id/attachments', () => {
   });
 
   it('returns error when note does not exist', async () => {
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/notes/ghost-note-id/attachments`,
       payload: {
@@ -149,7 +163,7 @@ describe('POST /notes/:id/attachments', () => {
   it('returns error when note belongs to another user', async () => {
     const note = await createNote(OTHER_USER_ID);
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'POST',
       url: `/notes/${note.id}/attachments`,
       payload: {
@@ -167,7 +181,7 @@ describe('GET /notes/:id/attachments', () => {
   it('returns all attachments for a note in order', async () => {
     const note = await createNote();
 
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: `/notes/${note.id}/attachments`,
       payload: {
@@ -176,7 +190,7 @@ describe('GET /notes/:id/attachments', () => {
         type: 'image',
       },
     });
-    await app.inject({
+    await injectAuth({
       method: 'POST',
       url: `/notes/${note.id}/attachments`,
       payload: {
@@ -186,7 +200,7 @@ describe('GET /notes/:id/attachments', () => {
       },
     });
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/notes/${note.id}/attachments`,
     });
@@ -202,7 +216,7 @@ describe('GET /notes/:id/attachments', () => {
   it('returns empty array when note has no attachments', async () => {
     const note = await createNote();
 
-    const res = await app.inject({
+    const res = await injectAuth({
       method: 'GET',
       url: `/notes/${note.id}/attachments`,
     });
