@@ -17,7 +17,7 @@ function renderSidebar(open: boolean, onClose = vi.fn()) {
         open={open}
         onClose={onClose}
         items={items}
-        title="Segundo Cérebro"
+        title="Ghost Brain"
       />
     </MemoryRouter>,
   );

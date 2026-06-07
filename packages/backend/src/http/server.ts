@@ -54,7 +54,7 @@ export async function buildServer() {
 
   await app.register(swagger, {
     openapi: {
-      info: { title: 'Segundo Cérebro API', version: '0.0.0' },
+      info: { title: 'Ghost Brain API', version: '0.0.0' },
     },
   });
   await app.register(swaggerUi, { routePrefix: '/docs' });

@@ -17,8 +17,8 @@ export default defineConfig({
         navigateFallback: 'index.html',
       },
       manifest: {
-        name: 'Segundo Cérebro',
-        short_name: 'Cérebro',
+        name: 'Ghost Brain',
+        short_name: 'Ghost Brain',
         start_url: '/',
         display: 'standalone',
         theme_color: '#B4583A',

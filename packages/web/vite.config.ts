@@ -9,8 +9,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Segundo Cérebro',
-        short_name: 'Cérebro',
+        name: 'Ghost Brain',
+        short_name: 'Ghost Brain',
         start_url: '/',
         display: 'standalone',
       },

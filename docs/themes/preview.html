@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ghost Brain — temas (preview)</title>
+    <style>
+      /* ── Paletas candidatas ───────────────────────────────────────────────
+         Cada tema define os mesmos tokens --cerebro-* que o app usa.
+         `.light` = claro, `.dark` = escuro. Para adotar um, é só copiar o
+         bloco para packages/ui/src/theme.css (:root = light, html.dark = dark).
+      */
+
+      /* TEMA 0 — Atual: Caderno / terracota (referência) */
+      .t-atual.light {
+        --cerebro-bg:#f4f1ea; --cerebro-card:#fbf8f1; --cerebro-raised:#ffffff;
+        --cerebro-fg:#211d17; --cerebro-muted:#857c6e; --cerebro-faint:#b7ae9f;
+        --cerebro-border:rgba(33,29,23,.1); --cerebro-border-strong:rgba(33,29,23,.16);
+        --cerebro-accent:#b4583a; --cerebro-accent-soft:rgba(180,88,58,.1); --cerebro-on-accent:#fbf8f1;
+        --cerebro-devotional:#b4583a; --cerebro-reflection:#4e6e63; --cerebro-study:#9a6a33; --cerebro-note:#8a8175;
+        --cerebro-success:#4e6e63; --cerebro-error:#b23b2e;
+        --cerebro-shadow-lg:0 12px 40px rgba(60,46,30,.14);
+      }
+      .t-atual.dark {
+        --cerebro-bg:#18140f; --cerebro-card:#211c16; --cerebro-raised:#2a241d;
+        --cerebro-fg:#efe8da; --cerebro-muted:#9f9484; --cerebro-faint:#6b6253;
+        --cerebro-border:rgba(239,232,218,.1); --cerebro-border-strong:rgba(239,232,218,.18);
+        --cerebro-accent:#d2734f; --cerebro-accent-soft:rgba(210,115,79,.14); --cerebro-on-accent:#1b1610;
+        --cerebro-devotional:#d2734f; --cerebro-reflection:#7fa293; --cerebro-study:#c79a5a; --cerebro-note:#a89c8a;
+        --cerebro-success:#7fa293; --cerebro-error:#d9695a;
+        --cerebro-shadow-lg:0 14px 44px rgba(0,0,0,.55);
+      }
+
+      /* TEMA 1 — Mono (Tinta) · preto e branco minimalista */
+      .t-mono.light {
+        --cerebro-bg:#f6f6f6; --cerebro-card:#ffffff; --cerebro-raised:#ffffff;
+        --cerebro-fg:#18181b; --cerebro-muted:#6b6b70; --cerebro-faint:#a6a6ac;
+        --cerebro-border:rgba(24,24,27,.1); --cerebro-border-strong:rgba(24,24,27,.16);
+        --cerebro-accent:#18181b; --cerebro-accent-soft:rgba(24,24,27,.07); --cerebro-on-accent:#ffffff;
+        --cerebro-devotional:#18181b; --cerebro-reflection:#52525b; --cerebro-study:#71717a; --cerebro-note:#a1a1aa;
+        --cerebro-success:#3f7d5e; --cerebro-error:#b3261e;
+        --cerebro-shadow-lg:0 12px 40px rgba(0,0,0,.1);
+      }
+      .t-mono.dark {
+        --cerebro-bg:#0c0c0d; --cerebro-card:#161618; --cerebro-raised:#1e1e21;
+        --cerebro-fg:#f4f4f5; --cerebro-muted:#a1a1aa; --cerebro-faint:#6b6b70;
+        --cerebro-border:rgba(244,244,245,.12); --cerebro-border-strong:rgba(244,244,245,.2);
+        --cerebro-accent:#f4f4f5; --cerebro-accent-soft:rgba(244,244,245,.12); --cerebro-on-accent:#0c0c0d;
+        --cerebro-devotional:#f4f4f5; --cerebro-reflection:#c4c4cc; --cerebro-study:#9a9aa3; --cerebro-note:#71717a;
+        --cerebro-success:#7fae87; --cerebro-error:#e0675a;
+        --cerebro-shadow-lg:0 14px 44px rgba(0,0,0,.6);
+      }
+
+      /* TEMA 2 — Slate · cinza-azulado frio, minimalista */
+      .t-slate.light {
+        --cerebro-bg:#f5f6f8; --cerebro-card:#ffffff; --cerebro-raised:#ffffff;
+        --cerebro-fg:#1b2027; --cerebro-muted:#6a7480; --cerebro-faint:#a7b0bb;
+        --cerebro-border:rgba(27,32,39,.1); --cerebro-border-strong:rgba(27,32,39,.16);
+        --cerebro-accent:#3f5b76; --cerebro-accent-soft:rgba(63,91,118,.1); --cerebro-on-accent:#ffffff;
+        --cerebro-devotional:#3f5b76; --cerebro-reflection:#3f7d76; --cerebro-study:#7a6aa8; --cerebro-note:#8a939e;
+        --cerebro-success:#3f7d6a; --cerebro-error:#b3463a;
+        --cerebro-shadow-lg:0 12px 40px rgba(20,30,45,.12);
+      }
+      .t-slate.dark {
+        --cerebro-bg:#0e1116; --cerebro-card:#161b22; --cerebro-raised:#1f2630;
+        --cerebro-fg:#e6eaf0; --cerebro-muted:#93a0b0; --cerebro-faint:#5d6776;
+        --cerebro-border:rgba(230,234,240,.12); --cerebro-border-strong:rgba(230,234,240,.2);
+        --cerebro-accent:#7ea0c9; --cerebro-accent-soft:rgba(126,160,201,.16); --cerebro-on-accent:#0e1116;
+        --cerebro-devotional:#7ea0c9; --cerebro-reflection:#7bb8ab; --cerebro-study:#a99bd6; --cerebro-note:#97a3b2;
+        --cerebro-success:#7bb8ab; --cerebro-error:#e07a6e;
+        --cerebro-shadow-lg:0 14px 44px rgba(0,0,0,.55);
+      }
+
+      /* TEMA 3 — Sage · verde calmo, neutro-quente, minimalista */
+      .t-sage.light {
+        --cerebro-bg:#f3f5f1; --cerebro-card:#fcfdfb; --cerebro-raised:#ffffff;
+        --cerebro-fg:#1e241d; --cerebro-muted:#6e776a; --cerebro-faint:#aab0a3;
+        --cerebro-border:rgba(30,36,29,.1); --cerebro-border-strong:rgba(30,36,29,.16);
+        --cerebro-accent:#4a7c59; --cerebro-accent-soft:rgba(74,124,89,.1); --cerebro-on-accent:#fcfdfb;
+        --cerebro-devotional:#4a7c59; --cerebro-reflection:#4f6e7d; --cerebro-study:#9a7b3f; --cerebro-note:#87867a;
+        --cerebro-success:#4a7c59; --cerebro-error:#b04a3a;
+        --cerebro-shadow-lg:0 12px 40px rgba(30,45,30,.12);
+      }
+      .t-sage.dark {
+        --cerebro-bg:#10130e; --cerebro-card:#181c14; --cerebro-raised:#20251b;
+        --cerebro-fg:#e9ece2; --cerebro-muted:#98a08c; --cerebro-faint:#646b58;
+        --cerebro-border:rgba(233,236,226,.11); --cerebro-border-strong:rgba(233,236,226,.2);
+        --cerebro-accent:#82b48d; --cerebro-accent-soft:rgba(130,180,141,.15); --cerebro-on-accent:#10130e;
+        --cerebro-devotional:#82b48d; --cerebro-reflection:#84a7b8; --cerebro-study:#c6a45f; --cerebro-note:#a7a695;
+        --cerebro-success:#82b48d; --cerebro-error:#e0786a;
+        --cerebro-shadow-lg:0 14px 44px rgba(0,0,0,.55);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; padding: 24px;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: #e9e9ee; color: #222;
+      }
+      h1 { font-size: 20px; margin: 0 0 4px; }
+      .sub { color: #666; font-size: 13px; margin: 0 0 20px; }
+      .theme-row { margin-bottom: 28px; }
+      .theme-name { font-size: 14px; font-weight: 700; margin: 0 0 8px; }
+      .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+
+      /* ── App mock (usa só os tokens --cerebro-*) ─────────────────────────── */
+      .panel {
+        background: var(--cerebro-bg); color: var(--cerebro-fg);
+        border-radius: 16px; padding: 16px; min-height: 260px;
+        border: 1px solid var(--cerebro-border);
+        position: relative; overflow: hidden;
+      }
+      .panel .tag { position:absolute; top:10px; right:12px; font-size:11px; color:var(--cerebro-faint); }
+      .hdr { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+      .dot { width:9px; height:9px; border-radius:50%; background:var(--cerebro-accent); }
+      .brand { font-weight:700; font-size:15px; }
+      .ico { width:30px; height:30px; border-radius:50%; border:1px solid var(--cerebro-border);
+             margin-left:auto; }
+      .ico + .ico { margin-left:6px; }
+      .card {
+        background: var(--cerebro-card); border:1px solid var(--cerebro-border);
+        border-radius:14px; padding:12px; box-shadow: var(--cerebro-shadow-lg);
+      }
+      .kicker { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--cerebro-accent); font-weight:700; }
+      .title { font-size:15px; font-weight:600; margin:4px 0 8px; }
+      .chip { display:inline-block; font-size:11px; padding:2px 10px; border-radius:999px;
+              background:var(--cerebro-accent-soft); color:var(--cerebro-accent); font-weight:600; }
+      .track { height:8px; border-radius:999px; background:var(--cerebro-accent-soft); margin:12px 0; overflow:hidden; }
+      .fill { height:100%; width:67%; background:var(--cerebro-accent); border-radius:999px; }
+      .row { display:flex; gap:8px; align-items:center; }
+      .btn { font-size:13px; font-weight:600; padding:8px 14px; border-radius:10px; border:none; cursor:default; }
+      .btn-primary { background:var(--cerebro-accent); color:var(--cerebro-on-accent); }
+      .btn-secondary { background:transparent; color:var(--cerebro-fg); border:1px solid var(--cerebro-border-strong); }
+      .legend { display:flex; gap:14px; margin-top:14px; flex-wrap:wrap; }
+      .lg { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--cerebro-muted); }
+      .bar { width:4px; height:14px; border-radius:2px; }
+      .pill {
+        margin-top:14px; display:inline-flex; align-items:center; gap:10px;
+        background:var(--cerebro-card); border:1px solid var(--cerebro-border);
+        border-radius:999px; padding:6px; box-shadow:var(--cerebro-shadow-lg);
+      }
+      .pill .slot { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+                    color:var(--cerebro-muted); font-size:15px; }
+      .pill .fab { width:40px; height:40px; background:var(--cerebro-accent); color:var(--cerebro-on-accent);
+                   border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:300; }
+      .foot { margin-top:14px; display:flex; gap:10px; align-items:center; }
+      .link { color:var(--cerebro-accent); font-size:13px; font-weight:600; }
+      .status { font-size:11px; padding:2px 8px; border-radius:999px; }
+      .ok { color:var(--cerebro-success); border:1px solid var(--cerebro-success); }
+      .err { color:var(--cerebro-error); border:1px solid var(--cerebro-error); }
+      .muted { color:var(--cerebro-muted); font-size:12px; margin-top:6px; }
+    </style>
+  </head>
+  <body>
+    <h1>Ghost Brain — temas para validar</h1>
+    <p class="sub">
+      4 paletas, cada uma em claro e escuro. Os 3 primeiros são novos e minimalistas (sem laranja);
+      o último é o atual, só para comparar. Escolha um e a gente aplica no app.
+    </p>
+
+    <template id="mock">
+      <div class="panel">
+        <span class="tag"></span>
+        <div class="hdr">
+          <span class="dot"></span>
+          <span class="brand">Ghost Brain</span>
+          <span class="ico"></span><span class="ico"></span>
+        </div>
+        <div class="card">
+          <div class="kicker">Fichamento · Clean Code</div>
+          <div class="title">Ler todo dia</div>
+          <span class="chip">Hábito</span>
+          <div class="track"><div class="fill"></div></div>
+          <div class="row">
+            <button class="btn btn-primary">Salvar</button>
+            <button class="btn btn-secondary">Arquivar</button>
+          </div>
+        </div>
+        <div class="legend">
+          <span class="lg"><span class="bar" style="background:var(--cerebro-devotional)"></span>Devocional</span>
+          <span class="lg"><span class="bar" style="background:var(--cerebro-reflection)"></span>Reflexão</span>
+          <span class="lg"><span class="bar" style="background:var(--cerebro-study)"></span>Fichamento</span>
+          <span class="lg"><span class="bar" style="background:var(--cerebro-note)"></span>Nota</span>
+        </div>
+        <div class="pill">
+          <span class="slot">⌂</span>
+          <span class="fab">+</span>
+          <span class="slot">▦</span>
+        </div>
+        <div class="foot">
+          <span class="link">ver arquivados</span>
+          <span class="status ok">Salvo</span>
+          <span class="status err">erro</span>
+        </div>
+      </div>
+    </template>
+
+    <div id="root"></div>
+
+    <script>
+      const themes = [
+        { key: 't-mono', name: '1 · Mono (Tinta) — preto e branco' },
+        { key: 't-slate', name: '2 · Slate — cinza-azulado frio' },
+        { key: 't-sage', name: '3 · Sage — verde calmo' },
+        { key: 't-atual', name: '0 · Atual (terracota) — referência' },
+      ];
+      const tpl = document.getElementById('mock');
+      const root = document.getElementById('root');
+      for (const th of themes) {
+        const row = document.createElement('div');
+        row.className = 'theme-row';
+        const h = document.createElement('div');
+        h.className = 'theme-name';
+        h.textContent = th.name;
+        row.appendChild(h);
+        const pair = document.createElement('div');
+        pair.className = 'pair';
+        for (const mode of ['light', 'dark']) {
+          const wrap = document.createElement('div');
+          wrap.className = `${th.key} ${mode}`;
+          wrap.appendChild(tpl.content.cloneNode(true));
+          wrap.querySelector('.tag').textContent = mode === 'light' ? 'claro' : 'escuro';
+          pair.appendChild(wrap);
+        }
+        row.appendChild(pair);
+        root.appendChild(row);
+      }
+    </script>
+  </body>
+</html>
