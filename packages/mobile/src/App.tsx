@@ -16,6 +16,7 @@ import {
   NotebookText,
   Plus,
   Search,
+  Settings,
   Tags,
   Target,
 } from 'lucide-react';
@@ -94,6 +95,11 @@ function AppShell() {
       to: '/labels',
       icon: <Tags size={18} strokeWidth={1.75} />,
       label: t('labels.title'),
+    },
+    {
+      to: '/settings',
+      icon: <Settings size={18} strokeWidth={1.75} />,
+      label: t('nav.settings'),
     },
   ];
 

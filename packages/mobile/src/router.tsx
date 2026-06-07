@@ -18,6 +18,7 @@ import { RecapsPage } from './pages/RecapsPage.js';
 import { ResourceDetailPage } from './pages/ResourceDetailPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
 import { SearchPage } from './pages/SearchPage.js';
+import { SettingsPage } from './pages/SettingsPage.js';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   return isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
       { path: 'calendar/:date', element: <DayDetailPage /> },
       { path: 'recaps', element: <RecapsPage /> },
       { path: 'labels', element: <LabelsPage /> },
+      { path: 'settings', element: <SettingsPage /> },
       { path: 'editor', element: <EditorPage /> },
       { path: 'editor/:noteId', element: <EditorPage /> },
       { path: 'assistant', element: <AssistantPage /> },

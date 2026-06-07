@@ -12,3 +12,4 @@ export * from './note.js';
 export * from './recap.js';
 export * from './resource.js';
 export * from './search.js';
+export * from './settings.js';

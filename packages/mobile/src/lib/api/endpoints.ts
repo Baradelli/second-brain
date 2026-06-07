@@ -35,8 +35,11 @@ import {
   type ResourceTypeInput,
   type SearchResultResponse,
   searchResultSchema,
+  type SettingsResponse,
+  settingsResponseSchema,
   type SuggestedQuestionsGroupResponse,
   suggestedQuestionsGroupResponseSchema,
+  type UpdateSettingsBody,
   uploadResponseSchema,
 } from '@cerebro/shared';
 import { z } from 'zod';
@@ -415,6 +418,18 @@ export function getDayDetail(date: string): Promise<CalendarDayDetailResponse> {
 export function getSearch(q: string): Promise<SearchResultResponse> {
   const query = new URLSearchParams({ q });
   return get(`/search?${query.toString()}`, searchResultSchema);
+}
+
+// ── Configurações ─────────────────────────────────────────────────────────────
+
+export function getSettings(): Promise<SettingsResponse> {
+  return get('/settings', settingsResponseSchema);
+}
+
+export function updateSettings(
+  body: UpdateSettingsBody,
+): Promise<SettingsResponse> {
+  return patch('/settings', body, settingsResponseSchema);
 }
 
 // ── Labels ──────────────────────────────────────────────────────────────────

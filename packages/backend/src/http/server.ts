@@ -27,6 +27,7 @@ import { noteRoutes } from '../routes/note-routes.js';
 import { recapRoutes } from '../routes/recap-routes.js';
 import { resourceRoutes } from '../routes/resource-routes.js';
 import { searchRoutes } from '../routes/search-routes.js';
+import { settingsRoutes } from '../routes/settings-routes.js';
 import { uploadRoutes } from '../routes/upload-routes.js';
 
 // O payload do JWT carrega o id do usuário em `sub`; após `jwtVerify`, vira `req.user`.
@@ -99,6 +100,7 @@ export async function buildServer() {
     await api.register(calendarRoutes, { prisma });
     await api.register(searchRoutes, { prisma });
     await api.register(recapRoutes, { prisma });
+    await api.register(settingsRoutes, { prisma });
   });
 
   return app;
