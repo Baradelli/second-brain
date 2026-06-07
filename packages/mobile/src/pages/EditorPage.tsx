@@ -15,6 +15,7 @@ import {
   attachFileToNote,
   getNoteAttachments,
   getNoteById,
+  getResource,
   getSuggestedQuestions,
   getTodayNote,
   listNotes,
@@ -81,13 +82,21 @@ export function EditorPage() {
 
   const noteTypeParam = resolveType(searchParams.get('type'));
   const resourceIdParam = searchParams.get('resourceId') ?? undefined;
-  const ritual = RITUAL[noteTypeParam];
 
   const [noteId, setNoteId] = useState<string | null>(routeNoteId ?? null);
   const [doc, setDoc] = useState<Record<string, unknown> | undefined>();
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [labelIds, setLabelIds] = useState<string[]>([]);
+  // Tipo/recurso reais da nota carregada (ao abrir por id, a query não traz `type`).
+  const [loadedType, setLoadedType] = useState<NoteType | null>(null);
+  const [resourceId, setResourceId] = useState<string | undefined>(
+    resourceIdParam,
+  );
+  const [resourceTitle, setResourceTitle] = useState<string | null>(null);
+
+  const effectiveType = loadedType ?? noteTypeParam;
+  const ritual = RITUAL[effectiveType];
   const [attachments, setAttachments] = useState<AttachmentResponse[]>([]);
   const [questionsOpen, setQuestionsOpen] = useState(false);
   const [attachOpen, setAttachOpen] = useState(false);
@@ -112,6 +121,8 @@ export function EditorPage() {
             setDoc(note.doc);
             setNoteId(note.id);
             setLabelIds(note.labelIds ?? []);
+            setLoadedType(note.type);
+            setResourceId(note.resourceId);
             resolvedNoteId = note.id;
           }
         } else if (
@@ -152,6 +163,17 @@ export function EditorPage() {
       .then(setAttachments)
       .catch(() => {});
   }, [noteId]);
+
+  // Título do recurso vinculado (fichamento) para o cabeçalho.
+  useEffect(() => {
+    if (!resourceId) {
+      setResourceTitle(null);
+      return;
+    }
+    getResource(resourceId)
+      .then((r) => setResourceTitle(r.title))
+      .catch(() => setResourceTitle(null));
+  }, [resourceId]);
 
   const handleChange = useCallback(
     (newDoc: Record<string, unknown>) => {
@@ -330,6 +352,14 @@ export function EditorPage() {
           >
             {t(ritual.labelKey)}
           </span>
+          {effectiveType === 'STUDY_NOTE' && resourceTitle && (
+            <span
+              className="truncate text-[0.6875rem] font-medium"
+              style={{ color: 'var(--cerebro-muted)' }}
+            >
+              · {resourceTitle}
+            </span>
+          )}
         </div>
         <p
           className="text-base italic leading-relaxed"

@@ -111,6 +111,36 @@ describe('NotesPage', () => {
     );
   });
 
+  it('mostra o recurso vinculado num fichamento', async () => {
+    vi.mocked(endpoints.listNotes).mockResolvedValue([
+      makeNote({
+        id: 'n-fich',
+        type: 'STUDY_NOTE',
+        resourceId: 'res-9',
+        plainText: 'Capítulo 1',
+      }) as never,
+    ]);
+    vi.mocked(endpoints.listResources).mockResolvedValue([
+      {
+        id: 'res-9',
+        userId: 'owner',
+        title: 'Clean Code',
+        type: 'book',
+        url: null,
+        author: null,
+        description: null,
+        stage: 'backlog',
+        status: 'ACTIVE',
+        archivedAt: null,
+        createdAt: '2026-06-01T00:00:00.000Z',
+        labelIds: [],
+      } as never,
+    ]);
+    renderNotesPage();
+
+    await waitFor(() => screen.getByText(/Clean Code/));
+  });
+
   it('filtra por tipo chamando listNotes com o tipo', async () => {
     const user = userEvent.setup();
     renderNotesPage();

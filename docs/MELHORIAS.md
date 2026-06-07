@@ -319,9 +319,10 @@ Itens que percebi faltando e que valem entrar na conversa:
 
 - **E1. Aplicar/ver labels nos fluxos** — hoje nenhum formulário deixa marcar label, então o
   vínculo N–N existe mas nunca é usado pela UI. (Já coberto por A5; reforço aqui a urgência.)
-- **E2. Mostrar o recurso vinculado no fichamento** — a nota já guarda `resourceId`, mas a
-  lista de Notas e o editor não mostram "Fichamento · Clean Code". Precisa de `GET /resources/:id`
-  ou mapear no cliente. **S/M**
+- **E2. Mostrar o recurso vinculado no fichamento** — **[x] feito**
+  (`tasks/49-e2-recurso-no-fichamento.md`): "Fichamento · <recurso>" na lista de Notas (mapa via
+  `listResources`) e no cabeçalho do editor (`getResource`); de quebra, o editor passou a refletir
+  o **tipo real** da nota ao abrir por id.
 - **E3. Notas de um recurso** — na Biblioteca, abrir um recurso e ver seus fichamentos. **M**
 - **E4. Editar/arquivar pela UI** — hoje não dá para **arquivar** nota/recurso/objetivo nem
   **editar** um recurso (só avançar stage) pela interface. Faltam ações de gerência. **M**

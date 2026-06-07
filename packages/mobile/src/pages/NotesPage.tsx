@@ -68,6 +68,18 @@ export function NotesPage() {
   const [labelFilter, setLabelFilter] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<NoteResponse | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [resourceTitles, setResourceTitles] = useState<Record<string, string>>(
+    {},
+  );
+
+  // Mapa id→título dos recursos, para rotular os fichamentos ("Fichamento · X").
+  useEffect(() => {
+    listResources({ status: 'ACTIVE' })
+      .then((rs) =>
+        setResourceTitles(Object.fromEntries(rs.map((r) => [r.id, r.title]))),
+      )
+      .catch(() => {});
+  }, []);
 
   async function handleDelete() {
     if (!confirmDelete) return;
@@ -218,10 +230,15 @@ export function NotesPage() {
                   />
                   <div className="min-w-0 flex-1">
                     <p
-                      className="mb-0.5 text-[0.625rem] font-bold uppercase tracking-[0.14em]"
+                      className="mb-0.5 truncate text-[0.625rem] font-bold uppercase tracking-[0.14em]"
                       style={{ color: COLOR_BY_TYPE[note.type] }}
                     >
                       {t(LABEL_BY_TYPE[note.type])}
+                      {note.type === 'STUDY_NOTE' &&
+                      note.resourceId &&
+                      resourceTitles[note.resourceId]
+                        ? ` · ${resourceTitles[note.resourceId]}`
+                        : ''}
                     </p>
                     <p
                       className="truncate text-sm font-medium"
