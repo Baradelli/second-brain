@@ -1,4 +1,6 @@
 import {
+  type ArchivedGoalResponse,
+  archivedGoalSchema,
   type AttachmentResponse,
   attachmentResponseSchema,
   type CalendarDayDetailResponse,
@@ -34,7 +36,7 @@ import {
 } from '@cerebro/shared';
 import { z } from 'zod';
 
-import { CURRENT_USER_ID, get, patch, post, postFile } from './client.js';
+import { CURRENT_USER_ID, del, get, patch, post, postFile } from './client.js';
 
 // ── Agenda ────────────────────────────────────────────────────────────────────
 
@@ -321,6 +323,60 @@ export function createGoal(body: CreateGoalBody): Promise<GoalResponse> {
   );
 }
 
+export interface EditGoalBody {
+  title?: string;
+  description?: string | null;
+  targetValue?: number | null;
+  unit?: string | null;
+  period?: GoalPeriodInput | null;
+  timesPerPeriod?: number | null;
+  weekdays?: number[];
+  labelIds?: string[];
+}
+
+export function editGoal(
+  id: string,
+  body: EditGoalBody,
+): Promise<GoalResponse> {
+  return patch(
+    `/goals/${id}`,
+    { ...body, userId: CURRENT_USER_ID },
+    goalResponseSchema,
+  );
+}
+
+export function archiveGoal(id: string): Promise<GoalResponse> {
+  return post(
+    `/goals/${id}/archive`,
+    { userId: CURRENT_USER_ID },
+    goalResponseSchema,
+  );
+}
+
+export function unarchiveGoal(id: string): Promise<GoalResponse> {
+  return post(
+    `/goals/${id}/unarchive`,
+    { userId: CURRENT_USER_ID },
+    goalResponseSchema,
+  );
+}
+
+/** Hard delete — só objetivos arquivados que nunca foram feitos (backend valida). */
+export function deleteGoal(id: string): Promise<GoalResponse> {
+  return post(
+    `/goals/${id}/delete`,
+    { userId: CURRENT_USER_ID },
+    goalResponseSchema,
+  );
+}
+
+export function listArchivedGoals(): Promise<ArchivedGoalResponse[]> {
+  return get(
+    `/goals/archived?userId=${CURRENT_USER_ID}`,
+    z.array(archivedGoalSchema),
+  );
+}
+
 export function getGoalProgress(id: string): Promise<GoalProgressResponse> {
   return get(
     `/goals/${id}/progress?userId=${CURRENT_USER_ID}`,
@@ -337,6 +393,11 @@ export function checkGoal(
     { ...body, userId: CURRENT_USER_ID },
     eventResponseSchema,
   );
+}
+
+/** Desfaz um check (hard delete do evento) — usado para desmarcar uma meta marcada por engano. */
+export function undoCheck(eventId: string): Promise<void> {
+  return del(`/events/${eventId}`, { userId: CURRENT_USER_ID });
 }
 
 export function completeGoal(id: string): Promise<GoalResponse> {

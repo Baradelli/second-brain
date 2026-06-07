@@ -1,3 +1,4 @@
+import type { GoalResponse } from '@cerebro/shared';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -33,17 +34,25 @@ interface GoalFormProps {
   onSubmit: (body: CreateGoalBody) => void;
   submitting?: boolean;
   defaultTitle?: string;
+  /** Quando presente, o formulário entra em modo edição (campos preenchidos, tipo travado). */
+  initial?: GoalResponse;
 }
 
 export function GoalForm({
   onSubmit,
   submitting,
   defaultTitle,
+  initial,
 }: GoalFormProps) {
   const { t, i18n } = useTranslation();
-  const [cadence, setCadence] = useState<'weekdays' | 'period'>('weekdays');
-  const [weekdays, setWeekdays] = useState<number[]>([]);
-  const [labelIds, setLabelIds] = useState<string[]>([]);
+  const editing = initial != null;
+  const [cadence, setCadence] = useState<'weekdays' | 'period'>(
+    initial && initial.weekdays.length === 0 && initial.period
+      ? 'period'
+      : 'weekdays',
+  );
+  const [weekdays, setWeekdays] = useState<number[]>(initial?.weekdays ?? []);
+  const [labelIds, setLabelIds] = useState<string[]>(initial?.labelIds ?? []);
 
   const {
     register,
@@ -52,7 +61,14 @@ export function GoalForm({
     formState: { errors },
   } = useForm<GoalFormValues>({
     resolver: zodResolver(goalFormSchema),
-    defaultValues: { type: 'HABIT', title: defaultTitle ?? '' },
+    defaultValues: {
+      type: initial?.type ?? 'HABIT',
+      title: initial?.title ?? defaultTitle ?? '',
+      period: initial?.period ?? undefined,
+      timesPerPeriod: initial?.timesPerPeriod ?? undefined,
+      targetValue: initial?.targetValue ?? undefined,
+      unit: initial?.unit ?? undefined,
+    },
   });
 
   const type = watch('type');
@@ -72,7 +88,8 @@ export function GoalForm({
       base.targetValue = values.targetValue;
       base.unit = values.unit?.trim() || undefined;
     }
-    if (labelIds.length) base.labelIds = labelIds;
+    // Em edição, sempre envia labelIds (inclusive vazio) para permitir limpar.
+    if (editing || labelIds.length) base.labelIds = labelIds;
     onSubmit(base);
   });
 
@@ -88,7 +105,7 @@ export function GoalForm({
         className="font-display text-lg font-semibold"
         style={{ color: 'var(--cerebro-fg)' }}
       >
-        {t('goals.create.title')}
+        {editing ? t('goals.edit.title') : t('goals.create.title')}
       </h2>
 
       <Input
@@ -101,6 +118,8 @@ export function GoalForm({
         <select
           className={selectClass}
           style={selectStyle}
+          disabled={editing}
+          title={editing ? t('goals.edit.typeLocked') : undefined}
           {...register('type')}
         >
           {GOAL_TYPES.map((gt) => (

@@ -3,6 +3,7 @@ import type { NoteScope } from '@cerebro/shared';
 import { type DateRange, dayRange } from '../domain/day-range.js';
 import { countDistinctDays } from '../domain/distinct-days.js';
 import { GoalNotFoundError } from '../domain/errors.js';
+import type { Event } from '../domain/event.js';
 import type { Goal, GoalPeriod, GoalType } from '../domain/goal.js';
 import type { EventRepository } from './ports/event-repository.js';
 import type { GoalRepository } from './ports/goal-repository.js';
@@ -30,7 +31,29 @@ export interface GoalProgress {
   ratio: number | null; // done/target, clampado [0,1]; null quando target null/0
   period: DateRange | null; // HABIT: janela; demais: null
   completed: boolean;
+  doneToday: boolean; // existe um done HOJE (fuso do usuário)?
+  todayEventId: string | null; // id do done de hoje mais recente (para desfazer)
   children?: GoalProgress[]; // só UMBRELLA
+}
+
+/** A partir dos eventos já carregados, descobre se há um `done` hoje e qual o id (mais recente). */
+function todayDone(
+  events: Event[],
+  timezone: string,
+  reference: Date,
+): { doneToday: boolean; todayEventId: string | null } {
+  const day = dayRange(reference, timezone, 'DAY');
+  const todays = events.filter(
+    (e) =>
+      e.type === 'done' &&
+      e.occurredAt >= day.from &&
+      e.occurredAt <= day.to,
+  );
+  if (todays.length === 0) return { doneToday: false, todayEventId: null };
+  const latest = todays.reduce((a, b) =>
+    a.occurredAt >= b.occurredAt ? a : b,
+  );
+  return { doneToday: true, todayEventId: latest.id };
 }
 
 function clamp01(n: number): number {
@@ -68,7 +91,7 @@ export class ComputeGoalProgress {
     if (goal.type === 'HABIT') {
       return this.computeHabit(goal, timezone, reference);
     }
-    return this.computeMeasurable(goal); // TARGET / PROJECT
+    return this.computeMeasurable(goal, timezone, reference); // TARGET / PROJECT
   }
 
   private async computeHabit(
@@ -109,10 +132,15 @@ export class ComputeGoalProgress {
       ratio,
       period,
       completed: this.isCompleted(goal, ratio),
+      ...todayDone(events, timezone, reference),
     };
   }
 
-  private async computeMeasurable(goal: Goal): Promise<GoalProgress> {
+  private async computeMeasurable(
+    goal: Goal,
+    timezone: string,
+    reference: Date,
+  ): Promise<GoalProgress> {
     const events = await this.events.find({
       userId: goal.userId,
       goalId: goal.id,
@@ -130,6 +158,7 @@ export class ComputeGoalProgress {
       ratio,
       period: null,
       completed: this.isCompleted(goal, ratio),
+      ...todayDone(events, timezone, reference),
     };
   }
 
@@ -159,6 +188,8 @@ export class ComputeGoalProgress {
       ratio,
       period: null,
       completed: goal.completedAt != null, // UMBRELLA fecha na mão
+      doneToday: false, // UMBRELLA não tem evento próprio
+      todayEventId: null,
       children: childProgresses,
     };
   }

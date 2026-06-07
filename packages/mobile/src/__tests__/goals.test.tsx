@@ -45,6 +45,12 @@ vi.mock('../lib/api/endpoints.js', () => ({
   getGoalProgress: vi.fn(),
   checkGoal: vi.fn(),
   completeGoal: vi.fn(),
+  editGoal: vi.fn(),
+  archiveGoal: vi.fn(),
+  unarchiveGoal: vi.fn(),
+  deleteGoal: vi.fn(),
+  listArchivedGoals: vi.fn(),
+  undoCheck: vi.fn(),
 }));
 
 import * as endpoints from '../lib/api/endpoints.js';
@@ -82,6 +88,16 @@ function makeProgress(overrides: Record<string, unknown> = {}) {
     ratio: 0.67,
     period: null,
     completed: false,
+    doneToday: false,
+    todayEventId: null,
+    ...overrides,
+  };
+}
+
+function makeArchived(overrides: Record<string, unknown> = {}) {
+  return {
+    ...makeGoal({ status: 'ARCHIVED', archivedAt: '2026-06-01T00:00:00.000Z' }),
+    deletable: true,
     ...overrides,
   };
 }
@@ -92,6 +108,7 @@ beforeEach(() => {
   vi.mocked(endpoints.getGoalProgress).mockResolvedValue(
     makeProgress() as never,
   );
+  vi.mocked(endpoints.listArchivedGoals).mockResolvedValue([]);
 });
 
 afterEach(async () => {
@@ -130,6 +147,26 @@ describe('GoalsPage', () => {
     );
   });
 
+  it('desmarca um HABIT já feito hoje (clicar de novo desfaz)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listActiveGoals).mockResolvedValue([
+      makeGoal() as never,
+    ]);
+    vi.mocked(endpoints.getGoalProgress).mockResolvedValue(
+      makeProgress({ doneToday: true, todayEventId: 'ev-9' }) as never,
+    );
+    vi.mocked(endpoints.undoCheck).mockResolvedValue(undefined as never);
+    render(<GoalsPage />);
+
+    await waitFor(() => screen.getByTestId('goal-action-g-1'));
+    await user.click(screen.getByTestId('goal-action-g-1'));
+
+    await waitFor(() =>
+      expect(endpoints.undoCheck).toHaveBeenCalledWith('ev-9'),
+    );
+    expect(endpoints.checkGoal).not.toHaveBeenCalled();
+  });
+
   it('cria um objetivo HABIT com weekdays', async () => {
     const user = userEvent.setup();
     vi.mocked(endpoints.createGoal).mockResolvedValue(makeGoal() as never);
@@ -150,5 +187,96 @@ describe('GoalsPage', () => {
         }),
       ),
     );
+  });
+
+  it('edita um objetivo ao tocar no card (sem enviar type)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listActiveGoals).mockResolvedValue([
+      makeGoal() as never,
+    ]);
+    vi.mocked(endpoints.editGoal).mockResolvedValue(makeGoal() as never);
+    render(<GoalsPage />);
+
+    await waitFor(() => screen.getByTestId('goal-edit-g-1'));
+    await user.click(screen.getByTestId('goal-edit-g-1'));
+
+    const input = await screen.findByLabelText('Título');
+    expect(input).toHaveValue('Ler todo dia'); // preenchido
+    await user.clear(input);
+    await user.type(input, 'Ler à noite');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(endpoints.editGoal).toHaveBeenCalled());
+    const [id, body] = vi.mocked(endpoints.editGoal).mock.calls[0]!;
+    expect(id).toBe('g-1');
+    expect(body).toMatchObject({ title: 'Ler à noite' });
+    expect(body).not.toHaveProperty('type');
+  });
+
+  it('arquiva um objetivo pela tela de edição', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listActiveGoals).mockResolvedValue([
+      makeGoal() as never,
+    ]);
+    vi.mocked(endpoints.archiveGoal).mockResolvedValue(makeGoal() as never);
+    render(<GoalsPage />);
+
+    await waitFor(() => screen.getByTestId('goal-edit-g-1'));
+    await user.click(screen.getByTestId('goal-edit-g-1'));
+    await user.click(await screen.findByTestId('archive-goal'));
+
+    await waitFor(() =>
+      expect(endpoints.archiveGoal).toHaveBeenCalledWith('g-1'),
+    );
+  });
+
+  it('lista e restaura objetivos arquivados', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listArchivedGoals).mockResolvedValue([
+      makeArchived() as never,
+    ]);
+    vi.mocked(endpoints.unarchiveGoal).mockResolvedValue(makeGoal() as never);
+    render(<GoalsPage />);
+
+    await waitFor(() => screen.getByTestId('toggle-archived'));
+    await user.click(screen.getByTestId('toggle-archived'));
+
+    await user.click(await screen.findByTestId('restore-goal-g-1'));
+    await waitFor(() =>
+      expect(endpoints.unarchiveGoal).toHaveBeenCalledWith('g-1'),
+    );
+  });
+
+  it('exclui um arquivado elegível com confirmação', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listArchivedGoals).mockResolvedValue([
+      makeArchived({ deletable: true }) as never,
+    ]);
+    vi.mocked(endpoints.deleteGoal).mockResolvedValue(makeGoal() as never);
+    render(<GoalsPage />);
+
+    await waitFor(() => screen.getByTestId('toggle-archived'));
+    await user.click(screen.getByTestId('toggle-archived'));
+
+    await user.click(await screen.findByTestId('delete-goal-g-1'));
+    await user.click(await screen.findByTestId('confirm-delete'));
+
+    await waitFor(() =>
+      expect(endpoints.deleteGoal).toHaveBeenCalledWith('g-1'),
+    );
+  });
+
+  it('não mostra excluir para arquivado não elegível', async () => {
+    const user = userEvent.setup();
+    vi.mocked(endpoints.listArchivedGoals).mockResolvedValue([
+      makeArchived({ deletable: false }) as never,
+    ]);
+    render(<GoalsPage />);
+
+    await waitFor(() => screen.getByTestId('toggle-archived'));
+    await user.click(screen.getByTestId('toggle-archived'));
+
+    await screen.findByTestId('restore-goal-g-1');
+    expect(screen.queryByTestId('delete-goal-g-1')).not.toBeInTheDocument();
   });
 });

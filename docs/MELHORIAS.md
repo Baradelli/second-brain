@@ -279,7 +279,7 @@ no MVP 3 (métricas) — manter escopo em navegação/histórico com **metas rea
 
 ---
 
-## Bloco F — Gerência de objetivos (editar / arquivar / restaurar / excluir) — **[~] em andamento**
+## Bloco F — Gerência de objetivos (editar / arquivar / restaurar / excluir) — **[x] FECHADO**
 
 > Pedido do dono (jun/2026), **antes do Bloco E**: poder **editar** objetivos e **excluir** os
 > que não vingaram. Modelo: **arquivar** (soft delete) e, numa **área de arquivados**, **restaurar**
@@ -307,7 +307,9 @@ arquivados, **excluir** e **desarquivar**; e no front, **nada** de editar/arquiv
   `POST /goals/:id/delete`, `POST /goals/:id/unarchive`, `GET /goals/archived`. **Back · M** —
   `tasks/47-back-gerencia-objetivos.md`.
 - F-front. Editar objetivo (toque → form preenchido, tipo travado), arquivar; seção "arquivados"
-  com restaurar/excluir (confirmação). **Front · M** — `tasks/48-tela-gerencia-objetivos.md`.
+  com restaurar/excluir (confirmação). **Front · M** — **[x] feito**
+  (`tasks/48-tela-gerencia-objetivos.md`). _Obs.: acesso mais direto à tela de Objetivos
+  (hoje só via painel da Home) ficou fora — decisão de navegação a combinar._
 
 ---
 

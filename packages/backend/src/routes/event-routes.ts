@@ -52,6 +52,8 @@ function toProgress(p: GoalProgress): GoalProgressResponse {
       ? { from: p.period.from.toISOString(), to: p.period.to.toISOString() }
       : null,
     completed: p.completed,
+    doneToday: p.doneToday,
+    todayEventId: p.todayEventId,
     children: p.children?.map(toProgress),
   };
 }

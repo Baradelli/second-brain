@@ -74,6 +74,10 @@ export interface GoalProgressResponse {
   ratio: number | null;
   period: { from: string; to: string } | null;
   completed: boolean;
+  /** Já existe um evento `done` HOJE (fuso do usuário)? */
+  doneToday: boolean;
+  /** Id do evento `done` de hoje mais recente — para desfazer (undo). */
+  todayEventId: string | null;
   children?: GoalProgressResponse[];
 }
 
@@ -87,6 +91,8 @@ export const goalProgressResponseSchema: z.ZodType<GoalProgressResponse> =
       ratio: z.number().nullable(),
       period: dateRangeSchema.nullable(),
       completed: z.boolean(),
+      doneToday: z.boolean(),
+      todayEventId: z.string().nullable(),
       children: z.array(goalProgressResponseSchema).optional(),
     }),
   );

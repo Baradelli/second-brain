@@ -54,6 +54,19 @@ export function patch<S extends z.ZodTypeAny>(
   }).then((data) => schema.parse(data));
 }
 
+/** DELETE sem corpo de resposta (204). Não tenta parsear JSON. */
+export async function del(path: string, body?: unknown): Promise<void> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+}
+
 /**
  * Envia um arquivo via multipart/form-data. Não seta Content-Type — o browser
  * monta o boundary sozinho. Usado pelo upload de anexos (disco do servidor).
