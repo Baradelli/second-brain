@@ -1,6 +1,7 @@
 import path from 'node:path';
 
 import cors from '@fastify/cors';
+import jwt from '@fastify/jwt';
 import fastifyStatic from '@fastify/static';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
@@ -14,6 +15,7 @@ import {
 
 import { agendaRoutes } from '../routes/agenda-routes.js';
 import { attachmentRoutes } from '../routes/attachment-routes.js';
+import { authRoutes } from '../routes/auth-routes.js';
 import { calendarRoutes } from '../routes/calendar-routes.js';
 import { captureRoutes } from '../routes/capture-routes.js';
 import { dayClosingRoutes } from '../routes/day-closing-routes.js';
@@ -48,6 +50,11 @@ export async function buildServer() {
   });
   await app.register(swaggerUi, { routePrefix: '/docs' });
 
+  // Auth via JWT (Bearer). Em produção defina JWT_SECRET; o default é só para dev.
+  await app.register(jwt, {
+    secret: process.env['JWT_SECRET'] ?? 'dev-secret-change-me-please',
+  });
+
   app.get('/health', async () => ({ status: 'ok' }));
 
   // Anexos vivem em disco; servimos o diretório de uploads em /uploads/*.
@@ -59,6 +66,7 @@ export async function buildServer() {
   });
   await app.register(uploadRoutes, { uploadDir });
 
+  await app.register(authRoutes, { prisma });
   await app.register(noteRoutes, { prisma });
   await app.register(attachmentRoutes, { prisma });
   await app.register(captureRoutes, { prisma });

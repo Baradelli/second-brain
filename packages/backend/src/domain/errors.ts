@@ -146,3 +146,10 @@ export class InvalidCheckError extends Error {
     this.name = 'InvalidCheckError';
   }
 }
+
+export class InvalidCredentialsError extends Error {
+  constructor() {
+    super('Invalid email or password.');
+    this.name = 'InvalidCredentialsError';
+  }
+}

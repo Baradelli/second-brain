@@ -39,10 +39,11 @@ enum NoteScope {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String? // bcrypt; nulo enquanto a conta não tem senha definida
+  createdAt    DateTime @default(now())
 
   settings    Settings?
   captures    Capture[]
