@@ -1,5 +1,7 @@
 import {
   BottomTabBar,
+  Sidebar,
+  type SidebarItem,
   type Tab,
   ThemeProvider,
   ThemeToggle,
@@ -8,36 +10,34 @@ import {
   BookOpen,
   CalendarDays,
   Home,
+  Menu,
   NotebookText,
   Plus,
   Tags,
+  Target,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import { LanguageSwitcher } from './components/LanguageSwitcher.js';
 import { startOfflineSync } from './lib/offline/index.js';
 
 function AppShell() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Sincroniza a fila offline (captura/escrita) ao reconectar e ao abrir o app.
   useEffect(() => {
     startOfflineSync();
   }, []);
 
+  // Footer flutuante: só os atalhos principais (Início · Capturar · Calendário).
   const tabs: Tab[] = [
     {
       to: '/',
       icon: <Home size={20} strokeWidth={1.75} />,
       label: t('nav.home'),
-    },
-    {
-      to: '/library',
-      icon: <BookOpen size={20} strokeWidth={1.75} />,
-      label: t('nav.library'),
     },
     {
       to: '/capture',
@@ -46,14 +46,39 @@ function AppShell() {
       isFab: true,
     },
     {
+      to: '/calendar',
+      icon: <CalendarDays size={20} strokeWidth={1.75} />,
+      label: t('nav.calendar'),
+    },
+  ];
+
+  // Demais seções moram no sidebar (cresce conforme o app ganha páginas).
+  const menuItems: SidebarItem[] = [
+    { to: '/', icon: <Home size={18} strokeWidth={1.75} />, label: t('nav.home') },
+    {
+      to: '/library',
+      icon: <BookOpen size={18} strokeWidth={1.75} />,
+      label: t('nav.library'),
+    },
+    {
+      to: '/goals',
+      icon: <Target size={18} strokeWidth={1.75} />,
+      label: t('nav.goals'),
+    },
+    {
       to: '/notes',
-      icon: <NotebookText size={20} strokeWidth={1.75} />,
+      icon: <NotebookText size={18} strokeWidth={1.75} />,
       label: t('nav.notes'),
     },
     {
       to: '/calendar',
-      icon: <CalendarDays size={20} strokeWidth={1.75} />,
+      icon: <CalendarDays size={18} strokeWidth={1.75} />,
       label: t('nav.calendar'),
+    },
+    {
+      to: '/labels',
+      icon: <Tags size={18} strokeWidth={1.75} />,
+      label: t('labels.title'),
     },
   ];
 
@@ -75,37 +100,45 @@ function AppShell() {
           WebkitBackdropFilter: 'blur(16px)',
         }}
       >
-        <span
-          className="flex items-center gap-2 font-display text-base font-semibold"
-          style={{ color: 'var(--cerebro-fg)' }}
-        >
-          <span
-            className="inline-block h-2 w-2 rounded-full"
-            style={{ backgroundColor: 'var(--cerebro-accent)' }}
-            aria-hidden
-          />
-          {t('app.name')}
-        </span>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => navigate('/labels')}
-            aria-label={t('labels.title')}
-            data-testid="labels-nav"
+            onClick={() => setMenuOpen(true)}
+            aria-label={t('nav.menu')}
+            data-testid="menu-button"
             className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"
             style={{ color: 'var(--cerebro-muted)' }}
           >
-            <Tags size={18} strokeWidth={1.75} />
+            <Menu size={20} strokeWidth={1.85} />
           </button>
+          <span
+            className="flex items-center gap-2 font-display text-base font-semibold"
+            style={{ color: 'var(--cerebro-fg)' }}
+          >
+            <span
+              className="inline-block h-2 w-2 rounded-full"
+              style={{ backgroundColor: 'var(--cerebro-accent)' }}
+              aria-hidden
+            />
+            {t('app.name')}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
           <ThemeToggle />
           <LanguageSwitcher />
         </div>
       </header>
 
-      <div className="flex-1 overflow-auto pb-24">
+      <div className="flex-1 overflow-auto pb-28">
         <Outlet />
       </div>
 
+      <Sidebar
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        items={menuItems}
+        title={t('app.name')}
+      />
       <BottomTabBar tabs={tabs} />
     </div>
   );

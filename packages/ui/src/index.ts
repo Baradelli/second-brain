@@ -10,6 +10,8 @@ export { ProgressRing } from './components/ProgressRing.js';
 export type { RichEditorProps } from './components/RichEditor.js';
 export { RichEditor } from './components/RichEditor.js';
 export { SectionHeader } from './components/SectionHeader.js';
+export type { SidebarItem } from './components/Sidebar.js';
+export { Sidebar } from './components/Sidebar.js';
 export { Textarea } from './components/Textarea.js';
 export type { Theme } from './theme/ThemeContext.js';
 export { useTheme } from './theme/ThemeContext.js';
