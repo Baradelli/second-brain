@@ -9,6 +9,7 @@ import {
 import {
   BookOpen,
   CalendarDays,
+  CalendarRange,
   Home,
   Menu,
   NotebookText,
@@ -81,6 +82,11 @@ function AppShell() {
       to: '/calendar',
       icon: <CalendarDays size={18} strokeWidth={1.75} />,
       label: t('nav.calendar'),
+    },
+    {
+      to: '/recaps',
+      icon: <CalendarRange size={18} strokeWidth={1.75} />,
+      label: t('nav.recaps'),
     },
     {
       to: '/labels',

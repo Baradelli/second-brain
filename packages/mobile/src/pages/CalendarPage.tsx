@@ -1,6 +1,6 @@
 import type { CalendarDayResponse, CalendarMonthResponse } from '@cerebro/shared';
 import { Card } from '@cerebro/ui';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarRange, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -83,15 +83,27 @@ export function CalendarPage() {
         >
           {t('calendar.title')}
         </h1>
-        <button
-          type="button"
-          onClick={() => setMonth(currentMonthKey())}
-          className="rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--cerebro-accent-soft)]"
-          style={{ color: 'var(--cerebro-accent)' }}
-          data-testid="calendar-today"
-        >
-          {t('calendar.today')}
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => navigate('/recaps')}
+            aria-label={t('nav.recaps')}
+            data-testid="calendar-recaps"
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"
+            style={{ color: 'var(--cerebro-muted)' }}
+          >
+            <CalendarRange size={18} strokeWidth={1.85} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setMonth(currentMonthKey())}
+            className="rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--cerebro-accent-soft)]"
+            style={{ color: 'var(--cerebro-accent)' }}
+            data-testid="calendar-today"
+          >
+            {t('calendar.today')}
+          </button>
+        </div>
       </div>
 
       <div className="mb-3 flex items-center justify-between">

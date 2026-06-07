@@ -313,7 +313,7 @@ arquivados, **excluir** e **desarquivar**; e no front, **nada** de editar/arquiv
 
 ---
 
-## Bloco E — Melhorias transversais (sugestões minhas, a debater)
+## Bloco E — Melhorias transversais (sugestões minhas, a debater) — **[x] FECHADO**
 
 Itens que percebi faltando e que valem entrar na conversa:
 
@@ -333,8 +333,10 @@ Itens que percebi faltando e que valem entrar na conversa:
   `GET /search`; `SearchPage` (`/search`) com ícone no header e item no sidebar. Semântica = MVP 4.
 - **E6. Aba "Assistente"** é só placeholder (MVP 5) ocupando um slot da tab bar — pode ceder
   lugar (ex.: para Calendário ou Labels) até existir. **S** (decisão de navegação)
-- **E7. Recapitulações na UI** — o backend de recap (semana/mês/ano) existe desde o MVP 1, mas
-  não há tela. Combina com o Bloco D (calendário/histórico). **M**
+- **E7. Recapitulações na UI** — **[x] feito** (`tasks/52-e7-recapitulacoes.md`): recap = nota
+  journal com `scope` WEEK/MONTH/YEAR; rota fina `POST /recaps` (acha-ou-cria via `UpsertRecap`
+  testado); `RecapsPage` (`/recaps`) com seções semana/mês/ano (devocional ou reflexão), no
+  sidebar e com atalho no Calendário. Listagem reusa `GET /notes?scope=`.
 
 ---
 

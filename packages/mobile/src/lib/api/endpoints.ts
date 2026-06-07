@@ -26,6 +26,7 @@ import {
   type NoteResponse,
   noteResponseSchema,
   type NoteType,
+  type RecapScope,
   type ResourceResponse,
   resourceResponseSchema,
   type ResourceStageInput,
@@ -181,6 +182,7 @@ export function archiveNote(id: string): Promise<NoteResponse> {
 export function listNotes(
   params: {
     type?: NoteType;
+    scope?: 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
     status?: 'ACTIVE' | 'ARCHIVED';
     resourceId?: string;
   } = {},
@@ -188,8 +190,21 @@ export function listNotes(
   const query = new URLSearchParams({ userId: CURRENT_USER_ID });
   query.set('status', params.status ?? 'ACTIVE');
   if (params.type) query.set('type', params.type);
+  if (params.scope) query.set('scope', params.scope);
   if (params.resourceId) query.set('resourceId', params.resourceId);
   return get(`/notes?${query.toString()}`, z.array(noteResponseSchema));
+}
+
+/** Acha-ou-cria o recap (nota journal com escopo de período) do período atual. */
+export function createRecap(
+  type: 'DEVOTIONAL' | 'REFLECTION',
+  scope: RecapScope,
+): Promise<NoteResponse> {
+  return post(
+    '/recaps',
+    { userId: CURRENT_USER_ID, type, scope },
+    noteResponseSchema,
+  );
 }
 
 // ── Suggested questions ───────────────────────────────────────────────────────

@@ -22,6 +22,7 @@ import { goalRoutes } from '../routes/goal-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
+import { recapRoutes } from '../routes/recap-routes.js';
 import { resourceRoutes } from '../routes/resource-routes.js';
 import { searchRoutes } from '../routes/search-routes.js';
 import { uploadRoutes } from '../routes/upload-routes.js';
@@ -70,6 +71,7 @@ export async function buildServer() {
   await app.register(dayClosingRoutes, { prisma });
   await app.register(calendarRoutes, { prisma });
   await app.register(searchRoutes, { prisma });
+  await app.register(recapRoutes, { prisma });
 
   return app;
 }
