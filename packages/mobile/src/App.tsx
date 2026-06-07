@@ -13,18 +13,20 @@ import {
   Menu,
   NotebookText,
   Plus,
+  Search,
   Tags,
   Target,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { LanguageSwitcher } from './components/LanguageSwitcher.js';
 import { startOfflineSync } from './lib/offline/index.js';
 
 function AppShell() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Sincroniza a fila offline (captura/escrita) ao reconectar e ao abrir o app.
@@ -55,6 +57,11 @@ function AppShell() {
   // Demais seções moram no sidebar (cresce conforme o app ganha páginas).
   const menuItems: SidebarItem[] = [
     { to: '/', icon: <Home size={18} strokeWidth={1.75} />, label: t('nav.home') },
+    {
+      to: '/search',
+      icon: <Search size={18} strokeWidth={1.75} />,
+      label: t('nav.search'),
+    },
     {
       to: '/library',
       icon: <BookOpen size={18} strokeWidth={1.75} />,
@@ -124,6 +131,16 @@ function AppShell() {
           </span>
         </div>
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => navigate('/search')}
+            aria-label={t('nav.search')}
+            data-testid="search-button"
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"
+            style={{ color: 'var(--cerebro-muted)' }}
+          >
+            <Search size={18} strokeWidth={1.85} />
+          </button>
           <ThemeToggle />
           <LanguageSwitcher />
         </div>

@@ -328,8 +328,9 @@ Itens que percebi faltando e que valem entrar na conversa:
   **editar recurso** em `tasks/50-e4-editar-recurso.md`: botão "Editar" na detail page →
   `ResourceForm` preenchido → `editResource`). _Pendência menor: arquivar um **recurso** pela UI
   ainda não existe — anotar se o dono quiser._
-- **E5. Busca simples** (texto) em notas/recursos/capturas — ganho rápido; a busca **semântica**
-  é MVP 4, mas um "buscar por palavra" simples ajuda já. **M**
+- **E5. Busca simples** (texto) em notas/recursos/capturas — **[x] feito**
+  (`tasks/51-e5-busca-simples.md`): `SearchAll` (substring em memória, ACTIVE/PENDING) +
+  `GET /search`; `SearchPage` (`/search`) com ícone no header e item no sidebar. Semântica = MVP 4.
 - **E6. Aba "Assistente"** é só placeholder (MVP 5) ocupando um slot da tab bar — pode ceder
   lugar (ex.: para Calendário ou Labels) até existir. **S** (decisão de navegação)
 - **E7. Recapitulações na UI** — o backend de recap (semana/mês/ano) existe desde o MVP 1, mas

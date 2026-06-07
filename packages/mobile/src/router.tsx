@@ -14,6 +14,7 @@ import { LibraryPage } from './pages/LibraryPage.js';
 import { NotesPage } from './pages/NotesPage.js';
 import { ResourceDetailPage } from './pages/ResourceDetailPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
+import { SearchPage } from './pages/SearchPage.js';
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { path: 'capture', element: <CapturePage /> },
       { path: 'review', element: <ReviewPage /> },
       { path: 'notes', element: <NotesPage /> },
+      { path: 'search', element: <SearchPage /> },
       { path: 'calendar', element: <CalendarPage /> },
       { path: 'calendar/:date', element: <DayDetailPage /> },
       { path: 'labels', element: <LabelsPage /> },

@@ -30,6 +30,8 @@ import {
   resourceResponseSchema,
   type ResourceStageInput,
   type ResourceTypeInput,
+  type SearchResultResponse,
+  searchResultSchema,
   type SuggestedQuestionsGroupResponse,
   suggestedQuestionsGroupResponseSchema,
   uploadResponseSchema,
@@ -438,6 +440,14 @@ export function getCalendar(month?: string): Promise<CalendarMonthResponse> {
 export function getDayDetail(date: string): Promise<CalendarDayDetailResponse> {
   const query = new URLSearchParams({ userId: CURRENT_USER_ID, date });
   return get(`/calendar/day?${query.toString()}`, calendarDayDetailResponseSchema);
+}
+
+// ── Busca ─────────────────────────────────────────────────────────────────────
+
+/** Busca simples por texto em notas/recursos/capturas. */
+export function getSearch(q: string): Promise<SearchResultResponse> {
+  const query = new URLSearchParams({ userId: CURRENT_USER_ID, q });
+  return get(`/search?${query.toString()}`, searchResultSchema);
 }
 
 // ── Labels ──────────────────────────────────────────────────────────────────
