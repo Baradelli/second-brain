@@ -11,6 +11,7 @@ import {
   CalendarDays,
   CalendarRange,
   Home,
+  LogOut,
   Menu,
   NotebookText,
   Plus,
@@ -23,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { LanguageSwitcher } from './components/LanguageSwitcher.js';
+import { logout } from './lib/auth.js';
 import { startOfflineSync } from './lib/offline/index.js';
 
 function AppShell() {
@@ -161,6 +163,20 @@ function AppShell() {
         onClose={() => setMenuOpen(false)}
         items={menuItems}
         title={t('app.name')}
+        footer={
+          <button
+            type="button"
+            onClick={() => logout()}
+            data-testid="logout"
+            className="flex w-full items-center gap-3 rounded-[var(--radius-card)] px-3 py-2.5 text-sm font-medium"
+            style={{ color: 'var(--cerebro-muted)' }}
+          >
+            <span className="flex h-5 w-5 items-center justify-center">
+              <LogOut size={18} strokeWidth={1.75} />
+            </span>
+            {t('nav.logout')}
+          </button>
+        }
       />
       <BottomTabBar tabs={tabs} />
     </div>

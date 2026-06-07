@@ -1,6 +1,7 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { App } from './App.js';
+import { isAuthenticated } from './lib/auth.js';
 import { AgendaPage } from './pages/AgendaPage.js';
 import { AssistantPage } from './pages/AssistantPage.js';
 import { CalendarPage } from './pages/CalendarPage.js';
@@ -11,16 +12,26 @@ import { EditorPage } from './pages/EditorPage.js';
 import { GoalsPage } from './pages/GoalsPage.js';
 import { LabelsPage } from './pages/LabelsPage.js';
 import { LibraryPage } from './pages/LibraryPage.js';
+import { LoginPage } from './pages/LoginPage.js';
 import { NotesPage } from './pages/NotesPage.js';
 import { RecapsPage } from './pages/RecapsPage.js';
 import { ResourceDetailPage } from './pages/ResourceDetailPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
 import { SearchPage } from './pages/SearchPage.js';
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  return isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
 export const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
   {
     path: '/',
-    element: <App />,
+    element: (
+      <RequireAuth>
+        <App />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <AgendaPage /> },
       { path: 'library', element: <LibraryPage /> },

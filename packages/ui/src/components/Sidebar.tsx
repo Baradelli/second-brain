@@ -12,13 +12,21 @@ interface SidebarProps {
   onClose: () => void;
   items: SidebarItem[];
   title?: string;
+  /** Conteúdo opcional fixado no rodapé do drawer (ex.: botão de sair). */
+  footer?: ReactNode;
 }
 
 /**
  * Drawer lateral (esquerda) com a navegação secundária. O footer flutuante guarda só os
  * atalhos principais; o resto das seções mora aqui e cresce conforme o app ganha páginas.
  */
-export function Sidebar({ open, onClose, items, title }: SidebarProps) {
+export function Sidebar({
+  open,
+  onClose,
+  items,
+  title,
+  footer,
+}: SidebarProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -79,6 +87,7 @@ export function Sidebar({ open, onClose, items, title }: SidebarProps) {
             {item.label}
           </NavLink>
         ))}
+        {footer && <div className="mt-auto pt-2">{footer}</div>}
       </aside>
     </>
   );

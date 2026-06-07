@@ -23,6 +23,8 @@ import {
   labelNodeResponseSchema,
   type LabelResponse,
   labelResponseSchema,
+  type LoginResponse,
+  loginResponseSchema,
   type NoteResponse,
   noteResponseSchema,
   type NoteType,
@@ -39,7 +41,13 @@ import {
 } from '@cerebro/shared';
 import { z } from 'zod';
 
-import { CURRENT_USER_ID, del, get, patch, post, postFile } from './client.js';
+import { del, get, patch, post, postFile } from './client.js';
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+
+export function login(email: string, password: string): Promise<LoginResponse> {
+  return post('/auth/login', { email, password }, loginResponseSchema);
+}
 
 // ── Agenda ────────────────────────────────────────────────────────────────────
 
@@ -60,7 +68,7 @@ export const todayAgendaSchema = z.object({
 export type TodayAgenda = z.infer<typeof todayAgendaSchema>;
 
 export function getAgenda(): Promise<TodayAgenda> {
-  return get(`/agenda?userId=${CURRENT_USER_ID}&day=today`, todayAgendaSchema);
+  return get(`/agenda?day=today`, todayAgendaSchema);
 }
 
 // ── Captures ──────────────────────────────────────────────────────────────────
@@ -100,18 +108,14 @@ export type PromoteCaptureBody =
 export type PromoteCaptureResult = z.infer<typeof promoteResultSchema>;
 
 export function createCapture(text: string): Promise<CaptureResponse> {
-  return post(
-    '/captures',
-    { text, userId: CURRENT_USER_ID },
-    captureResponseSchema,
-  );
+  return post('/captures', { text }, captureResponseSchema);
 }
 
 export function listCaptures(
   status: 'PENDING' | 'ARCHIVED',
 ): Promise<CaptureResponse[]> {
   return get(
-    `/captures?userId=${CURRENT_USER_ID}&status=${status}`,
+    `/captures?status=${status}`,
     z.array(captureResponseSchema),
   );
 }
@@ -155,7 +159,6 @@ export function createNote(body: {
     '/notes',
     {
       ...body,
-      userId: CURRENT_USER_ID,
       scope: body.scope ?? 'DAY',
       date: body.date ?? new Date().toISOString(),
     },
@@ -187,7 +190,7 @@ export function listNotes(
     resourceId?: string;
   } = {},
 ): Promise<NoteResponse[]> {
-  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  const query = new URLSearchParams();
   query.set('status', params.status ?? 'ACTIVE');
   if (params.type) query.set('type', params.type);
   if (params.scope) query.set('scope', params.scope);
@@ -200,11 +203,7 @@ export function createRecap(
   type: 'DEVOTIONAL' | 'REFLECTION',
   scope: RecapScope,
 ): Promise<NoteResponse> {
-  return post(
-    '/recaps',
-    { userId: CURRENT_USER_ID, type, scope },
-    noteResponseSchema,
-  );
+  return post('/recaps', { type, scope }, noteResponseSchema);
 }
 
 // ── Suggested questions ───────────────────────────────────────────────────────
@@ -242,7 +241,7 @@ export function attachFileToNote(
 ): Promise<AttachmentResponse> {
   return post(
     `/notes/${noteId}/attachments`,
-    { ...file, userId: CURRENT_USER_ID, noteId },
+    { ...file, noteId },
     attachmentResponseSchema,
   );
 }
@@ -264,7 +263,7 @@ export interface ListResourcesParams {
 export function listResources(
   params: ListResourcesParams = {},
 ): Promise<ResourceResponse[]> {
-  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  const query = new URLSearchParams();
   if (params.stage) query.set('stage', params.stage);
   if (params.labelId) query.set('labelId', params.labelId);
   query.set('status', params.status ?? 'ACTIVE');
@@ -272,10 +271,7 @@ export function listResources(
 }
 
 export function getResource(id: string): Promise<ResourceResponse> {
-  return get(
-    `/resources/${id}?userId=${CURRENT_USER_ID}`,
-    resourceResponseSchema,
-  );
+  return get(`/resources/${id}`, resourceResponseSchema);
 }
 
 export interface CreateResourceBody {
@@ -290,22 +286,14 @@ export interface CreateResourceBody {
 export function createResource(
   body: CreateResourceBody,
 ): Promise<ResourceResponse> {
-  return post(
-    '/resources',
-    { ...body, userId: CURRENT_USER_ID },
-    resourceResponseSchema,
-  );
+  return post('/resources', body, resourceResponseSchema);
 }
 
 export function editResource(
   id: string,
   body: Partial<CreateResourceBody> & { stage?: ResourceStageInput },
 ): Promise<ResourceResponse> {
-  return patch(
-    `/resources/${id}`,
-    { ...body, userId: CURRENT_USER_ID },
-    resourceResponseSchema,
-  );
+  return patch(`/resources/${id}`, body, resourceResponseSchema);
 }
 
 // ── Goals ─────────────────────────────────────────────────────────────────────
@@ -313,10 +301,11 @@ export function editResource(
 export function listActiveGoals(
   params: { type?: GoalTypeInput; parentId?: string } = {},
 ): Promise<GoalResponse[]> {
-  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  const query = new URLSearchParams();
   if (params.type) query.set('type', params.type);
   if (params.parentId) query.set('parentId', params.parentId);
-  return get(`/goals?${query.toString()}`, z.array(goalResponseSchema));
+  const qs = query.toString();
+  return get(`/goals${qs ? `?${qs}` : ''}`, z.array(goalResponseSchema));
 }
 
 export interface CreateGoalBody {
@@ -333,11 +322,7 @@ export interface CreateGoalBody {
 }
 
 export function createGoal(body: CreateGoalBody): Promise<GoalResponse> {
-  return post(
-    '/goals',
-    { ...body, userId: CURRENT_USER_ID },
-    goalResponseSchema,
-  );
+  return post('/goals', body, goalResponseSchema);
 }
 
 export interface EditGoalBody {
@@ -355,105 +340,72 @@ export function editGoal(
   id: string,
   body: EditGoalBody,
 ): Promise<GoalResponse> {
-  return patch(
-    `/goals/${id}`,
-    { ...body, userId: CURRENT_USER_ID },
-    goalResponseSchema,
-  );
+  return patch(`/goals/${id}`, body, goalResponseSchema);
 }
 
 export function archiveGoal(id: string): Promise<GoalResponse> {
-  return post(
-    `/goals/${id}/archive`,
-    { userId: CURRENT_USER_ID },
-    goalResponseSchema,
-  );
+  return post(`/goals/${id}/archive`, {}, goalResponseSchema);
 }
 
 export function unarchiveGoal(id: string): Promise<GoalResponse> {
-  return post(
-    `/goals/${id}/unarchive`,
-    { userId: CURRENT_USER_ID },
-    goalResponseSchema,
-  );
+  return post(`/goals/${id}/unarchive`, {}, goalResponseSchema);
 }
 
 /** Hard delete — só objetivos arquivados que nunca foram feitos (backend valida). */
 export function deleteGoal(id: string): Promise<GoalResponse> {
-  return post(
-    `/goals/${id}/delete`,
-    { userId: CURRENT_USER_ID },
-    goalResponseSchema,
-  );
+  return post(`/goals/${id}/delete`, {}, goalResponseSchema);
 }
 
 export function listArchivedGoals(): Promise<ArchivedGoalResponse[]> {
-  return get(
-    `/goals/archived?userId=${CURRENT_USER_ID}`,
-    z.array(archivedGoalSchema),
-  );
+  return get(`/goals/archived`, z.array(archivedGoalSchema));
 }
 
 export function getGoalProgress(id: string): Promise<GoalProgressResponse> {
-  return get(
-    `/goals/${id}/progress?userId=${CURRENT_USER_ID}`,
-    goalProgressResponseSchema,
-  );
+  return get(`/goals/${id}/progress`, goalProgressResponseSchema);
 }
 
 export function checkGoal(
   id: string,
   body: { value?: number } = {},
 ): Promise<EventResponse> {
-  return post(
-    `/goals/${id}/check`,
-    { ...body, userId: CURRENT_USER_ID },
-    eventResponseSchema,
-  );
+  return post(`/goals/${id}/check`, body, eventResponseSchema);
 }
 
 /** Desfaz um check (hard delete do evento) — usado para desmarcar uma meta marcada por engano. */
 export function undoCheck(eventId: string): Promise<void> {
-  return del(`/events/${eventId}`, { userId: CURRENT_USER_ID });
+  return del(`/events/${eventId}`, {});
 }
 
 export function completeGoal(id: string): Promise<GoalResponse> {
-  return post(
-    `/goals/${id}/complete`,
-    { userId: CURRENT_USER_ID },
-    goalResponseSchema,
-  );
+  return post(`/goals/${id}/complete`, {}, goalResponseSchema);
 }
 
 export function skipGoal(id: string, reason: string): Promise<EventResponse> {
-  return post(
-    `/goals/${id}/skip`,
-    { reason, userId: CURRENT_USER_ID },
-    eventResponseSchema,
-  );
+  return post(`/goals/${id}/skip`, { reason }, eventResponseSchema);
 }
 
 // ── Fechar o dia ────────────────────────────────────────────────────────────
 
 export function getDayClosing(): Promise<DayClosingResponse> {
-  return get(
-    `/day-closing?userId=${CURRENT_USER_ID}&day=today`,
-    dayClosingResponseSchema,
-  );
+  return get(`/day-closing?day=today`, dayClosingResponseSchema);
 }
 
 // ── Calendário ──────────────────────────────────────────────────────────────
 
 /** Agregado mensal: por dia, metas previstas × cumpridas + selo de diário. */
 export function getCalendar(month?: string): Promise<CalendarMonthResponse> {
-  const query = new URLSearchParams({ userId: CURRENT_USER_ID });
+  const query = new URLSearchParams();
   if (month) query.set('month', month);
-  return get(`/calendar?${query.toString()}`, calendarMonthResponseSchema);
+  const qs = query.toString();
+  return get(
+    `/calendar${qs ? `?${qs}` : ''}`,
+    calendarMonthResponseSchema,
+  );
 }
 
 /** Detalhe de um dia: metas (com status) + notas escritas no dia. */
 export function getDayDetail(date: string): Promise<CalendarDayDetailResponse> {
-  const query = new URLSearchParams({ userId: CURRENT_USER_ID, date });
+  const query = new URLSearchParams({ date });
   return get(`/calendar/day?${query.toString()}`, calendarDayDetailResponseSchema);
 }
 
@@ -461,17 +413,14 @@ export function getDayDetail(date: string): Promise<CalendarDayDetailResponse> {
 
 /** Busca simples por texto em notas/recursos/capturas. */
 export function getSearch(q: string): Promise<SearchResultResponse> {
-  const query = new URLSearchParams({ userId: CURRENT_USER_ID, q });
+  const query = new URLSearchParams({ q });
   return get(`/search?${query.toString()}`, searchResultSchema);
 }
 
 // ── Labels ──────────────────────────────────────────────────────────────────
 
 export function listLabels(): Promise<LabelNodeResponse[]> {
-  return get(
-    `/labels?userId=${CURRENT_USER_ID}`,
-    z.array(labelNodeResponseSchema),
-  );
+  return get(`/labels`, z.array(labelNodeResponseSchema));
 }
 
 export interface LabelBody {
@@ -481,19 +430,11 @@ export interface LabelBody {
 }
 
 export function createLabel(body: LabelBody): Promise<LabelResponse> {
-  return post(
-    '/labels',
-    { ...body, userId: CURRENT_USER_ID },
-    labelResponseSchema,
-  );
+  return post('/labels', body, labelResponseSchema);
 }
 
 export function editLabel(id: string, body: LabelBody): Promise<LabelResponse> {
-  return patch(
-    `/labels/${id}`,
-    { ...body, userId: CURRENT_USER_ID },
-    labelResponseSchema,
-  );
+  return patch(`/labels/${id}`, body, labelResponseSchema);
 }
 
 export function archiveLabel(id: string): Promise<LabelResponse> {
@@ -535,7 +476,7 @@ export async function getTodayNote(
   ).toISOString();
 
   const notes = await get(
-    `/notes?userId=${CURRENT_USER_ID}&type=${type}&scope=DAY&from=${encodeURIComponent(dayStart)}&to=${encodeURIComponent(dayEnd)}&status=ACTIVE`,
+    `/notes?type=${type}&scope=DAY&from=${encodeURIComponent(dayStart)}&to=${encodeURIComponent(dayEnd)}&status=ACTIVE`,
     z.array(noteResponseSchema),
   );
 
