@@ -1,14 +1,16 @@
 import type { StudyItemResponse } from '@cerebro/shared';
 import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
-import { Brain, FileText, Plus } from 'lucide-react';
+import { BookOpen, Brain, FileText, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { StudyItemForm } from '../components/StudyItemForm.js';
 import {
+  createNote,
   createStudyItem,
   type CreateStudyItemInput,
+  editStudyItem,
   listStudyItems,
   logRecall,
 } from '../lib/api/endpoints.js';
@@ -108,6 +110,23 @@ export function StudyItemsPage() {
       setParams(params, { replace: true });
     }
     reload();
+  }
+
+  // Fichamento de memória (Práticas 1/6): cria uma STUDY_NOTE e a vincula ao item
+  // na primeira vez; depois apenas reabre. Editor é a tela de escrita.
+  async function ensureFichamento(item: StudyItemResponse) {
+    let noteId = item.fichamentoNoteId;
+    if (!noteId) {
+      const note = await createNote({
+        type: 'STUDY_NOTE',
+        doc: { type: 'doc', content: [] },
+        resourceId: item.resourceId ?? undefined,
+        title: item.title,
+      });
+      await editStudyItem(item.id, { fichamentoNoteId: note.id });
+      noteId = note.id;
+    }
+    navigate(`/editor/${noteId}`);
   }
 
   return (
@@ -210,12 +229,9 @@ export function StudyItemsPage() {
         item={reviewing}
         onClose={() => setReviewing(null)}
         onRecall={handleRecall}
-        onWriteFichamento={(item) =>
-          navigate(
-            item.resourceId
-              ? `/editor?type=STUDY_NOTE&resourceId=${item.resourceId}`
-              : `/editor?type=STUDY_NOTE`,
-          )
+        onWriteFichamento={ensureFichamento}
+        onCompare={(item) =>
+          item.resourceId ? navigate(`/library/${item.resourceId}`) : undefined
         }
       />
     </main>
@@ -229,11 +245,13 @@ function RecallSheet({
   onClose,
   onRecall,
   onWriteFichamento,
+  onCompare,
 }: {
   item: StudyItemResponse | null;
   onClose: () => void;
   onRecall: (confidence: 'A' | 'B' | 'C') => void;
   onWriteFichamento: (item: StudyItemResponse) => void;
+  onCompare: (item: StudyItemResponse) => void;
 }) {
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
@@ -318,14 +336,47 @@ function RecallSheet({
             </ul>
           </div>
 
-          <Button
-            variant="secondary"
-            onClick={() => onWriteFichamento(item)}
-            data-testid="write-fichamento"
-          >
-            <FileText size={16} strokeWidth={1.85} />
-            {t('study.fichamento.write')}
-          </Button>
+          {/* Fichamento de memória — duas fases (Práticas 1/6) */}
+          {!item.fichamentoNoteId ? (
+            <div className="flex flex-col gap-1.5">
+              <p
+                className="text-sm leading-relaxed"
+                style={{ color: 'var(--cerebro-muted)' }}
+              >
+                {t('study.fichamento.blindHint')}
+              </p>
+              <Button
+                onClick={() => onWriteFichamento(item)}
+                data-testid="write-fichamento"
+              >
+                <FileText size={16} strokeWidth={1.85} />
+                {t('study.fichamento.phase1')}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => onWriteFichamento(item)}
+                data-testid="view-fichamento"
+                className="flex-1"
+              >
+                <FileText size={16} strokeWidth={1.85} />
+                {t('study.fichamento.view')}
+              </Button>
+              {item.resourceId && (
+                <Button
+                  variant="secondary"
+                  onClick={() => onCompare(item)}
+                  data-testid="compare-fichamento"
+                  className="flex-1"
+                >
+                  <BookOpen size={16} strokeWidth={1.85} />
+                  {t('study.fichamento.compare')}
+                </Button>
+              )}
+            </div>
+          )}
 
           <div>
             <h3

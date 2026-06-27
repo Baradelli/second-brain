@@ -123,6 +123,8 @@ Sem IA, sem métricas/streaks (isso é MVP 3), sem busca semântica (MVP 4).
       → `tasks/64-tela-revisao-recall.md`
 - [x] **65** — Seção **"Revisões de hoje"** na Agenda (`recallsDue`, empty/lista/overdue/deep-link).
       → `tasks/65-agenda-revisoes-de-hoje.md`
+- [x] **65b** — Fichamento de memória em **duas fases** (escrever sem olhar → comparar) +
+      auto-vínculo `fichamentoNoteId`. → `tasks/65b-fichamento-duas-fases.md`
 
 ### Bloco O — Ensinar para Reter (publicação)
 
