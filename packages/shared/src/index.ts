@@ -13,3 +13,4 @@ export * from './recap.js';
 export * from './resource.js';
 export * from './search.js';
 export * from './settings.js';
+export * from './study-item.js';

@@ -9,8 +9,10 @@ import {
   calendarMonthResponseSchema,
   type CaptureResponse,
   captureResponseSchema,
+  type CreateStudyItemBody,
   type DayClosingResponse,
   dayClosingResponseSchema,
+  type EditStudyItemBody,
   type EventResponse,
   eventResponseSchema,
   type GoalPeriodInput,
@@ -25,9 +27,12 @@ import {
   labelResponseSchema,
   type LoginResponse,
   loginResponseSchema,
+  type LogRecallBody,
   type NoteResponse,
   noteResponseSchema,
   type NoteType,
+  type RecallResponse,
+  recallResponseSchema,
   type RecapScope,
   type ResourceResponse,
   resourceResponseSchema,
@@ -37,6 +42,9 @@ import {
   searchResultSchema,
   type SettingsResponse,
   settingsResponseSchema,
+  type StudyItemResponse,
+  studyItemResponseSchema,
+  type StudyItemStatusInput,
   type SuggestedQuestionsGroupResponse,
   suggestedQuestionsGroupResponseSchema,
   type UpdateSettingsBody,
@@ -59,6 +67,14 @@ const journalEntrySchema = z.object({
   noteId: z.string().optional(),
 });
 
+const agendaRecallSchema = z.object({
+  studyItemId: z.string(),
+  title: z.string(),
+  dueToday: z.boolean(),
+  overdue: z.boolean(),
+  nextRecallAt: z.string().nullable(),
+});
+
 export const todayAgendaSchema = z.object({
   date: z.string(),
   journal: z.object({
@@ -66,12 +82,68 @@ export const todayAgendaSchema = z.object({
     reflection: journalEntrySchema,
   }),
   capturesToReview: z.array(captureResponseSchema),
+  recallsDue: z.array(agendaRecallSchema).default([]),
 });
 
 export type TodayAgenda = z.infer<typeof todayAgendaSchema>;
 
 export function getAgenda(): Promise<TodayAgenda> {
   return get(`/agenda?day=today`, todayAgendaSchema);
+}
+
+// ── Study items / Recalls (Leitura Retentiva) ───────────────────────────────
+
+export type CreateStudyItemInput = Omit<CreateStudyItemBody, 'userId'>;
+export type EditStudyItemInput = Omit<EditStudyItemBody, 'userId'>;
+export type LogRecallInput = Omit<LogRecallBody, 'userId'>;
+
+export function createStudyItem(
+  body: CreateStudyItemInput,
+): Promise<StudyItemResponse> {
+  return post('/study-items', body, studyItemResponseSchema);
+}
+
+export function listStudyItems(params?: {
+  status?: StudyItemStatusInput;
+  resourceId?: string;
+  labelId?: string;
+}): Promise<StudyItemResponse[]> {
+  const qs = new URLSearchParams();
+  if (params?.status) qs.set('status', params.status);
+  if (params?.resourceId) qs.set('resourceId', params.resourceId);
+  if (params?.labelId) qs.set('labelId', params.labelId);
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return get(`/study-items${suffix}`, z.array(studyItemResponseSchema));
+}
+
+export function getStudyItem(id: string): Promise<StudyItemResponse> {
+  return get(`/study-items/${id}`, studyItemResponseSchema);
+}
+
+export function editStudyItem(
+  id: string,
+  body: EditStudyItemInput,
+): Promise<StudyItemResponse> {
+  return patch(`/study-items/${id}`, body, studyItemResponseSchema);
+}
+
+export function archiveStudyItem(id: string): Promise<StudyItemResponse> {
+  return post(`/study-items/${id}/archive`, {}, studyItemResponseSchema);
+}
+
+export function logRecall(
+  studyItemId: string,
+  body: LogRecallInput,
+): Promise<RecallResponse> {
+  return post(
+    `/study-items/${studyItemId}/recalls`,
+    body,
+    recallResponseSchema,
+  );
+}
+
+export function undoRecall(recallId: string): Promise<void> {
+  return del(`/recalls/${recallId}`);
 }
 
 // ── Captures ──────────────────────────────────────────────────────────────────

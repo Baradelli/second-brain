@@ -38,6 +38,12 @@ enum NoteScope {
   YEAR
 }
 
+enum StudyItemStatus {
+  ACTIVE
+  ARCHIVED
+  CONSOLIDATED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -53,6 +59,8 @@ model User {
   resources   Resource[]
   goals       Goal[]
   events      Event[]
+  studyItems  StudyItem[]
+  recalls     Recall[]
 }
 
 model Settings {
@@ -67,23 +75,24 @@ model Settings {
 }
 
 model Label {
-  id        String        @id @default(cuid())
-  userId    String
-  user      User          @relation(fields: [userId], references: [id])
-  name      String
-  parentId  String?
-  parent    Label?        @relation("Tree", fields: [parentId], references: [id])
-  children  Label[]       @relation("Tree")
-  color     String?
-  status    GeneralStatus @default(ACTIVE)
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  name       String
+  parentId   String?
+  parent     Label?        @relation("Tree", fields: [parentId], references: [id])
+  children   Label[]       @relation("Tree")
+  color      String?
+  status     GeneralStatus @default(ACTIVE)
   archivedAt DateTime?
-  createdAt DateTime      @default(now())
+  createdAt  DateTime      @default(now())
 
-  captures  Capture[]       @relation("CaptureLabels")
-  notes     Note[]          @relation("NoteLabels")
-  questions GuideQuestion[]
-  resources Resource[]      @relation("ResourceLabels")
-  goals     Goal[]          @relation("GoalLabels")
+  captures   Capture[]       @relation("CaptureLabels")
+  notes      Note[]          @relation("NoteLabels")
+  questions  GuideQuestion[]
+  resources  Resource[]      @relation("ResourceLabels")
+  goals      Goal[]          @relation("GoalLabels")
+  studyItems StudyItem[]     @relation("StudyItemLabels")
 }
 
 model GuideQuestion {
@@ -134,12 +143,13 @@ model Note {
 
   labels      Label[]      @relation("NoteLabels")
   attachments Attachment[]
+  studyItems  StudyItem[]  @relation("StudyItemFichamento")
 }
 
 model Attachment {
-  id            String  @id @default(cuid())
+  id            String   @id @default(cuid())
   userId        String
-  user          User    @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
   url           String
   type          String // image | pdf | audio | video | other
   mimeType      String?
@@ -170,8 +180,9 @@ model Resource {
   archivedAt  DateTime?
   createdAt   DateTime      @default(now())
 
-  labels Label[] @relation("ResourceLabels")
-  notes  Note[]
+  labels     Label[]     @relation("ResourceLabels")
+  notes      Note[]
+  studyItems StudyItem[]
 }
 
 model Goal {
@@ -213,4 +224,40 @@ model Event {
   occurredAt DateTime // instante UTC; "o dia" é calculado no timezone do Settings
   createdAt  DateTime @default(now())
   // log imutável: sem status/archivedAt. Hard delete SÓ no desfazer-check (Tarefa 32).
+}
+
+// Leitura Retentiva (Bloco N, Tarefa 58). Motor de revisão espaçada + recuperação ativa.
+// StudyItem = unidade de estudo a reter (durável); Recall = log imutável de cada revisão.
+// Agendamento (nextRecallAt/consolidado) é CALCULADO dos Recall (Tarefa 60), nunca guardado.
+
+model StudyItem {
+  id               String          @id @default(cuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id])
+  resourceId       String?
+  resource         Resource?       @relation(fields: [resourceId], references: [id])
+  title            String
+  reference        String? // ex.: "pp. 40–60"
+  questions        Json? // { before: string[]; during: string[]; after: string[] }
+  fichamentoNoteId String? // Note STUDY_NOTE escrita de memória (Práticas 1/6)
+  fichamentoNote   Note?           @relation("StudyItemFichamento", fields: [fichamentoNoteId], references: [id])
+  status           StudyItemStatus @default(ACTIVE)
+  archivedAt       DateTime?
+  createdAt        DateTime        @default(now()) // = dia do fichamento ("mesmo dia" da escada)
+
+  recalls Recall[]
+  labels  Label[]  @relation("StudyItemLabels")
+}
+
+model Recall {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  studyItemId String
+  studyItem   StudyItem @relation(fields: [studyItemId], references: [id])
+  confidence  String // "A"|"B"|"C" (z.enum) — A=sei explicar, B=reconheço, C=não sei
+  note        String? // observação curta opcional
+  occurredAt  DateTime // instante UTC; "o dia" é calculado no timezone do Settings
+  createdAt   DateTime  @default(now())
+  // log imutável: sem status/archivedAt. Hard delete SÓ no desfazer-recall (Tarefa 60).
 }

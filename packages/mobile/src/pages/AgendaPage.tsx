@@ -1,5 +1,13 @@
 import { Card, EmptyState, SectionHeader } from '@cerebro/ui';
-import { ArrowRight, Check, Inbox, Moon, Sunrise, Target } from 'lucide-react';
+import {
+  ArrowRight,
+  Brain,
+  Check,
+  Inbox,
+  Moon,
+  Sunrise,
+  Target,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -239,6 +247,82 @@ export function AgendaPage() {
               <div className="space-y-2.5">
                 {agenda.capturesToReview.slice(0, 3).map((c) => (
                   <CapturePreviewCard key={c.id} text={c.text} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* ── Revisões de hoje ───────────────────────────────────────── */}
+          <section className="px-5 mb-7">
+            <div className="mb-3 flex items-center justify-between">
+              <SectionHeader label={t('agenda.section.reviews')} />
+              {agenda.recallsDue.length > 3 && (
+                <button
+                  type="button"
+                  onClick={() => navigate('/study')}
+                  className="inline-flex items-center gap-1 text-xs font-semibold transition-opacity hover:opacity-70"
+                  style={{ color: 'var(--cerebro-accent)' }}
+                >
+                  {t('agenda.reviews.viewAll', {
+                    count: agenda.recallsDue.length,
+                  })}
+                  <ArrowRight size={13} strokeWidth={2.25} />
+                </button>
+              )}
+            </div>
+
+            {agenda.recallsDue.length === 0 ? (
+              <EmptyState
+                icon={<Brain size={20} strokeWidth={1.75} />}
+                title={t('agenda.reviews.empty')}
+              />
+            ) : (
+              <div className="space-y-2.5">
+                {agenda.recallsDue.slice(0, 3).map((r) => (
+                  <button
+                    key={r.studyItemId}
+                    type="button"
+                    onClick={() => navigate(`/study?review=${r.studyItemId}`)}
+                    data-testid={`review-${r.studyItemId}`}
+                    className="w-full text-left transition-transform duration-150 active:scale-[0.99]"
+                  >
+                    <Card padding="sm">
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                          style={{
+                            backgroundColor: 'var(--cerebro-accent-soft)',
+                            color: 'var(--cerebro-accent)',
+                          }}
+                          aria-hidden
+                        >
+                          <Brain size={18} strokeWidth={1.75} />
+                        </span>
+                        <p
+                          className="min-w-0 flex-1 truncate text-sm font-medium"
+                          style={{ color: 'var(--cerebro-fg)' }}
+                        >
+                          {r.title}
+                        </p>
+                        {r.overdue && (
+                          <span
+                            className="shrink-0 text-[0.6875rem] font-semibold"
+                            style={{
+                              color:
+                                'var(--cerebro-error, var(--cerebro-accent))',
+                            }}
+                          >
+                            {t('agenda.reviews.overdue')}
+                          </span>
+                        )}
+                        <ArrowRight
+                          size={16}
+                          strokeWidth={2.25}
+                          style={{ color: 'var(--cerebro-muted)' }}
+                        />
+                      </div>
+                    </Card>
+                  </button>
                 ))}
               </div>
             )}

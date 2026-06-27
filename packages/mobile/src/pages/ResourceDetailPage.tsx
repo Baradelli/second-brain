@@ -12,6 +12,7 @@ import {
   Trash2,
   Video,
 } from 'lucide-react';
+// GraduationCap is also used as the "study item" entry-point icon below.
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -185,16 +186,27 @@ export function ResourceDetailPage() {
             >
               {t('resource.notes.title')}
             </h2>
-            <Button
-              size="sm"
-              onClick={() =>
-                navigate(`/editor?type=STUDY_NOTE&resourceId=${id}`)
-              }
-              data-testid="new-study-note"
-            >
-              <Plus size={16} strokeWidth={2.25} />
-              {t('resource.notes.new')}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => navigate(`/study?new=1&resourceId=${id}`)}
+                data-testid="new-study-item"
+              >
+                <GraduationCap size={15} strokeWidth={1.85} />
+                {t('study.fromResource')}
+              </Button>
+              <Button
+                size="sm"
+                onClick={() =>
+                  navigate(`/editor?type=STUDY_NOTE&resourceId=${id}`)
+                }
+                data-testid="new-study-note"
+              >
+                <Plus size={16} strokeWidth={2.25} />
+                {t('resource.notes.new')}
+              </Button>
+            </div>
           </div>
 
           {notes.length === 0 ? (

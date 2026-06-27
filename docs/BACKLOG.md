@@ -74,3 +74,82 @@ Sem IA, sem métricas/streaks (isso é MVP 3), sem busca semântica (MVP 4).
 > As specs em `docs/tasks/` são detalhadas **uma de cada vez**, conforme a tarefa se aproxima
 > (para não gerar 18 specs que envelhecem antes do uso). A da Tarefa 25 já está criada.
 > Quando chegar perto de uma tarefa ainda não detalhada, peça para detalhá-la.
+
+---
+
+# Leitura Retentiva (pós-MVP 2)
+
+> Origem: `docs/10-Praticas-de-Leitura-Retentiva.pdf` + pedido do dono. **Design e racional em
+> `docs/LEITURA-RETENTIVA.md`** (leia antes). Três blocos: **N** (motor de revisão espaçada +
+> recuperação ativa), **O** (Ensinar para Reter / publicação) e **P** (Agente IA prompt-first).
+> Mesma ordem do projeto: migração → domínio/UseCases (TDD) → repo/rota → agenda → telas. As specs
+> de fundação do Bloco N (58/59/60) já estão detalhadas; o resto detalha-se ao se aproximar.
+
+## Decisões fechadas (não reabrir sem o dono)
+
+- **Espaçamento por intervalos fixos:** 2 dias → 1 semana → 1 mês, igual para todos os tópicos.
+- **A/B/C é registro metacognitivo** (Prática 7), **não** dirige o intervalo — só prioriza/destaca
+  o que se sabe menos.
+- **Naming (código em inglês):** `StudyItem` (durável) + `Recall` (log imutável). Evita colidir com
+  o "review" do ritual de capturas. UI/conteúdo seguem dizendo "revisão".
+- **`Recall` é log imutável** (sem `status`/`archivedAt`); desfazer = **hard delete** (mesma exceção
+  do `Event`). **`nextRecallAt`/consolidado são calculados**, nunca guardados.
+- **IA = só design neste round** (Bloco P): prompt-first, **modo cheap (copiar prompt) primeiro**,
+  Anthropic SDK depois — mesmos templates. Respeita o **§9 do plano** (espelho, não piloto).
+
+### Bloco N — Motor de Leitura Retentiva
+
+- [x] **58** — Migração Prisma: `StudyItem` + `Recall` + `enum StudyItemStatus` + FKs nullable
+      (`resourceId`, `fichamentoNoteId`, `studyItemId`, `userId`) + m2m `StudyItemLabels`. Migração
+      pura, sem TDD. → `tasks/58-migracao-leitura-retentiva.md`
+      (migração `20260627151117_leitura_retentiva_studyitem_recall`; smoke de contrato com 2 testes)
+- [x] **59** — Domínio + UseCase `createStudyItem` (+ `editStudyItem`/`archiveStudyItem`): valida
+      título, vincula `Resource`/labels/`questions`/`fichamentoNoteId`. TDD estrito (fake repo). →
+      `tasks/59-usecase-criar-study-item.md` (16 testes de UseCase verdes)
+- [x] **60** — Domínio `recall-schedule` (escada fixa, puro — **TDD pesado**) + UseCases `logRecall`
+      (cria `Recall` com `confidence` A/B/C) e `undoRecall` (hard delete). →
+      `tasks/60-usecase-recall-agendamento.md` (20 testes verdes: 10 escada · 7 log · 3 undo)
+- [x] **61** — Repository (`StudyItem` + `Recall`): Prisma + contrato + Schemas Zod em `shared/` +
+      rotas `/study-items` (criar/listar/editar/arquivar) e `/study-items/:id/recalls` (logar/desfazer).
+      → `tasks/61-repo-rota-study-item.md` (schedule embutido no response; contratos + rotas verdes)
+- [x] **62** — Estender `buildTodayAgenda` com `recallsDue` (revisões devidas hoje) — campo novo
+      retrocompatível, reusando o helper de agendamento da 60. → `tasks/62-agenda-recalls-due.md`
+      (`SelectDueRecalls` + agenda/contrato; frontend `todayAgendaSchema` atualizado)
+- [x] **63** — Tela: criar `StudyItem` + **fichamento de memória** a partir de um `Resource`
+      (`StudyItemsPage` + `StudyItemForm` + rota `/study` + nav + entry point no ResourceDetailPage).
+      → `tasks/63-tela-study-item-fichamento.md`
+- [x] **64** — Tela: **revisão do dia** (recall) — `RecallSheet` com prompts de "tente lembrar" +
+      contexto episódico (Prática 8) + A/B/C → `logRecall`; deep-link `?review=`.
+      → `tasks/64-tela-revisao-recall.md`
+- [x] **65** — Seção **"Revisões de hoje"** na Agenda (`recallsDue`, empty/lista/overdue/deep-link).
+      → `tasks/65-agenda-revisoes-de-hoje.md`
+
+### Bloco O — Ensinar para Reter (publicação)
+
+- [ ] **66** — Migração + domínio `Publication` (entidade leve: `sourceType`/`sourceId`, `format`,
+      `status`, `noteId?`). _(detalhar ao chegar)_
+- [ ] **67** — UseCases `createPublication`/`editPublication`/mudar `status` (idea→draft→published)
+  - repo + Zod + rotas `/publications`. _(detalhar ao chegar)_
+- [ ] **68** — **Gatilho de publicação** a partir de fichamento/nota/recap (cria `Publication` em
+      `idea`, em tom de convite). _(detalhar ao chegar)_
+- [ ] **69** — Tela de **pipeline de publicações** (por status) + editar rascunho no editor TipTap.
+      _(detalhar ao chegar)_
+
+### Bloco P — Agente IA (prompt-first; só design neste round)
+
+- [ ] **70** — `PromptBuilder` em `shared/` (templates + interpolação, **puro, TDD**) — habilidade
+      `study.questions` primeiro. _(detalhar ao chegar)_
+- [ ] **71** — Porta `AiRunner` + `CopyPasteRunner` (modo cheap) + UI "Copiar prompt" nas
+      superfícies das habilidades 1–4. _(detalhar ao chegar)_
+- [ ] **72** — Persistir resultado colado como **candidato** a `Note`/`Publication` (com
+      confirmação) + Settings de modo. _(detalhar ao chegar)_
+- [ ] **73** — _(futuro)_ `AnthropicRunner` (modo conectado) reusando os mesmos templates.
+      _(detalhar ao chegar)_
+
+## Definição de "Leitura Retentiva pronta" (Blocos N+O)
+
+Eu leio um capítulo, formulo perguntas antes, **escrevo de memória sem olhar** e comparo. Aquilo
+vira um `StudyItem` que o app me devolve para **revisar em 2 dias, 1 semana e 1 mês**, sempre
+começando por tentar lembrar; marco **A/B/C** e o app destaca o que sei menos. Quando algo vale,
+**viro num rascunho de post/aula** com um clique. Tudo com domínio coberto por testes, sem IA
+obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo **modo cheap**.

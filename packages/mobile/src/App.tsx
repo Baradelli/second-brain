@@ -10,6 +10,7 @@ import {
   BookOpen,
   CalendarDays,
   CalendarRange,
+  GraduationCap,
   Home,
   LogOut,
   Menu,
@@ -79,6 +80,11 @@ function AppShell() {
       to: '/goals',
       icon: <Target size={18} strokeWidth={1.75} />,
       label: t('nav.goals'),
+    },
+    {
+      to: '/study',
+      icon: <GraduationCap size={18} strokeWidth={1.75} />,
+      label: t('nav.study'),
     },
     {
       to: '/notes',

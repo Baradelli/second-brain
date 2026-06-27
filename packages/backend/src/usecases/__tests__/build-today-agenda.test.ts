@@ -4,10 +4,13 @@ import { CaptureRepositoryFake } from '../_fakes/capture-repository-fake.js';
 import { EventRepositoryFake } from '../_fakes/event-repository-fake.js';
 import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
+import { RecallRepositoryFake } from '../_fakes/recall-repository-fake.js';
 import { SettingsReaderFake } from '../_fakes/settings-reader-fake.js';
+import { StudyItemRepositoryFake } from '../_fakes/study-item-repository-fake.js';
 import { BuildTodayAgenda } from '../build-today-agenda.js';
 import { FindNoteOfTheDay } from '../find-note-of-the-day.js';
 import { ListPendingCaptures } from '../list-pending-captures.js';
+import { SelectDueRecalls } from '../select-due-recalls.js';
 import { SelectTodaysGoals } from '../select-todays-goals.js';
 
 // Reference: 2026-06-03 17:00 UTC = 2026-06-03 14:00 BRT (UTC-3)
@@ -51,6 +54,8 @@ describe('BuildTodayAgenda', () => {
   let captureRepo: CaptureRepositoryFake;
   let goalRepo: GoalRepositoryFake;
   let eventRepo: EventRepositoryFake;
+  let studyItemRepo: StudyItemRepositoryFake;
+  let recallRepo: RecallRepositoryFake;
   let settingsReader: SettingsReaderFake;
   let usecase: BuildTodayAgenda;
 
@@ -59,6 +64,8 @@ describe('BuildTodayAgenda', () => {
     captureRepo = new CaptureRepositoryFake();
     goalRepo = new GoalRepositoryFake();
     eventRepo = new EventRepositoryFake();
+    studyItemRepo = new StudyItemRepositoryFake();
+    recallRepo = new RecallRepositoryFake();
     settingsReader = new SettingsReaderFake();
     settingsReader.set(USER_ID, { timezone: TIMEZONE, reviewWeekday: 1 });
     usecase = new BuildTodayAgenda(
@@ -66,6 +73,7 @@ describe('BuildTodayAgenda', () => {
       new FindNoteOfTheDay(noteRepo),
       new ListPendingCaptures(captureRepo),
       new SelectTodaysGoals(goalRepo, eventRepo),
+      new SelectDueRecalls(studyItemRepo, recallRepo),
     );
   });
 
@@ -141,6 +149,7 @@ describe('BuildTodayAgenda', () => {
       new FindNoteOfTheDay(noteRepo),
       new ListPendingCaptures(captureRepo),
       new SelectTodaysGoals(goalRepo, eventRepo),
+      new SelectDueRecalls(studyItemRepo, recallRepo),
     );
 
     const agenda = await agendaUsecase.execute({
@@ -189,7 +198,32 @@ describe('BuildTodayAgenda', () => {
     });
   });
 
-  it('os campos atuais seguem intactos (goals é só acréscimo)', async () => {
+  it('inclui revisões devidas hoje (study item criado há ≥2 dias) em recallsDue', async () => {
+    // createdAt 2026-06-01 12:00 UTC → +2 dias = 2026-06-03, devida no REFERENCE (2026-06-03).
+    await studyItemRepo.save({
+      id: 'si-due',
+      userId: USER_ID,
+      resourceId: null,
+      title: 'Cap. 3',
+      reference: null,
+      questions: null,
+      fichamentoNoteId: null,
+      status: 'ACTIVE',
+      archivedAt: null,
+      createdAt: new Date('2026-06-01T12:00:00.000Z'),
+      labelIds: [],
+    });
+
+    const agenda = await usecase.execute({
+      userId: USER_ID,
+      reference: REFERENCE,
+    });
+
+    expect(agenda.recallsDue).toHaveLength(1);
+    expect(agenda.recallsDue[0]?.studyItemId).toBe('si-due');
+  });
+
+  it('os campos atuais seguem intactos (goals/recallsDue são só acréscimo)', async () => {
     const agenda = await usecase.execute({
       userId: USER_ID,
       reference: REFERENCE,
@@ -197,5 +231,6 @@ describe('BuildTodayAgenda', () => {
     expect(agenda.journal).toBeDefined();
     expect(agenda.capturesToReview).toEqual([]);
     expect(agenda.goals).toEqual([]);
+    expect(agenda.recallsDue).toEqual([]);
   });
 });

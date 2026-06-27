@@ -153,3 +153,31 @@ export class InvalidCredentialsError extends Error {
     this.name = 'InvalidCredentialsError';
   }
 }
+
+export class StudyItemNotFoundError extends Error {
+  constructor(id: string) {
+    super(`StudyItem not found: ${id}`);
+    this.name = 'StudyItemNotFoundError';
+  }
+}
+
+export class InvalidStudyItemError extends Error {
+  constructor(message: string) {
+    super(`Invalid study item: ${message}`);
+    this.name = 'InvalidStudyItemError';
+  }
+}
+
+export class RecallNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Recall not found: ${id}`);
+    this.name = 'RecallNotFoundError';
+  }
+}
+
+export class InvalidRecallError extends Error {
+  constructor(message: string) {
+    super(`Invalid recall: ${message}`);
+    this.name = 'InvalidRecallError';
+  }
+}

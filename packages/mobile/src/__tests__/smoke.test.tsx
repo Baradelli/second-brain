@@ -11,6 +11,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
     date: new Date().toISOString(),
     journal: { devotional: { done: false }, reflection: { done: false } },
     capturesToReview: [],
+    recallsDue: [],
   }),
   createCapture: vi.fn(),
   listActiveGoals: vi.fn().mockResolvedValue([]),

@@ -19,6 +19,7 @@ import { ResourceDetailPage } from './pages/ResourceDetailPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
 import { SearchPage } from './pages/SearchPage.js';
 import { SettingsPage } from './pages/SettingsPage.js';
+import { StudyItemsPage } from './pages/StudyItemsPage.js';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   return isAuthenticated() ? <>{children}</> : <Navigate to="/login" replace />;
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
       { path: 'library', element: <LibraryPage /> },
       { path: 'library/:id', element: <ResourceDetailPage /> },
       { path: 'goals', element: <GoalsPage /> },
+      { path: 'study', element: <StudyItemsPage /> },
       { path: 'day-closing', element: <DayClosingPage /> },
       { path: 'capture', element: <CapturePage /> },
       { path: 'review', element: <ReviewPage /> },

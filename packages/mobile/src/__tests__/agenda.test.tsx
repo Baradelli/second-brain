@@ -49,6 +49,7 @@ function stubAgenda(overrides: object = {}) {
       reflection: { done: false },
     },
     capturesToReview: [],
+    recallsDue: [],
     ...overrides,
   };
 }

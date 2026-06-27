@@ -4,6 +4,8 @@ import type { Capture } from '../domain/capture.js';
 import { FindNoteOfTheDay } from './find-note-of-the-day.js';
 import { ListPendingCaptures } from './list-pending-captures.js';
 import type { SettingsReader } from './ports/settings-reader.js';
+import type { DueRecallItem } from './select-due-recalls.js';
+import { SelectDueRecalls } from './select-due-recalls.js';
 import { SelectTodaysGoals } from './select-todays-goals.js';
 
 export interface BuildTodayAgendaInput {
@@ -26,6 +28,7 @@ export interface TodayAgenda {
   };
   capturesToReview: Capture[];
   goals: AgendaGoal[];
+  recallsDue: DueRecallItem[];
 }
 
 // When the user has no Settings configured, fall back to UTC so the UseCase
@@ -38,6 +41,7 @@ export class BuildTodayAgenda {
     private findNoteOfTheDay: FindNoteOfTheDay,
     private listPendingCaptures: ListPendingCaptures,
     private selectTodaysGoals: SelectTodaysGoals,
+    private selectDueRecalls: SelectDueRecalls,
   ) {}
 
   async execute(input: BuildTodayAgendaInput): Promise<TodayAgenda> {
@@ -54,13 +58,19 @@ export class BuildTodayAgenda {
       timezone,
     };
 
-    const [devotionalNote, reflectionNote, capturesToReview, todaysGoals] =
-      await Promise.all([
-        this.findNoteOfTheDay.execute({ ...noteInput, type: 'DEVOTIONAL' }),
-        this.findNoteOfTheDay.execute({ ...noteInput, type: 'REFLECTION' }),
-        this.listPendingCaptures.execute(noteInput),
-        this.selectTodaysGoals.execute(noteInput),
-      ]);
+    const [
+      devotionalNote,
+      reflectionNote,
+      capturesToReview,
+      todaysGoals,
+      recallsDue,
+    ] = await Promise.all([
+      this.findNoteOfTheDay.execute({ ...noteInput, type: 'DEVOTIONAL' }),
+      this.findNoteOfTheDay.execute({ ...noteInput, type: 'REFLECTION' }),
+      this.listPendingCaptures.execute(noteInput),
+      this.selectTodaysGoals.execute(noteInput),
+      this.selectDueRecalls.execute(noteInput),
+    ]);
 
     return {
       date,
@@ -79,6 +89,7 @@ export class BuildTodayAgenda {
         kind: g.kind,
         resolvedToday: g.resolvedToday,
       })),
+      recallsDue,
     };
   }
 }
