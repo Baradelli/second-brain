@@ -1,10 +1,14 @@
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Sparkles } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import type { CreateStudyItemInput } from '../lib/api/endpoints.js';
+import { parseQuestions } from '../lib/text-to-doc.js';
+import { type PromptRequest, PromptSheet } from './PromptSheet.js';
 
 const studyItemFormSchema = z.object({
   title: z.string().trim().min(1),
@@ -39,11 +43,37 @@ export function StudyItemForm({
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<StudyItemFormValues>({
     resolver: zodResolver(studyItemFormSchema),
     defaultValues: { title: '' },
   });
+
+  const [promptReq, setPromptReq] = useState<PromptRequest | null>(null);
+  const watchedTitle = watch('title');
+  const watchedReference = watch('reference');
+
+  function openQuestionsPrompt() {
+    const title = watchedTitle?.trim();
+    if (!title) return;
+    setPromptReq({
+      skill: 'study.questions',
+      context: {
+        title,
+        reference: watchedReference?.trim() || undefined,
+      },
+      // Resultado colado vira candidato: preenche os campos do form (editáveis); só
+      // persiste quando o usuário salva o item (§9 — nada gravado sem confirmação).
+      apply: (text) => {
+        const q = parseQuestions(text);
+        setValue('before', q.before.join('\n'));
+        setValue('during', q.during.join('\n'));
+        setValue('after', q.after.join('\n'));
+      },
+    });
+  }
 
   const submit = handleSubmit((values) => {
     const before = toLines(values.before);
@@ -102,6 +132,20 @@ export function StudyItemForm({
           className="text-xs font-medium"
           style={{ color: 'var(--cerebro-fg)', opacity: 0.8 }}
         >
+          {t('study.field.questionsDuring')}
+        </span>
+        <textarea
+          className={textareaClass}
+          style={textareaStyle}
+          {...register('during')}
+        />
+      </label>
+
+      <label className="flex flex-col gap-1.5">
+        <span
+          className="text-xs font-medium"
+          style={{ color: 'var(--cerebro-fg)', opacity: 0.8 }}
+        >
           {t('study.field.questionsAfter')}
         </span>
         <textarea
@@ -111,9 +155,22 @@ export function StudyItemForm({
         />
       </label>
 
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={openQuestionsPrompt}
+        disabled={!watchedTitle?.trim()}
+        data-testid="prompt-study-questions"
+      >
+        <Sparkles size={16} strokeWidth={1.85} />
+        {t('ai.skill.study.questions')}
+      </Button>
+
       <Button type="submit" disabled={submitting} className="mt-1">
         {submitting ? t('capture.submitting') : t('common.save')}
       </Button>
+
+      <PromptSheet request={promptReq} onClose={() => setPromptReq(null)} />
     </form>
   );
 }

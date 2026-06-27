@@ -1,19 +1,23 @@
 import type { StudyItemResponse } from '@cerebro/shared';
 import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
-import { BookOpen, Brain, FileText, Plus } from 'lucide-react';
+import { BookOpen, Brain, FileText, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { type PromptRequest, PromptSheet } from '../components/PromptSheet.js';
+import { PublishTrigger } from '../components/PublishTrigger.js';
 import { StudyItemForm } from '../components/StudyItemForm.js';
 import {
   createNote,
   createStudyItem,
   type CreateStudyItemInput,
   editStudyItem,
+  getNoteById,
   listStudyItems,
   logRecall,
 } from '../lib/api/endpoints.js';
+import { textToDoc } from '../lib/text-to-doc.js';
 
 function scheduleBadge(
   item: StudyItemResponse,
@@ -254,7 +258,9 @@ function RecallSheet({
   onCompare: (item: StudyItemResponse) => void;
 }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
+  const [promptReq, setPromptReq] = useState<PromptRequest | null>(null);
 
   async function mark(confidence: 'A' | 'B' | 'C') {
     setSaving(true);
@@ -265,6 +271,45 @@ function RecallSheet({
     }
   }
 
+  // Resultado colado vira uma NOTE candidata, aberta no editor para revisão (§9).
+  async function saveAsNote(itemTitle: string, suffix: string, text: string) {
+    const note = await createNote({
+      type: 'NOTE',
+      doc: textToDoc(text),
+      title: `${itemTitle} — ${suffix}`,
+    });
+    navigate(`/editor/${note.id}`);
+  }
+
+  function openQuizPrompt() {
+    if (!item) return;
+    const topics = item.questions
+      ? [...item.questions.before, ...item.questions.after]
+      : undefined;
+    const title = item.title;
+    setPromptReq({
+      skill: 'study.quiz',
+      context: {
+        title,
+        topics: topics && topics.length > 0 ? topics : undefined,
+      },
+      apply: (text) => saveAsNote(title, t('ai.skill.study.quiz'), text),
+    });
+  }
+
+  // Feedback do fichamento precisa do texto escrito de memória (plainText da Note).
+  async function openFeedbackPrompt() {
+    if (!item?.fichamentoNoteId) return;
+    const note = await getNoteById(item.fichamentoNoteId);
+    const title = item.title;
+    setPromptReq({
+      skill: 'study.fichamento_feedback',
+      context: { title, fichamentoText: note.plainText },
+      apply: (text) =>
+        saveAsNote(title, t('ai.skill.study.fichamento_feedback'), text),
+    });
+  }
+
   const contextPrompts = [
     t('review.context.where'),
     t('review.context.against'),
@@ -272,149 +317,182 @@ function RecallSheet({
   ];
 
   return (
-    <BottomSheet open={item !== null} onClose={onClose}>
-      {item && (
-        <div className="flex flex-col gap-4">
-          <div>
-            <h2
-              className="font-display text-lg font-semibold"
-              style={{ color: 'var(--cerebro-fg)' }}
-            >
-              {item.title}
-            </h2>
-            <p
-              className="mt-1 text-sm font-medium"
-              style={{ color: 'var(--cerebro-accent)' }}
-            >
-              {t('review.tryRecall')}
-            </p>
-            <p
-              className="mt-1 text-sm leading-relaxed"
-              style={{ color: 'var(--cerebro-muted)' }}
-            >
-              {t('review.tryRecall.body')}
-            </p>
-          </div>
+    <>
+      <BottomSheet open={item !== null} onClose={onClose}>
+        {item && (
+          <div className="flex flex-col gap-4">
+            <div>
+              <h2
+                className="font-display text-lg font-semibold"
+                style={{ color: 'var(--cerebro-fg)' }}
+              >
+                {item.title}
+              </h2>
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{ color: 'var(--cerebro-accent)' }}
+              >
+                {t('review.tryRecall')}
+              </p>
+              <p
+                className="mt-1 text-sm leading-relaxed"
+                style={{ color: 'var(--cerebro-muted)' }}
+              >
+                {t('review.tryRecall.body')}
+              </p>
+            </div>
 
-          {item.questions &&
-            (item.questions.before.length > 0 ||
-              item.questions.after.length > 0) && (
-              <div>
-                <h3
-                  className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+            {item.questions &&
+              (item.questions.before.length > 0 ||
+                item.questions.after.length > 0) && (
+                <div>
+                  <h3
+                    className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+                    style={{ color: 'var(--cerebro-muted)' }}
+                  >
+                    {t('review.questions')}
+                  </h3>
+                  <ul
+                    className="mt-1.5 list-disc pl-5 text-sm"
+                    style={{ color: 'var(--cerebro-fg)' }}
+                  >
+                    {[...item.questions.before, ...item.questions.after].map(
+                      (q, idx) => (
+                        <li key={idx}>{q}</li>
+                      ),
+                    )}
+                  </ul>
+                </div>
+              )}
+
+            <div>
+              <h3
+                className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
+                style={{ color: 'var(--cerebro-muted)' }}
+              >
+                {t('review.context')}
+              </h3>
+              <ul
+                className="mt-1.5 list-disc pl-5 text-sm"
+                style={{ color: 'var(--cerebro-muted)' }}
+              >
+                {contextPrompts.map((p, idx) => (
+                  <li key={idx}>{p}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Fichamento de memória — duas fases (Práticas 1/6) */}
+            {!item.fichamentoNoteId ? (
+              <div className="flex flex-col gap-1.5">
+                <p
+                  className="text-sm leading-relaxed"
                   style={{ color: 'var(--cerebro-muted)' }}
                 >
-                  {t('review.questions')}
-                </h3>
-                <ul
-                  className="mt-1.5 list-disc pl-5 text-sm"
-                  style={{ color: 'var(--cerebro-fg)' }}
+                  {t('study.fichamento.blindHint')}
+                </p>
+                <Button
+                  onClick={() => onWriteFichamento(item)}
+                  data-testid="write-fichamento"
                 >
-                  {[...item.questions.before, ...item.questions.after].map(
-                    (q, idx) => (
-                      <li key={idx}>{q}</li>
-                    ),
-                  )}
-                </ul>
+                  <FileText size={16} strokeWidth={1.85} />
+                  {t('study.fichamento.phase1')}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => onWriteFichamento(item)}
+                  data-testid="view-fichamento"
+                  className="flex-1"
+                >
+                  <FileText size={16} strokeWidth={1.85} />
+                  {t('study.fichamento.view')}
+                </Button>
+                {item.resourceId && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => onCompare(item)}
+                    data-testid="compare-fichamento"
+                    className="flex-1"
+                  >
+                    <BookOpen size={16} strokeWidth={1.85} />
+                    {t('study.fichamento.compare')}
+                  </Button>
+                )}
               </div>
             )}
 
-          <div>
-            <h3
-              className="text-[0.6875rem] font-bold uppercase tracking-[0.14em]"
-              style={{ color: 'var(--cerebro-muted)' }}
-            >
-              {t('review.context')}
-            </h3>
-            <ul
-              className="mt-1.5 list-disc pl-5 text-sm"
-              style={{ color: 'var(--cerebro-muted)' }}
-            >
-              {contextPrompts.map((p, idx) => (
-                <li key={idx}>{p}</li>
-              ))}
-            </ul>
-          </div>
+            {/* Ensinar para Reter (Bloco O): convite a virar publicação. */}
+            {item.fichamentoNoteId && (
+              <PublishTrigger
+                source={{ type: 'study_item', id: item.id, title: item.title }}
+                className="w-full"
+              />
+            )}
 
-          {/* Fichamento de memória — duas fases (Práticas 1/6) */}
-          {!item.fichamentoNoteId ? (
-            <div className="flex flex-col gap-1.5">
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: 'var(--cerebro-muted)' }}
-              >
-                {t('study.fichamento.blindHint')}
-              </p>
-              <Button
-                onClick={() => onWriteFichamento(item)}
-                data-testid="write-fichamento"
-              >
-                <FileText size={16} strokeWidth={1.85} />
-                {t('study.fichamento.phase1')}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex gap-2">
+            {/* IA opcional (modo cheap): copiar prompt para colar no próprio chat. */}
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="secondary"
-                onClick={() => onWriteFichamento(item)}
-                data-testid="view-fichamento"
-                className="flex-1"
+                onClick={openQuizPrompt}
+                data-testid="prompt-quiz"
               >
-                <FileText size={16} strokeWidth={1.85} />
-                {t('study.fichamento.view')}
+                <Sparkles size={16} strokeWidth={1.85} />
+                {t('ai.skill.study.quiz')}
               </Button>
-              {item.resourceId && (
+              {item.fichamentoNoteId && (
                 <Button
                   variant="secondary"
-                  onClick={() => onCompare(item)}
-                  data-testid="compare-fichamento"
-                  className="flex-1"
+                  onClick={() => void openFeedbackPrompt()}
+                  data-testid="prompt-fichamento-feedback"
                 >
-                  <BookOpen size={16} strokeWidth={1.85} />
-                  {t('study.fichamento.compare')}
+                  <Sparkles size={16} strokeWidth={1.85} />
+                  {t('ai.skill.study.fichamento_feedback')}
                 </Button>
               )}
             </div>
-          )}
 
-          <div>
-            <h3
-              className="mb-2 text-sm font-medium"
-              style={{ color: 'var(--cerebro-fg)' }}
-            >
-              {t('review.howDidItGo')}
-            </h3>
-            <div className="grid grid-cols-3 gap-2">
-              {(['A', 'B', 'C'] as const).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  disabled={saving}
-                  onClick={() => void mark(c)}
-                  data-testid={`recall-${c}`}
-                  className="flex flex-col items-center gap-1 rounded-[var(--radius-card)] px-2 py-3 text-center transition-transform duration-150 active:scale-[0.97]"
-                  style={{
-                    backgroundColor: 'var(--cerebro-raised)',
-                    border: '1px solid var(--cerebro-border)',
-                    color: 'var(--cerebro-fg)',
-                  }}
-                >
-                  <span className="font-display text-lg font-semibold">
-                    {c}
-                  </span>
-                  <span
-                    className="text-[0.6875rem]"
-                    style={{ color: 'var(--cerebro-muted)' }}
+            <div>
+              <h3
+                className="mb-2 text-sm font-medium"
+                style={{ color: 'var(--cerebro-fg)' }}
+              >
+                {t('review.howDidItGo')}
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                {(['A', 'B', 'C'] as const).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void mark(c)}
+                    data-testid={`recall-${c}`}
+                    className="flex flex-col items-center gap-1 rounded-[var(--radius-card)] px-2 py-3 text-center transition-transform duration-150 active:scale-[0.97]"
+                    style={{
+                      backgroundColor: 'var(--cerebro-raised)',
+                      border: '1px solid var(--cerebro-border)',
+                      color: 'var(--cerebro-fg)',
+                    }}
                   >
-                    {t(`review.confidence.${c}`)}
-                  </span>
-                </button>
-              ))}
+                    <span className="font-display text-lg font-semibold">
+                      {c}
+                    </span>
+                    <span
+                      className="text-[0.6875rem]"
+                      style={{ color: 'var(--cerebro-muted)' }}
+                    >
+                      {t(`review.confidence.${c}`)}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </BottomSheet>
+        )}
+      </BottomSheet>
+      <PromptSheet request={promptReq} onClose={() => setPromptReq(null)} />
+    </>
   );
 }

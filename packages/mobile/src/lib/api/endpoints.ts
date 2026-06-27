@@ -1,4 +1,7 @@
 import {
+  type AiRunRequest,
+  type AiRunResponse,
+  aiRunResponseSchema,
   type ArchivedGoalResponse,
   archivedGoalSchema,
   type AttachmentResponse,
@@ -31,6 +34,11 @@ import {
   type NoteResponse,
   noteResponseSchema,
   type NoteType,
+  type PublicationFormatInput,
+  type PublicationResponse,
+  publicationResponseSchema,
+  type PublicationSourceTypeInput,
+  type PublicationStageInput,
   type RecallResponse,
   recallResponseSchema,
   type RecapScope,
@@ -565,4 +573,63 @@ export async function getTodayNote(
   );
 
   return notes[0] ?? null;
+}
+
+// ── Publications (Ensinar para Reter) ────────────────────────────────────────
+
+export interface ListPublicationsParams {
+  stage?: PublicationStageInput;
+  format?: PublicationFormatInput;
+  status?: 'ACTIVE' | 'ARCHIVED';
+}
+
+export function listPublications(
+  params: ListPublicationsParams = {},
+): Promise<PublicationResponse[]> {
+  const query = new URLSearchParams();
+  if (params.stage) query.set('stage', params.stage);
+  if (params.format) query.set('format', params.format);
+  query.set('status', params.status ?? 'ACTIVE');
+  return get(
+    `/publications?${query.toString()}`,
+    z.array(publicationResponseSchema),
+  );
+}
+
+export function getPublication(id: string): Promise<PublicationResponse> {
+  return get(`/publications/${id}`, publicationResponseSchema);
+}
+
+export interface CreatePublicationBody {
+  sourceType: PublicationSourceTypeInput;
+  sourceId: string;
+  format: PublicationFormatInput;
+  title: string;
+  noteId?: string | null;
+  labelIds?: string[];
+}
+
+export function createPublication(
+  body: CreatePublicationBody,
+): Promise<PublicationResponse> {
+  return post('/publications', body, publicationResponseSchema);
+}
+
+export function editPublication(
+  id: string,
+  body: Partial<Omit<CreatePublicationBody, 'sourceType' | 'sourceId'>> & {
+    stage?: PublicationStageInput;
+  },
+): Promise<PublicationResponse> {
+  return patch(`/publications/${id}`, body, publicationResponseSchema);
+}
+
+export function archivePublication(id: string): Promise<PublicationResponse> {
+  return post(`/publications/${id}/archive`, {}, publicationResponseSchema);
+}
+
+// ── AI (modo conectado) ──────────────────────────────────────────────────────
+
+export function runAi(body: AiRunRequest): Promise<AiRunResponse> {
+  return post('/ai/run', body, aiRunResponseSchema);
 }

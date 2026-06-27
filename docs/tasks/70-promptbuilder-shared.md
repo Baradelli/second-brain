@@ -75,6 +75,6 @@ locale pt/en, skill inválida, e um teste garantindo que `system` menciona os li
 
 ## Definição de pronto
 
-- [ ] `buildPrompt` puro + 4 skills + templates pt/en, exportados de `shared/`.
-- [ ] Testes cobrindo interpolação, opcionais, locale, skill inválida e moldura §9; verdes.
-- [ ] Determinístico (sem relógio/aleatório). Marcar BACKLOG.
+- [x] `buildPrompt` puro + 4 skills + templates pt/en, exportados de `shared/`. (`shared/src/prompt/{index,types,templates.pt,templates.en}.ts`; overloads por skill)
+- [x] Testes cobrindo interpolação, opcionais, locale, skill inválida e moldura §9; verdes. (19 testes em `build-prompt.test.ts`)
+- [x] Determinístico (sem relógio/aleatório). Marcar BACKLOG.

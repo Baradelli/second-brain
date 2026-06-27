@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { PublishTrigger } from '../components/PublishTrigger.js';
 import { createRecap, listNotes } from '../lib/api/endpoints.js';
 
 const SCOPES: RecapScope[] = ['WEEK', 'MONTH', 'YEAR'];
@@ -112,36 +113,51 @@ export function RecapsPage() {
                   />
                 ) : (
                   <div className="space-y-2">
-                    {items.map((note) => (
-                      <button
-                        key={note.id}
-                        type="button"
-                        onClick={() => navigate(`/editor/${note.id}`)}
-                        data-testid={`recap-${note.id}`}
-                        className="w-full text-left"
-                      >
-                        <Card padding="sm">
-                          <p
-                            className="text-sm font-medium capitalize"
-                            style={{ color: 'var(--cerebro-fg)' }}
-                          >
-                            {recapPeriodLabel(note, scope, i18n.language, (d) =>
-                              t('recaps.weekOf', { date: d }),
-                            )}
-                          </p>
-                          <p
-                            className="text-xs"
-                            style={{ color: 'var(--cerebro-muted)' }}
-                          >
-                            {t(
-                              note.type === 'DEVOTIONAL'
-                                ? 'editor.type.devotional'
-                                : 'editor.type.reflection',
-                            )}
-                          </p>
+                    {items.map((note) => {
+                      const periodLabel = recapPeriodLabel(
+                        note,
+                        scope,
+                        i18n.language,
+                        (d) => t('recaps.weekOf', { date: d }),
+                      );
+                      return (
+                        <Card key={note.id} padding="sm">
+                          <div className="flex items-start justify-between gap-3">
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/editor/${note.id}`)}
+                              data-testid={`recap-${note.id}`}
+                              className="min-w-0 flex-1 text-left"
+                            >
+                              <p
+                                className="text-sm font-medium capitalize"
+                                style={{ color: 'var(--cerebro-fg)' }}
+                              >
+                                {periodLabel}
+                              </p>
+                              <p
+                                className="text-xs"
+                                style={{ color: 'var(--cerebro-muted)' }}
+                              >
+                                {t(
+                                  note.type === 'DEVOTIONAL'
+                                    ? 'editor.type.devotional'
+                                    : 'editor.type.reflection',
+                                )}
+                              </p>
+                            </button>
+                            <PublishTrigger
+                              compact
+                              source={{
+                                type: 'recap',
+                                id: note.id,
+                                title: periodLabel,
+                              }}
+                            />
+                          </div>
                         </Card>
-                      </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </section>

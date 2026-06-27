@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Home,
   LogOut,
+  Megaphone,
   Menu,
   NotebookText,
   Plus,
@@ -85,6 +86,11 @@ function AppShell() {
       to: '/study',
       icon: <GraduationCap size={18} strokeWidth={1.75} />,
       label: t('nav.study'),
+    },
+    {
+      to: '/publications',
+      icon: <Megaphone size={18} strokeWidth={1.75} />,
+      label: t('nav.publications'),
     },
     {
       to: '/notes',

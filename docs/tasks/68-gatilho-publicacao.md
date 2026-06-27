@@ -38,6 +38,7 @@ Dado um artefato (fichamento `STUDY_NOTE`, nota qualquer, ou recap), criar uma `
 
 ## Definição de pronto
 
-- [ ] `PublishTrigger` cria `Publication` (`idea`) com formato escolhido, a partir de fichamento e recap.
-- [ ] Tom de convite; i18n pt/en.
-- [ ] Typecheck + build do mobile passam. Marcar BACKLOG.
+- [x] `PublishTrigger` cria `Publication` (`idea`) com formato escolhido, a partir de fichamento e recap.
+      (`components/PublishTrigger.tsx`; RecallSheet da `StudyItemsPage` quando há fichamento; cada recap da `RecapsPage`)
+- [x] Tom de convite; i18n pt/en. (`publish.*` — convite anti-culpa, 5 formatos)
+- [x] Typecheck + build do mobile passam. Marcar BACKLOG. (typecheck limpo; build ok; 123 testes mobile verdes)

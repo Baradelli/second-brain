@@ -35,7 +35,7 @@ Visualizar e mover publicações pelo funil, editar o rascunho e marcar como pub
 
 ## Definição de pronto
 
-- [ ] `PublicationsPage` por stage (idea/draft/published) + filtro de formato + avançar stage +
-      editar rascunho (auto-vínculo de `noteId`) + arquivar.
-- [ ] Rota + nav + i18n pt/en. Typecheck + build do mobile passam.
-- [ ] Marcar BACKLOG. **Fim do Bloco O.**
+- [x] `PublicationsPage` por stage (idea/draft/published) + filtro de formato + avançar stage +
+      editar rascunho (auto-vínculo de `noteId`) + arquivar. (`pages/PublicationsPage.tsx`)
+- [x] Rota + nav + i18n pt/en. Typecheck + build do mobile passam. (rota `/publications`; nav "Publicações"; `publish.*`/`nav.publications`)
+- [x] Marcar BACKLOG. **Fim do Bloco O.** (123 testes mobile verdes; typecheck + build limpos)

@@ -42,6 +42,9 @@ confirma. E registrar a preferência de **modo** do agente.
 
 ## Definição de pronto
 
-- [ ] Colar resultado → **prévia editável** → confirmação → vira `questions`/`Note`/rascunho de `Publication`.
-- [ ] `Settings.aiMode` (migração + shared + toggle na tela), default `cheap`.
-- [ ] i18n pt/en. Typecheck/testes/build passam. Marcar BACKLOG.
+- [x] Colar resultado → **prévia editável** → confirmação → vira `questions`/`Note`/rascunho de `Publication`.
+      (passo "colar" no `PromptSheet` com `apply`; study.questions→preenche o form; quiz/feedback→NOTE no editor; publish.draft→rascunho da Publication)
+- [x] `Settings.aiMode` (migração + shared + toggle na tela), default `cheap`.
+      (migração `settings_ai_mode`; `domain/settings`+repo+rota+`shared/settings`; toggle na `SettingsPage`)
+- [x] i18n pt/en. Typecheck/testes/build passam. Marcar BACKLOG.
+      (`ai.paste.*`/`settings.ai.*`; backend 368u/169i, shared 19, mobile 123 verdes; builds limpos)

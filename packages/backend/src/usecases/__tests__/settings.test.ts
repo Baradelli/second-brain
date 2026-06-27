@@ -22,6 +22,7 @@ describe('GetSettings', () => {
       timezone: 'America/Sao_Paulo',
       devotionalTime: '07:00',
       reflectionTime: '21:00',
+      aiMode: 'cheap',
     });
   });
 

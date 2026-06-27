@@ -14,6 +14,7 @@ function toResponse(s: Settings) {
     timezone: s.timezone,
     devotionalTime: s.devotionalTime,
     reflectionTime: s.reflectionTime,
+    aiMode: s.aiMode,
   };
 }
 

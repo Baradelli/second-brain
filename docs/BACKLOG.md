@@ -128,25 +128,33 @@ Sem IA, sem métricas/streaks (isso é MVP 3), sem busca semântica (MVP 4).
 
 ### Bloco O — Ensinar para Reter (publicação)
 
-- [ ] **66** — Migração + domínio `Publication` (`sourceType`/`sourceId`, `format`, `stage`
+- [x] **66** — Migração + domínio `Publication` (`sourceType`/`sourceId`, `format`, `stage`
       idea/draft/published, `status` soft-delete, `noteId?`). → `tasks/66-migracao-dominio-publication.md`
-- [ ] **67** — UseCases create/edit/archive/list + repo Prisma + contrato + Zod + rotas
+      (migração `20260627164943_publication`; `domain/publication.ts`; smoke de contrato com 2 testes)
+- [x] **67** — UseCases create/edit/archive/list + repo Prisma + contrato + Zod + rotas
       `/publications` (edit move `stage`; published seta `publishedAt`). → `tasks/67-usecases-repo-rota-publication.md`
-- [ ] **68** — **Gatilho de publicação** a partir de fichamento/nota/recap (`PublishTrigger` cria
+      (26 testes de UseCase; contrato Prisma + 6 testes de rota; `shared/publication.ts`; endpoints no frontend)
+- [x] **68** — **Gatilho de publicação** a partir de fichamento/nota/recap (`PublishTrigger` cria
       `Publication` em `idea`, em tom de convite). → `tasks/68-gatilho-publicacao.md`
-- [ ] **69** — Tela de **pipeline de publicações** (idea/draft/published) + editar rascunho no editor
+      (`components/PublishTrigger.tsx`; instâncias em `StudyItemsPage`/`RecapsPage`; i18n `publish.*`)
+- [x] **69** — Tela de **pipeline de publicações** (idea/draft/published) + editar rascunho no editor
       (auto-vínculo de `noteId`). → `tasks/69-tela-pipeline-publicacoes.md`
+      (`pages/PublicationsPage.tsx` + rota `/publications` + nav "Publicações"; filtro de formato, avançar stage, editar/arquivar)
 
 ### Bloco P — Agente IA (prompt-first)
 
-- [ ] **70** — `PromptBuilder` em `shared/` (templates + interpolação, **puro, TDD**; 4 skills, pt/en,
+- [x] **70** — `PromptBuilder` em `shared/` (templates + interpolação, **puro, TDD**; 4 skills, pt/en,
       moldura §9). → `tasks/70-promptbuilder-shared.md`
-- [ ] **71** — Modo **cheap**: `PromptSheet` "Copiar prompt" nas 4 superfícies (frontend; sem chave,
+      (`shared/src/prompt/` — `buildPrompt` + types + templates pt/en; 19 testes verdes)
+- [x] **71** — Modo **cheap**: `PromptSheet` "Copiar prompt" nas 4 superfícies (frontend; sem chave,
       sem custo). → `tasks/71-modo-cheap-copiar-prompt.md`
-- [ ] **72** — **Colar resultado** → prévia editável → confirmação vira `questions`/`Note`/rascunho;
+      (`components/PromptSheet.tsx`; ligado a study.questions/quiz/fichamento_feedback/publish.draft; i18n `ai.*`)
+- [x] **72** — **Colar resultado** → prévia editável → confirmação vira `questions`/`Note`/rascunho;
       `Settings.aiMode` (cheap/connected, default cheap). → `tasks/72-colar-resultado-candidato.md`
-- [ ] **73** — _(futuro)_ Modo **conectado**: porta `AiRunner` + `AnthropicRunner` + `POST /ai/run`,
+      (passo "colar" no `PromptSheet` + `apply` por superfície; migração `settings_ai_mode` + shared + toggle na `SettingsPage`)
+- [x] **73** — Modo **conectado**: porta `AiRunner` + `AnthropicRunner` + `POST /ai/run`,
       reusando os templates; chave só no servidor. → `tasks/73-modo-conectado-anthropic.md`
+      (`run-ai-skill` TDD + fake; `copy-paste`/`anthropic` runners (`claude-opus-4-8`); rota respeita `Settings.aiMode`; PromptSheet "Gerar com IA"; smoke live ✓)
 
 ## Definição de "Leitura Retentiva pronta" (Blocos N+O)
 

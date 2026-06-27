@@ -14,6 +14,7 @@ import { LabelsPage } from './pages/LabelsPage.js';
 import { LibraryPage } from './pages/LibraryPage.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { NotesPage } from './pages/NotesPage.js';
+import { PublicationsPage } from './pages/PublicationsPage.js';
 import { RecapsPage } from './pages/RecapsPage.js';
 import { ResourceDetailPage } from './pages/ResourceDetailPage.js';
 import { ReviewPage } from './pages/ReviewPage.js';
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
       { path: 'library/:id', element: <ResourceDetailPage /> },
       { path: 'goals', element: <GoalsPage /> },
       { path: 'study', element: <StudyItemsPage /> },
+      { path: 'publications', element: <PublicationsPage /> },
       { path: 'day-closing', element: <DayClosingPage /> },
       { path: 'capture', element: <CapturePage /> },
       { path: 'review', element: <ReviewPage /> },

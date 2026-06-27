@@ -37,6 +37,6 @@ Em cada superfície relevante, um botão "Copiar prompt" que abre uma folha com 
 
 ## Definição de pronto
 
-- [ ] `PromptSheet` montando prompt via `buildPrompt` + copiar para área de transferência.
-- [ ] Ligado às 4 superfícies (questions, fichamento_feedback, quiz, publish.draft).
-- [ ] i18n pt/en. Typecheck + build do mobile passam. Marcar BACKLOG.
+- [x] `PromptSheet` montando prompt via `buildPrompt` + copiar para área de transferência. (`components/PromptSheet.tsx`; system recolhível; clipboard com fallback)
+- [x] Ligado às 4 superfícies (questions, fichamento_feedback, quiz, publish.draft). (StudyItemForm → questions; RecallSheet → quiz + fichamento_feedback; PublicationsPage → publish.draft)
+- [x] i18n pt/en. Typecheck + build do mobile passam. Marcar BACKLOG. (`ai.*`; 123 testes mobile verdes)

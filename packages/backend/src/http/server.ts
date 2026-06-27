@@ -14,6 +14,7 @@ import {
 } from 'fastify-type-provider-zod';
 
 import { agendaRoutes } from '../routes/agenda-routes.js';
+import { aiRoutes } from '../routes/ai-routes.js';
 import { attachmentRoutes } from '../routes/attachment-routes.js';
 import { authRoutes } from '../routes/auth-routes.js';
 import { calendarRoutes } from '../routes/calendar-routes.js';
@@ -24,6 +25,7 @@ import { goalRoutes } from '../routes/goal-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
+import { publicationRoutes } from '../routes/publication-routes.js';
 import { recapRoutes } from '../routes/recap-routes.js';
 import { resourceRoutes } from '../routes/resource-routes.js';
 import { searchRoutes } from '../routes/search-routes.js';
@@ -103,6 +105,8 @@ export async function buildServer() {
     await api.register(recapRoutes, { prisma });
     await api.register(settingsRoutes, { prisma });
     await api.register(studyItemRoutes, { prisma });
+    await api.register(publicationRoutes, { prisma });
+    await api.register(aiRoutes, { prisma });
   });
 
   return app;

@@ -56,7 +56,7 @@ Integração nos caminhos críticos (criar; avançar para published seta publish
 
 ## Definição de pronto
 
-- [ ] UseCases com testes (fake) cobrindo as regras (incl. `publishedAt`).
-- [ ] Repository Prisma + contrato verdes; Zod em `shared/`.
-- [ ] Rotas registradas + integração nos caminhos críticos; endpoints no frontend.
-- [ ] `unit` + `integration` verdes; sem tela. Marcar BACKLOG.
+- [x] UseCases com testes (fake) cobrindo as regras (incl. `publishedAt`). (26 testes: create 7, edit 10, archive 4, list 5)
+- [x] Repository Prisma + contrato verdes; Zod em `shared/`. (`prisma-publication-repository` + 11 testes de contrato; `shared/publication.ts`)
+- [x] Rotas registradas + integração nos caminhos críticos; endpoints no frontend. (`publication-routes` + 6 testes; `endpoints.ts`)
+- [x] `unit` + `integration` verdes; sem tela. Marcar BACKLOG. (368 unit / 169 integration)

@@ -1,3 +1,4 @@
+export * from './ai.js';
 export * from './attachment.js';
 export * from './auth.js';
 export * from './calendar.js';
@@ -9,6 +10,8 @@ export * from './goal.js';
 export * from './guide-question.js';
 export * from './label.js';
 export * from './note.js';
+export * from './prompt/index.js';
+export * from './publication.js';
 export * from './recap.js';
 export * from './resource.js';
 export * from './search.js';

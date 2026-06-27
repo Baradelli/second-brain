@@ -199,6 +199,27 @@ export function SettingsPage() {
             />
           </Field>
 
+          <Field
+            label={t('settings.ai.mode')}
+            help={t('settings.ai.mode.help')}
+          >
+            <select
+              className={selectClass}
+              style={fieldStyle}
+              value={settings.aiMode}
+              onChange={(e) =>
+                set('aiMode', e.target.value as SettingsResponse['aiMode'])
+              }
+              aria-label={t('settings.ai.mode')}
+              data-testid="settings-ai-mode"
+            >
+              <option value="cheap">{t('settings.ai.mode.cheap')}</option>
+              <option value="connected">
+                {t('settings.ai.mode.connected')}
+              </option>
+            </select>
+          </Field>
+
           <div className="flex items-center gap-3 pt-1">
             <Button
               onClick={() => void handleSave()}

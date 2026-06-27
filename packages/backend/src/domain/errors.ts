@@ -181,3 +181,17 @@ export class InvalidRecallError extends Error {
     this.name = 'InvalidRecallError';
   }
 }
+
+export class PublicationNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Publication not found: ${id}`);
+    this.name = 'PublicationNotFoundError';
+  }
+}
+
+export class InvalidPublicationError extends Error {
+  constructor(message: string) {
+    super(`Invalid publication: ${message}`);
+    this.name = 'InvalidPublicationError';
+  }
+}

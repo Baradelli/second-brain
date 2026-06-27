@@ -113,7 +113,10 @@ Migração pura (sem TDD de regra). Smoke de contrato
 
 ## Definição de pronto
 
-- [ ] Schema + migração aplicada limpa; `prisma generate` tipa `Publication`.
-- [ ] Domínio `Publication` com `stage` (pipeline) e `status` (soft delete) separados.
-- [ ] Smoke de contrato verde. Sem UseCase/Zod/rota/tela.
-- [ ] Marcar BACKLOG + reportar.
+- [x] Schema + migração aplicada limpa; `prisma generate` tipa `Publication`.
+      (`20260627164943_publication`)
+- [x] Domínio `Publication` com `stage` (pipeline) e `status` (soft delete) separados.
+      (`src/domain/publication.ts`)
+- [x] Smoke de contrato verde. Sem UseCase/Zod/rota/tela.
+      (`leitura-retentiva-publication-schema.contract.integration.test.ts`, 2 testes)
+- [x] Marcar BACKLOG + reportar.

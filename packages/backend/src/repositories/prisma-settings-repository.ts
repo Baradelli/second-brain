@@ -13,6 +13,7 @@ function toDomain(s: {
   timezone: string;
   devotionalTime: string;
   reflectionTime: string;
+  aiMode: string;
 }): Settings {
   return {
     userId: s.userId,
@@ -21,6 +22,7 @@ function toDomain(s: {
     timezone: s.timezone,
     devotionalTime: s.devotionalTime,
     reflectionTime: s.reflectionTime,
+    aiMode: s.aiMode as Settings['aiMode'],
   };
 }
 

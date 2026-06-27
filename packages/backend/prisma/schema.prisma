@@ -51,16 +51,17 @@ model User {
   passwordHash String? // bcrypt; nulo enquanto a conta não tem senha definida
   createdAt    DateTime @default(now())
 
-  settings    Settings?
-  captures    Capture[]
-  notes       Note[]
-  labels      Label[]
-  attachments Attachment[]
-  resources   Resource[]
-  goals       Goal[]
-  events      Event[]
-  studyItems  StudyItem[]
-  recalls     Recall[]
+  settings     Settings?
+  captures     Capture[]
+  notes        Note[]
+  labels       Label[]
+  attachments  Attachment[]
+  resources    Resource[]
+  goals        Goal[]
+  events       Event[]
+  studyItems   StudyItem[]
+  recalls      Recall[]
+  publications Publication[]
 }
 
 model Settings {
@@ -72,6 +73,7 @@ model Settings {
   timezone       String @default("America/Sao_Paulo")
   devotionalTime String @default("07:00") // HH:mm (validado na API)
   reflectionTime String @default("21:00") // HH:mm (validado na API)
+  aiMode         String @default("cheap") // "cheap"|"connected" (z.enum) — modo do agente (Bloco P)
 }
 
 model Label {
@@ -87,12 +89,13 @@ model Label {
   archivedAt DateTime?
   createdAt  DateTime      @default(now())
 
-  captures   Capture[]       @relation("CaptureLabels")
-  notes      Note[]          @relation("NoteLabels")
-  questions  GuideQuestion[]
-  resources  Resource[]      @relation("ResourceLabels")
-  goals      Goal[]          @relation("GoalLabels")
-  studyItems StudyItem[]     @relation("StudyItemLabels")
+  captures     Capture[]       @relation("CaptureLabels")
+  notes        Note[]          @relation("NoteLabels")
+  questions    GuideQuestion[]
+  resources    Resource[]      @relation("ResourceLabels")
+  goals        Goal[]          @relation("GoalLabels")
+  studyItems   StudyItem[]     @relation("StudyItemLabels")
+  publications Publication[]   @relation("PublicationLabels")
 }
 
 model GuideQuestion {
@@ -141,9 +144,10 @@ model Note {
   archivedAt DateTime?
   createdAt  DateTime      @default(now())
 
-  labels      Label[]      @relation("NoteLabels")
-  attachments Attachment[]
-  studyItems  StudyItem[]  @relation("StudyItemFichamento")
+  labels       Label[]       @relation("NoteLabels")
+  attachments  Attachment[]
+  studyItems   StudyItem[]   @relation("StudyItemFichamento")
+  publications Publication[] @relation("PublicationDraft")
 }
 
 model Attachment {
@@ -260,4 +264,27 @@ model Recall {
   occurredAt  DateTime // instante UTC; "o dia" é calculado no timezone do Settings
   createdAt   DateTime  @default(now())
   // log imutável: sem status/archivedAt. Hard delete SÓ no desfazer-recall (Tarefa 60).
+}
+
+// Leitura Retentiva (Bloco O, Tarefa 66). "Ensinar para Reter": rascunho de post/aula/vídeo
+// derivado de um artefato de estudo. Mirror estrutural de Resource: stage (pipeline) ≠ status
+// (soft delete). Fonte polimórfica leve (sourceType/sourceId, sem FK). Rascunho reusa Note.
+
+model Publication {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  sourceType  String // "study_item"|"note"|"resource"|"recap" (z.enum)
+  sourceId    String // id da fonte (sem FK — fonte heterogênea, como Capture.promotedToId)
+  format      String // "linkedin"|"substack"|"blog"|"lesson"|"video" (z.enum)
+  stage       String        @default("idea") // "idea"|"draft"|"published" (z.enum)
+  title       String
+  noteId      String? // rascunho (TipTap) reaproveitando Note
+  note        Note?         @relation("PublicationDraft", fields: [noteId], references: [id])
+  publishedAt DateTime? // preenchido quando stage vira "published" (regra de aplicação, Tarefa 67)
+  status      GeneralStatus @default(ACTIVE)
+  archivedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  labels Label[] @relation("PublicationLabels")
 }
