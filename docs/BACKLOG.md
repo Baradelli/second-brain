@@ -128,25 +128,25 @@ Sem IA, sem métricas/streaks (isso é MVP 3), sem busca semântica (MVP 4).
 
 ### Bloco O — Ensinar para Reter (publicação)
 
-- [ ] **66** — Migração + domínio `Publication` (entidade leve: `sourceType`/`sourceId`, `format`,
-      `status`, `noteId?`). _(detalhar ao chegar)_
-- [ ] **67** — UseCases `createPublication`/`editPublication`/mudar `status` (idea→draft→published)
-  - repo + Zod + rotas `/publications`. _(detalhar ao chegar)_
-- [ ] **68** — **Gatilho de publicação** a partir de fichamento/nota/recap (cria `Publication` em
-      `idea`, em tom de convite). _(detalhar ao chegar)_
-- [ ] **69** — Tela de **pipeline de publicações** (por status) + editar rascunho no editor TipTap.
-      _(detalhar ao chegar)_
+- [ ] **66** — Migração + domínio `Publication` (`sourceType`/`sourceId`, `format`, `stage`
+      idea/draft/published, `status` soft-delete, `noteId?`). → `tasks/66-migracao-dominio-publication.md`
+- [ ] **67** — UseCases create/edit/archive/list + repo Prisma + contrato + Zod + rotas
+      `/publications` (edit move `stage`; published seta `publishedAt`). → `tasks/67-usecases-repo-rota-publication.md`
+- [ ] **68** — **Gatilho de publicação** a partir de fichamento/nota/recap (`PublishTrigger` cria
+      `Publication` em `idea`, em tom de convite). → `tasks/68-gatilho-publicacao.md`
+- [ ] **69** — Tela de **pipeline de publicações** (idea/draft/published) + editar rascunho no editor
+      (auto-vínculo de `noteId`). → `tasks/69-tela-pipeline-publicacoes.md`
 
-### Bloco P — Agente IA (prompt-first; só design neste round)
+### Bloco P — Agente IA (prompt-first)
 
-- [ ] **70** — `PromptBuilder` em `shared/` (templates + interpolação, **puro, TDD**) — habilidade
-      `study.questions` primeiro. _(detalhar ao chegar)_
-- [ ] **71** — Porta `AiRunner` + `CopyPasteRunner` (modo cheap) + UI "Copiar prompt" nas
-      superfícies das habilidades 1–4. _(detalhar ao chegar)_
-- [ ] **72** — Persistir resultado colado como **candidato** a `Note`/`Publication` (com
-      confirmação) + Settings de modo. _(detalhar ao chegar)_
-- [ ] **73** — _(futuro)_ `AnthropicRunner` (modo conectado) reusando os mesmos templates.
-      _(detalhar ao chegar)_
+- [ ] **70** — `PromptBuilder` em `shared/` (templates + interpolação, **puro, TDD**; 4 skills, pt/en,
+      moldura §9). → `tasks/70-promptbuilder-shared.md`
+- [ ] **71** — Modo **cheap**: `PromptSheet` "Copiar prompt" nas 4 superfícies (frontend; sem chave,
+      sem custo). → `tasks/71-modo-cheap-copiar-prompt.md`
+- [ ] **72** — **Colar resultado** → prévia editável → confirmação vira `questions`/`Note`/rascunho;
+      `Settings.aiMode` (cheap/connected, default cheap). → `tasks/72-colar-resultado-candidato.md`
+- [ ] **73** — _(futuro)_ Modo **conectado**: porta `AiRunner` + `AnthropicRunner` + `POST /ai/run`,
+      reusando os templates; chave só no servidor. → `tasks/73-modo-conectado-anthropic.md`
 
 ## Definição de "Leitura Retentiva pronta" (Blocos N+O)
 
