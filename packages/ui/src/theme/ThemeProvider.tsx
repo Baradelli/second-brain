@@ -4,10 +4,11 @@ import { type Theme, ThemeContext } from './ThemeContext.js';
 
 const STORAGE_KEY = 'cerebro-theme';
 
-function getInitialTheme(): Theme {
+function getInitialTheme(defaultTheme?: Theme): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'dark' || stored === 'light') return stored;
+    if (defaultTheme) return defaultTheme;
     if (window.matchMedia('(prefers-color-scheme: dark)').matches)
       return 'dark';
   } catch {
@@ -16,8 +17,16 @@ function getInitialTheme(): Theme {
   return 'light';
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+export function ThemeProvider({
+  children,
+  defaultTheme,
+}: {
+  children: ReactNode;
+  defaultTheme?: Theme;
+}) {
+  const [theme, setTheme] = useState<Theme>(() =>
+    getInitialTheme(defaultTheme),
+  );
 
   useEffect(() => {
     const root = document.documentElement;

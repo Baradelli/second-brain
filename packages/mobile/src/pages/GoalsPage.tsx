@@ -4,6 +4,20 @@ import type {
   GoalResponse,
 } from '@cerebro/shared';
 import {
+  archiveGoal,
+  checkGoal,
+  completeGoal,
+  createGoal,
+  type CreateGoalBody,
+  deleteGoal,
+  editGoal,
+  getGoalProgress,
+  listActiveGoals,
+  listArchivedGoals,
+  unarchiveGoal,
+  undoCheck,
+} from '@cerebro/shared/client';
+import {
   BottomSheet,
   Button,
   Card,
@@ -17,20 +31,6 @@ import { useTranslation } from 'react-i18next';
 
 import { GoalForm } from '../components/GoalForm.js';
 import { LabelFilter } from '../components/LabelFilter.js';
-import {
-  archiveGoal,
-  checkGoal,
-  completeGoal,
-  createGoal,
-  type CreateGoalBody,
-  deleteGoal,
-  editGoal,
-  getGoalProgress,
-  listActiveGoals,
-  listArchivedGoals,
-  unarchiveGoal,
-  undoCheck,
-} from '../lib/api/endpoints.js';
 
 export function GoalsPage() {
   const { t } = useTranslation();

@@ -1,16 +1,16 @@
+import { i18n } from '@cerebro/ui';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { LabelFilter } from '../components/LabelFilter.js';
-import i18n from '../lib/i18n/index.js';
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   listLabels: vi.fn(),
 }));
 
-import * as endpoints from '../lib/api/endpoints.js';
+import * as endpoints from '@cerebro/shared/client';
 
 function labelNode(id: string, name: string) {
   return {

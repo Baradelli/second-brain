@@ -7,12 +7,14 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./theme.css": "./src/theme.css"
+    "./theme.css": "./src/theme.css",
+    "./editor.css": "./src/editor.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@cerebro/shared": "workspace:*",
     "@tiptap/core": "^2.10.0",
     "@tiptap/extension-color": "^2.10.0",
     "@tiptap/extension-details": "^2.10.0",
@@ -33,7 +35,9 @@
     "@tiptap/react": "^2.10.0",
     "@tiptap/starter-kit": "^2.10.0",
     "@tiptap/suggestion": "^2.10.0",
+    "i18next": "^23.15.0",
     "lucide-react": "^1.17.0",
+    "react-i18next": "^15.0.0",
     "tippy.js": "^6.3.7"
   },
   "peerDependencies": {

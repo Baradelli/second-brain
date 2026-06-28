@@ -1,6 +1,6 @@
 import type { NoteType } from '@cerebro/shared';
+import { createCapture, createNote, editNote } from '@cerebro/shared/client';
 
-import { createCapture, createNote, editNote } from '../api/endpoints.js';
 import { OfflineQueue } from './queue.js';
 import { processQueue, type SyncResult } from './sync.js';
 import type { OfflineApi } from './types.js';

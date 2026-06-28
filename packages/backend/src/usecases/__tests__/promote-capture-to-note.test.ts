@@ -6,6 +6,7 @@ import {
   CaptureNotFoundError,
 } from '../../domain/errors.js';
 import { CaptureRepositoryFake } from '../_fakes/capture-repository-fake.js';
+import { NoteLinkRepositoryFake } from '../_fakes/note-link-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { CreateNote } from '../create-note.js';
 import { PromoteCaptureToNote } from '../promote-capture-to-note.js';
@@ -42,7 +43,7 @@ describe('PromoteCaptureToNote', () => {
   beforeEach(async () => {
     captureRepo = new CaptureRepositoryFake();
     noteRepo = new NoteRepositoryFake();
-    createNote = new CreateNote(noteRepo);
+    createNote = new CreateNote(noteRepo, new NoteLinkRepositoryFake());
     usecase = new PromoteCaptureToNote(captureRepo, createNote);
     await captureRepo.save({ ...BASE_CAPTURE });
   });

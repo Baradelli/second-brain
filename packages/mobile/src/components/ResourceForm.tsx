@@ -1,4 +1,5 @@
 import type { ResourceResponse } from '@cerebro/shared';
+import type { CreateResourceBody } from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -6,7 +7,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import type { CreateResourceBody } from '../lib/api/endpoints.js';
 import { LabelPicker } from './LabelPicker.js';
 
 const RESOURCE_TYPES = [

@@ -1,4 +1,5 @@
 import type { NoteResponse, NoteType, ResourceResponse } from '@cerebro/shared';
+import { archiveNote, listNotes, listResources } from '@cerebro/shared/client';
 import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -6,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { LabelFilter } from '../components/LabelFilter.js';
-import { archiveNote, listNotes, listResources } from '../lib/api/endpoints.js';
 
 const NOTE_TYPES: { type: NoteType; labelKey: string; color: string }[] = [
   {

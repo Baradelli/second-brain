@@ -1,4 +1,5 @@
 import type { GoalResponse } from '@cerebro/shared';
+import type { CreateGoalBody } from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -6,7 +7,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import type { CreateGoalBody } from '../lib/api/endpoints.js';
 import { LabelPicker } from './LabelPicker.js';
 
 const GOAL_TYPES = ['HABIT', 'TARGET', 'PROJECT', 'UMBRELLA'] as const;

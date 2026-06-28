@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import i18n from 'i18next';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import i18n from '../lib/i18n/index.js';
 import { DayDetailPage } from '../pages/DayDetailPage.js';
 
 vi.mock('@cerebro/ui', () => ({
@@ -24,11 +24,11 @@ vi.mock('react-router-dom', () => ({
   useParams: () => ({ date: '2026-06-03' }),
 }));
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   getDayDetail: vi.fn(),
 }));
 
-import * as endpoints from '../lib/api/endpoints.js';
+import * as endpoints from '@cerebro/shared/client';
 
 beforeEach(() => {
   vi.clearAllMocks();

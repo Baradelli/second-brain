@@ -1,39 +1,45 @@
-/* ── Design tokens — "Mono / Tinta" ─────────────────────────────────────────
- * Paleta preto e branco minimalista: papel quase branco + tinta, acento = a
- * própria tinta (sem cor). Verde/vermelho discretos só para status (feito/erro).
- * Importado por cada app via @cerebro/ui/theme.css.
+/* ── Design tokens — "Verde de Estudo" ──────────────────────────────────────
+ * Papel quase branco levemente esverdeado + tinta; acento verde profundo (foco,
+ * crescimento, descanso visual em leitura longa). Tipos de nota são CATEGÓRICOS
+ * (matizes distintos harmonizados), não mais tons de cinza. Verde/vermelho de
+ * status afastados do verde da marca. Importado por cada app via
+ * @cerebro/ui/theme.css.
  */
 
 :root {
   /* Surfaces */
-  --cerebro-bg: #f6f6f6; /* papel */
+  --cerebro-bg: #f5f6f2; /* papel (off-white levemente esverdeado) */
   --cerebro-card: #ffffff; /* página */
   --cerebro-raised: #ffffff; /* elementos elevados / inputs em foco */
 
   /* Ink */
-  --cerebro-fg: #18181b; /* tinta */
-  --cerebro-muted: #6b6b70; /* tinta esmaecida (datas, legendas) */
-  --cerebro-faint: #a6a6ac; /* tinta bem clara (placeholders) */
+  --cerebro-fg: #18211c; /* tinta */
+  --cerebro-muted: #566159; /* tinta esmaecida (datas, legendas) — ≥4.5:1 no papel */
+  --cerebro-faint: #8a948e; /* tinta bem clara (placeholders) */
 
   /* Lines */
-  --cerebro-border: rgba(24, 24, 27, 0.1);
-  --cerebro-border-strong: rgba(24, 24, 27, 0.16);
+  --cerebro-border: rgba(24, 33, 28, 0.1);
+  --cerebro-border-strong: rgba(24, 33, 28, 0.16);
 
-  /* Accent — tinta (monocromático) */
-  --cerebro-accent: #18181b;
-  --cerebro-accent-strong: #000000;
-  --cerebro-accent-soft: rgba(24, 24, 27, 0.07);
+  /* Accent — verde de estudo */
+  --cerebro-accent: #2f6b4f;
+  --cerebro-accent-strong: #245840;
+  --cerebro-accent-soft: rgba(47, 107, 79, 0.1);
   --cerebro-on-accent: #ffffff;
 
-  /* Tipos de nota (escala de cinza) */
-  --cerebro-devotional: #18181b;
-  --cerebro-reflection: #52525b;
-  --cerebro-study: #71717a;
-  --cerebro-note: #a1a1aa;
+  /* Tipos de nota (categórico, harmonizado) */
+  --cerebro-devotional: #6d4d86; /* violeta/ameixa */
+  --cerebro-reflection: #2f6f7a; /* azul-petróleo */
+  --cerebro-study: #2f6b4f; /* verde (família primária) */
+  --cerebro-note: #9a7b3c; /* areia/ocre */
 
-  /* Status (única cor do tema — funcional) */
-  --cerebro-success: #3f7d5e;
+  /* Status (funcional — success afastado do verde da marca: mais claro/vivo) */
+  --cerebro-success: #4f9d6b;
   --cerebro-error: #b3261e;
+
+  /* Scrollbar (thumb fino; track sempre transparente) */
+  --cerebro-scrollbar-thumb: rgba(24, 33, 28, 0.28);
+  --cerebro-scrollbar-thumb-hover: rgba(47, 107, 79, 0.55);
 
   /* Sombras neutras */
   --cerebro-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -43,34 +49,38 @@
 
 html.dark {
   /* Surfaces */
-  --cerebro-bg: #0c0c0d;
-  --cerebro-card: #161618;
-  --cerebro-raised: #1e1e21;
+  --cerebro-bg: #0e1310;
+  --cerebro-card: #161b17;
+  --cerebro-raised: #1d231f;
 
   /* Ink */
-  --cerebro-fg: #f4f4f5;
-  --cerebro-muted: #a1a1aa;
-  --cerebro-faint: #6b6b70;
+  --cerebro-fg: #eef2ec;
+  --cerebro-muted: #9aa69f;
+  --cerebro-faint: #6a756e;
 
   /* Lines */
-  --cerebro-border: rgba(244, 244, 245, 0.12);
-  --cerebro-border-strong: rgba(244, 244, 245, 0.2);
+  --cerebro-border: rgba(238, 242, 236, 0.12);
+  --cerebro-border-strong: rgba(238, 242, 236, 0.2);
 
-  /* Accent — tinta clara sobre fundo escuro */
-  --cerebro-accent: #f4f4f5;
-  --cerebro-accent-strong: #ffffff;
-  --cerebro-accent-soft: rgba(244, 244, 245, 0.12);
-  --cerebro-on-accent: #0c0c0d;
+  /* Accent — verde claro sobre fundo escuro */
+  --cerebro-accent: #5aa87f;
+  --cerebro-accent-strong: #74c098;
+  --cerebro-accent-soft: rgba(90, 168, 127, 0.16);
+  --cerebro-on-accent: #0e1310;
 
   /* Tipos de nota */
-  --cerebro-devotional: #f4f4f5;
-  --cerebro-reflection: #c4c4cc;
-  --cerebro-study: #9a9aa3;
-  --cerebro-note: #71717a;
+  --cerebro-devotional: #b08fd0;
+  --cerebro-reflection: #5fb0bd;
+  --cerebro-study: #5aa87f;
+  --cerebro-note: #cda25a;
 
   /* Status */
-  --cerebro-success: #7fae87;
+  --cerebro-success: #7fc99a;
   --cerebro-error: #e0675a;
+
+  /* Scrollbar */
+  --cerebro-scrollbar-thumb: rgba(238, 242, 236, 0.24);
+  --cerebro-scrollbar-thumb-hover: rgba(90, 168, 127, 0.6);
 
   --cerebro-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --cerebro-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);

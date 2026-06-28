@@ -1,4 +1,11 @@
 import type { NoteResponse, NoteType, ResourceResponse } from '@cerebro/shared';
+import {
+  archiveNote,
+  type CreateResourceBody,
+  editResource,
+  getResource,
+  listNotes,
+} from '@cerebro/shared/client';
 import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
 import {
   ArrowLeft,
@@ -18,13 +25,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { ResourceForm } from '../components/ResourceForm.js';
-import {
-  archiveNote,
-  type CreateResourceBody,
-  editResource,
-  getResource,
-  listNotes,
-} from '../lib/api/endpoints.js';
 
 const TYPE_ICON: Record<string, LucideIcon> = {
   book: BookOpen,

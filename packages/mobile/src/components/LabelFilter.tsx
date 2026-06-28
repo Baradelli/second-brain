@@ -1,8 +1,7 @@
 import type { LabelNodeResponse } from '@cerebro/shared';
+import { listLabels } from '@cerebro/shared/client';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { listLabels } from '../lib/api/endpoints.js';
 
 interface FlatLabel {
   id: string;

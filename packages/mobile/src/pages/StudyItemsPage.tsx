@@ -1,4 +1,14 @@
 import type { StudyItemResponse } from '@cerebro/shared';
+import {
+  createNote,
+  createStudyItem,
+  type CreateStudyItemInput,
+  editStudyItem,
+  getNoteById,
+  listStudyItems,
+  logRecall,
+  textToDoc,
+} from '@cerebro/shared/client';
 import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
 import { BookOpen, Brain, FileText, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -8,16 +18,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { type PromptRequest, PromptSheet } from '../components/PromptSheet.js';
 import { PublishTrigger } from '../components/PublishTrigger.js';
 import { StudyItemForm } from '../components/StudyItemForm.js';
-import {
-  createNote,
-  createStudyItem,
-  type CreateStudyItemInput,
-  editStudyItem,
-  getNoteById,
-  listStudyItems,
-  logRecall,
-} from '../lib/api/endpoints.js';
-import { textToDoc } from '../lib/text-to-doc.js';
 
 function scheduleBadge(
   item: StudyItemResponse,

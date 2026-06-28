@@ -1,0 +1,84 @@
+/* Tema do driver.js casado com os tokens do app (importado DEPOIS do driver.css
+   no AppTour, então ganha por ordem). Verde de estudo, serifa nos títulos. */
+
+.driver-popover {
+  background-color: var(--cerebro-card);
+  color: var(--cerebro-fg);
+  border: 1px solid var(--cerebro-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--cerebro-shadow-lg);
+  max-width: 320px;
+}
+
+.driver-popover-title {
+  font-family: Fraunces, ui-serif, Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--cerebro-fg);
+}
+
+.driver-popover-description {
+  color: var(--cerebro-muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.driver-popover-progress-text {
+  color: var(--cerebro-faint);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.driver-popover-close-btn {
+  color: var(--cerebro-faint);
+}
+.driver-popover-close-btn:hover {
+  color: var(--cerebro-fg);
+}
+
+/* Botões: tira o text-shadow padrão e usa o vocabulário de botão do app. */
+.driver-popover-footer button {
+  text-shadow: none;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--cerebro-border-strong);
+  background-color: transparent;
+  color: var(--cerebro-fg);
+  transition: background-color 0.15s ease;
+}
+.driver-popover-footer button:hover {
+  background-color: var(--cerebro-accent-soft);
+}
+
+.driver-popover-next-btn {
+  background-color: var(--cerebro-accent) !important;
+  color: var(--cerebro-on-accent) !important;
+  border-color: transparent !important;
+}
+.driver-popover-next-btn:hover {
+  background-color: var(--cerebro-accent-strong) !important;
+}
+
+/* A seta do balão acompanha a cor de fundo do popover (senão fica branca). */
+.driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: var(--cerebro-card);
+}
+.driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: var(--cerebro-card);
+}
+.driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: var(--cerebro-card);
+}
+.driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: var(--cerebro-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .driver-popover,
+  .driver-overlay {
+    transition: none !important;
+  }
+}

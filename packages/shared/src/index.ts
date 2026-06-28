@@ -7,6 +7,7 @@ export * from './common.js';
 export * from './day-closing.js';
 export * from './event.js';
 export * from './goal.js';
+export * from './graph.js';
 export * from './guide-question.js';
 export * from './label.js';
 export * from './note.js';

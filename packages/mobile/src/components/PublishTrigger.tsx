@@ -3,12 +3,11 @@ import type {
   PublicationResponse,
   PublicationSourceTypeInput,
 } from '@cerebro/shared';
+import { createPublication } from '@cerebro/shared/client';
 import { BottomSheet, Button } from '@cerebro/ui';
 import { Check, Megaphone } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { createPublication } from '../lib/api/endpoints.js';
 
 const FORMATS: PublicationFormatInput[] = [
   'linkedin',

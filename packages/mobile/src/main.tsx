@@ -1,5 +1,5 @@
 import './index.css';
-import './lib/i18n/index.js';
+import '@cerebro/ui';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';

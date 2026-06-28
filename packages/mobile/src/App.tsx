@@ -1,3 +1,4 @@
+import { logout } from '@cerebro/shared/client';
 import {
   BottomTabBar,
   Sidebar,
@@ -27,7 +28,6 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { LanguageSwitcher } from './components/LanguageSwitcher.js';
-import { logout } from './lib/auth.js';
 import { startOfflineSync } from './lib/offline/index.js';
 
 function AppShell() {

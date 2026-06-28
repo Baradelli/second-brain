@@ -1,3 +1,7 @@
+import {
+  type CreateStudyItemInput,
+  parseQuestions,
+} from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Sparkles } from 'lucide-react';
@@ -6,8 +10,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import type { CreateStudyItemInput } from '../lib/api/endpoints.js';
-import { parseQuestions } from '../lib/text-to-doc.js';
 import { type PromptRequest, PromptSheet } from './PromptSheet.js';
 
 const studyItemFormSchema = z.object({

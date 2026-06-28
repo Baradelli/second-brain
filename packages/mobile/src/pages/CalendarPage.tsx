@@ -2,13 +2,12 @@ import type {
   CalendarDayResponse,
   CalendarMonthResponse,
 } from '@cerebro/shared';
+import { getCalendar } from '@cerebro/shared/client';
 import { Card } from '@cerebro/ui';
 import { CalendarRange, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-
-import { getCalendar } from '../lib/api/endpoints.js';
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');

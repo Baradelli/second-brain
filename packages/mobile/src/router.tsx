@@ -1,7 +1,7 @@
+import { isAuthenticated } from '@cerebro/shared/client';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { App } from './App.js';
-import { isAuthenticated } from './lib/auth.js';
 import { AgendaPage } from './pages/AgendaPage.js';
 import { AssistantPage } from './pages/AssistantPage.js';
 import { CalendarPage } from './pages/CalendarPage.js';

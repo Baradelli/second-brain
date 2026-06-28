@@ -4,6 +4,7 @@ import type {
   CalendarDayNoteResponse,
   NoteType,
 } from '@cerebro/shared';
+import { getDayDetail } from '@cerebro/shared/client';
 import { Button, Card, EmptyState } from '@cerebro/ui';
 import {
   Check,
@@ -16,8 +17,6 @@ import {
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-
-import { getDayDetail } from '../lib/api/endpoints.js';
 
 const NOTE_TYPE_KEY: Record<NoteType, string> = {
   DEVOTIONAL: 'editor.type.devotional',

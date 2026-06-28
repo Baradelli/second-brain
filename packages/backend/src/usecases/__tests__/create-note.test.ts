@@ -1,6 +1,7 @@
 import { createNoteSchema } from '@cerebro/shared';
 import { describe, expect, it } from 'vitest';
 
+import { NoteLinkRepositoryFake } from '../_fakes/note-link-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { CreateNote } from '../create-note.js';
 
@@ -14,10 +15,16 @@ const baseInput = {
   },
 };
 
+function setup() {
+  const repo = new NoteRepositoryFake();
+  const linkRepo = new NoteLinkRepositoryFake();
+  const useCase = new CreateNote(repo, linkRepo);
+  return { repo, linkRepo, useCase };
+}
+
 describe('CreateNote', () => {
   it('creates a note with minimal fields and returns id + ACTIVE status', async () => {
-    const repo = new NoteRepositoryFake();
-    const useCase = new CreateNote(repo);
+    const { useCase } = setup();
 
     const note = await useCase.execute(baseInput);
 
@@ -28,8 +35,7 @@ describe('CreateNote', () => {
   });
 
   it('derives plainText from doc content', async () => {
-    const repo = new NoteRepositoryFake();
-    const useCase = new CreateNote(repo);
+    const { useCase } = setup();
     const doc = {
       type: 'doc',
       content: [
@@ -50,8 +56,7 @@ describe('CreateNote', () => {
   });
 
   it('defaults scope to DAY when not provided', async () => {
-    const repo = new NoteRepositoryFake();
-    const useCase = new CreateNote(repo);
+    const { useCase } = setup();
 
     const note = await useCase.execute(baseInput);
 
@@ -59,8 +64,7 @@ describe('CreateNote', () => {
   });
 
   it('returns empty plainText for empty doc', async () => {
-    const repo = new NoteRepositoryFake();
-    const useCase = new CreateNote(repo);
+    const { useCase } = setup();
 
     const note = await useCase.execute({
       ...baseInput,
@@ -71,14 +75,61 @@ describe('CreateNote', () => {
   });
 
   it('calls repo.save exactly once with the assembled note', async () => {
-    const repo = new NoteRepositoryFake();
-    const useCase = new CreateNote(repo);
+    const { repo, useCase } = setup();
 
     await useCase.execute(baseInput);
 
     expect(repo.saved).toHaveLength(1);
     expect(repo.saved[0].userId).toBe('user-1');
     expect(repo.saved[0].status).toBe('ACTIVE');
+  });
+
+  it('recomputes outgoing links from mentions in the doc', async () => {
+    const { linkRepo, useCase } = setup();
+    const doc = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            { type: 'text', text: 'ver ' },
+            { type: 'mention', attrs: { id: 'note-a', label: 'A' } },
+            { type: 'mention', attrs: { id: 'note-b', label: 'B' } },
+          ],
+        },
+      ],
+    };
+
+    const note = await useCase.execute({ ...baseInput, doc });
+
+    const edges = await linkRepo.listGraphEdges('user-1');
+    expect(edges.map((e) => e.toNoteId).sort()).toEqual(['note-a', 'note-b']);
+    expect(edges.every((e) => e.fromNoteId === note.id)).toBe(true);
+  });
+
+  it('persists no links when the doc has no mentions', async () => {
+    const { linkRepo, useCase } = setup();
+
+    await useCase.execute(baseInput);
+
+    expect(await linkRepo.listGraphEdges('user-1')).toEqual([]);
+  });
+
+  it('dedupes repeated mentions into a single outgoing link', async () => {
+    const { linkRepo, useCase } = setup();
+    const doc = {
+      type: 'doc',
+      content: [
+        { type: 'mention', attrs: { id: 'dup' } },
+        { type: 'mention', attrs: { id: 'dup' } },
+      ],
+    };
+
+    const note = await useCase.execute({ ...baseInput, doc });
+
+    expect(await linkRepo.listGraphEdges('user-1')).toEqual([
+      { fromNoteId: note.id, toNoteId: 'dup' },
+    ]);
   });
 });
 

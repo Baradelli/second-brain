@@ -13,6 +13,7 @@ export { SectionHeader } from './components/SectionHeader.js';
 export type { SidebarItem } from './components/Sidebar.js';
 export { Sidebar } from './components/Sidebar.js';
 export { Textarea } from './components/Textarea.js';
+export { i18n } from './i18n/index.js';
 export type { Theme } from './theme/ThemeContext.js';
 export { useTheme } from './theme/ThemeContext.js';
 export { ThemeProvider } from './theme/ThemeProvider.js';

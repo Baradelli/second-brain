@@ -11,6 +11,7 @@ import { z } from 'zod';
 
 import { NoteNotFoundError } from '../domain/errors.js';
 import type { Note } from '../domain/note.js';
+import { PrismaNoteLinkRepository } from '../repositories/prisma-note-link-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
 import { ArchiveNote } from '../usecases/archive-note.js';
 import { CreateNote } from '../usecases/create-note.js';
@@ -40,8 +41,9 @@ export const noteRoutes: FastifyPluginAsyncZod<{
   prisma: PrismaClient;
 }> = async (app, options) => {
   const repo = new PrismaNoteRepository(options.prisma);
-  const createNote = new CreateNote(repo);
-  const editNote = new EditNote(repo);
+  const linkRepo = new PrismaNoteLinkRepository(options.prisma);
+  const createNote = new CreateNote(repo, linkRepo);
+  const editNote = new EditNote(repo, linkRepo);
   const archiveNote = new ArchiveNote(repo);
 
   app.post(

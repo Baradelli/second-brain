@@ -22,6 +22,7 @@ import { captureRoutes } from '../routes/capture-routes.js';
 import { dayClosingRoutes } from '../routes/day-closing-routes.js';
 import { eventRoutes } from '../routes/event-routes.js';
 import { goalRoutes } from '../routes/goal-routes.js';
+import { graphRoutes } from '../routes/graph-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
@@ -91,6 +92,7 @@ export async function buildServer() {
 
     await api.register(uploadRoutes, { uploadDir });
     await api.register(noteRoutes, { prisma });
+    await api.register(graphRoutes, { prisma });
     await api.register(attachmentRoutes, { prisma });
     await api.register(captureRoutes, { prisma });
     await api.register(labelRoutes, { prisma });
