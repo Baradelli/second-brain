@@ -8,6 +8,8 @@ import {
   archivedGoalSchema,
   type AttachmentResponse,
   attachmentResponseSchema,
+  type BacklinkResponse,
+  backlinkResponseSchema,
   type CalendarDayDetailResponse,
   calendarDayDetailResponseSchema,
   type CalendarMonthResponse,
@@ -33,6 +35,8 @@ import {
   type LoginResponse,
   loginResponseSchema,
   type LogRecallBody,
+  type NoteGraphResponse,
+  noteGraphResponseSchema,
   type NoteResponse,
   noteResponseSchema,
   type NoteType,
@@ -583,6 +587,18 @@ export async function getTodayNote(
   );
 
   return notes[0] ?? null;
+}
+
+// ── Backlinks / Grafo de notas ────────────────────────────────────────────────
+
+/** Notas que mencionam (apontam para) a nota informada. */
+export function getBacklinks(noteId: string): Promise<BacklinkResponse[]> {
+  return get(`/notes/${noteId}/backlinks`, z.array(backlinkResponseSchema));
+}
+
+/** Grafo global: nós (notas) + arestas (links nota→nota) do usuário. */
+export function getNoteGraph(): Promise<NoteGraphResponse> {
+  return get('/graph', noteGraphResponseSchema);
 }
 
 // ── Publications (Ensinar para Reter) ────────────────────────────────────────

@@ -3,11 +3,16 @@ import { randomUUID } from 'node:crypto';
 import { createNoteSchema } from '@cerebro/shared';
 
 import { docToText } from '../domain/doc-to-text.js';
+import { extractMentionIds } from '../domain/extract-mention-ids.js';
 import type { Note } from '../domain/note.js';
+import type { NoteLinkRepository } from './ports/note-link-repository.js';
 import type { NoteRepository } from './ports/note-repository.js';
 
 export class CreateNote {
-  constructor(private repo: NoteRepository) {}
+  constructor(
+    private repo: NoteRepository,
+    private links: NoteLinkRepository,
+  ) {}
 
   async execute(input: unknown): Promise<Note> {
     const data = createNoteSchema.parse(input);
@@ -29,6 +34,15 @@ export class CreateNote {
       createdAt: new Date(),
     };
 
-    return this.repo.save(note);
+    const saved = await this.repo.save(note);
+
+    // Grafo materializado: persiste os links de saída derivados das menções do doc
+    // (ver ADR docs/adr/0001-note-link-materialized.md). Exclui auto-referência.
+    const toNoteIds = extractMentionIds(saved.doc).filter(
+      (id) => id !== saved.id,
+    );
+    await this.links.replaceOutgoing(saved.userId, saved.id, toNoteIds);
+
+    return saved;
   }
 }

@@ -62,6 +62,7 @@ model User {
   studyItems   StudyItem[]
   recalls      Recall[]
   publications Publication[]
+  noteLinks    NoteLink[]
 }
 
 model Settings {
@@ -148,6 +149,8 @@ model Note {
   attachments  Attachment[]
   studyItems   StudyItem[]   @relation("StudyItemFichamento")
   publications Publication[] @relation("PublicationDraft")
+  linksFrom    NoteLink[]    @relation("NoteLinksFrom")
+  linksTo      NoteLink[]    @relation("NoteLinksTo")
 }
 
 model Attachment {
@@ -287,4 +290,24 @@ model Publication {
   createdAt   DateTime      @default(now())
 
   labels Label[] @relation("PublicationLabels")
+}
+
+// Grafo de notas (Fase 4.1). Backlinks/grafo usam uma tabela MATERIALIZADA: os links
+// de saída de uma nota são recomputados e persistidos a cada create/edit (ver ADR
+// docs/adr/0001-note-link-materialized.md), em vez de derivar do doc JSON a cada leitura.
+// A fonte do link é a menção `{ type: 'mention', attrs: { id } }` no doc TipTap.
+
+model NoteLink {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  fromNoteId String
+  fromNote   Note     @relation("NoteLinksFrom", fields: [fromNoteId], references: [id], onDelete: Cascade)
+  toNoteId   String
+  toNote     Note     @relation("NoteLinksTo", fields: [toNoteId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([fromNoteId, toNoteId])
+  @@index([userId])
+  @@index([toNoteId])
 }

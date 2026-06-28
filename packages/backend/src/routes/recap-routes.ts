@@ -4,6 +4,7 @@ import type { PrismaClient } from '@prisma/client';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 
 import type { Note } from '../domain/note.js';
+import { PrismaNoteLinkRepository } from '../repositories/prisma-note-link-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
 import { PrismaSettingsReader } from '../repositories/prisma-settings-reader.js';
 import { CreateNote } from '../usecases/create-note.js';
@@ -36,12 +37,13 @@ export const recapRoutes: FastifyPluginAsyncZod<{
   prisma: PrismaClient;
 }> = async (app, options) => {
   const noteRepo = new PrismaNoteRepository(options.prisma);
+  const linkRepo = new PrismaNoteLinkRepository(options.prisma);
   const settings = new PrismaSettingsReader(options.prisma);
   const upsertRecap = new UpsertRecap(
     new UpsertJournalNote(
       new FindNoteOfTheDay(noteRepo),
-      new CreateNote(noteRepo),
-      new EditNote(noteRepo),
+      new CreateNote(noteRepo, linkRepo),
+      new EditNote(noteRepo, linkRepo),
     ),
   );
 

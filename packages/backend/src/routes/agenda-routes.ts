@@ -22,6 +22,7 @@ import type { Resource } from '../domain/resource.js';
 import { PrismaCaptureRepository } from '../repositories/prisma-capture-repository.js';
 import { PrismaEventRepository } from '../repositories/prisma-event-repository.js';
 import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
+import { PrismaNoteLinkRepository } from '../repositories/prisma-note-link-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
 import { PrismaRecallRepository } from '../repositories/prisma-recall-repository.js';
 import { PrismaResourceRepository } from '../repositories/prisma-resource-repository.js';
@@ -185,7 +186,7 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
   const archiveCapture = new ArchiveCapture(captureRepo);
   const promoteCaptureToNote = new PromoteCaptureToNote(
     captureRepo,
-    new CreateNote(noteRepo),
+    new CreateNote(noteRepo, new PrismaNoteLinkRepository(options.prisma)),
   );
   const promoteCaptureToResource = new PromoteCaptureToResource(
     captureRepo,

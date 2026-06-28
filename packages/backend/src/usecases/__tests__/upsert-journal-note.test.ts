@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { dayRange } from '../../domain/day-range.js';
 import { NotAJournalTypeError } from '../../domain/errors.js';
+import { NoteLinkRepositoryFake } from '../_fakes/note-link-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { CreateNote } from '../create-note.js';
 import { EditNote } from '../edit-note.js';
@@ -24,10 +25,11 @@ describe('UpsertJournalNote', () => {
 
   beforeEach(() => {
     repo = new NoteRepositoryFake();
+    const linkRepo = new NoteLinkRepositoryFake();
     useCase = new UpsertJournalNote(
       new FindNoteOfTheDay(repo),
-      new CreateNote(repo),
-      new EditNote(repo),
+      new CreateNote(repo, linkRepo),
+      new EditNote(repo, linkRepo),
     );
   });
 
