@@ -8,6 +8,7 @@ import {
   Inbox,
   type LucideIcon,
   Megaphone,
+  Network,
   Search,
   Settings,
   Sun,
@@ -38,6 +39,7 @@ const PINNED: PinnedItem[] = [
   { kind: 'calendar', labelKey: 'shell.calendar', icon: Calendar },
   { kind: 'recaps', labelKey: 'shell.recaps', icon: CalendarRange },
   { kind: 'assistant', labelKey: 'shell.assistant', icon: Brain },
+  { kind: 'graph', labelKey: 'shell.graph', icon: Network },
 ];
 
 interface SectionDef {

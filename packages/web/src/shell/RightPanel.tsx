@@ -1,4 +1,5 @@
 import type {
+  BacklinkResponse,
   GoalResponse,
   NoteResponse,
   NoteType,
@@ -9,6 +10,7 @@ import type {
 } from '@cerebro/shared';
 import {
   flattenLabels,
+  getBacklinks,
   getResource,
   listActiveGoals,
   listLabels,
@@ -24,6 +26,7 @@ import {
   goalProgressPercent,
 } from '../goals/goal-display.js';
 import { useActiveNotes } from '../notes/active-note-context.js';
+import { backlinkDisplayTitle } from '../notes/backlink-display.js';
 import { extractOutline, type OutlineHeading } from '../notes/outline.js';
 import { useActivePublications } from '../publications/active-publication-context.js';
 import {
@@ -52,8 +55,8 @@ const LABEL_BY_TYPE: Record<NoteType, string> = {
 /**
  * Painel direito, contextual à aba ativa. Para uma nota mostra Propriedades
  * (tipo/escopo/labels/vínculos), Outline (títulos extraídos do doc, clicáveis)
- * e Backlinks (placeholder até a Fase 4). Lê a nota ativa do ActiveNotesContext
- * pela id do descriptor da aba ativa.
+ * e Backlinks (notas que mencionam esta, clicáveis). Lê a nota ativa do
+ * ActiveNotesContext pela id do descriptor da aba ativa.
  */
 export function RightPanel() {
   const { t } = useTranslation();
@@ -115,9 +118,83 @@ function NotePanel({ noteId }: { noteId: string }) {
         storageKey="web.shell.right.backlinks"
         label={t('shell.backlinks')}
       >
-        <p className="px-2 py-2 text-xs text-muted">{t('shell.comingSoon')}</p>
+        <Backlinks noteId={noteId} />
       </CollapsibleSection>
     </aside>
+  );
+}
+
+// ── Backlinks ─────────────────────────────────────────────────────────────────
+
+/**
+ * Backlinks da nota ativa: as notas que mencionam esta (via menção `@` no doc),
+ * vindas do grafo materializado no backend (`getBacklinks`). Read-only — cada
+ * linha abre a aba da nota de origem (que se auto-titula pelo rename). Recarrega
+ * ao trocar de nota; os links de ENTRADA só mudam quando OUTRA nota edita a
+ * menção, então buscar ao abrir basta (sem refetch a cada salvar). Estados
+ * calmos: vazio é normal, não assustador.
+ */
+function Backlinks({ noteId }: { noteId: string }) {
+  const { t } = useTranslation();
+  const { openTab } = useTabs();
+  const [state, setState] = useState<
+    | { kind: 'loading' }
+    | { kind: 'error' }
+    | { kind: 'ready'; backlinks: BacklinkResponse[] }
+  >({ kind: 'loading' });
+
+  useEffect(() => {
+    let cancelled = false;
+    setState({ kind: 'loading' });
+    getBacklinks(noteId)
+      .then((backlinks) => {
+        if (!cancelled) setState({ kind: 'ready', backlinks });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ kind: 'error' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [noteId]);
+
+  if (state.kind === 'loading') {
+    return (
+      <p className="px-2 py-2 text-xs text-muted">{t('agenda.loading')}</p>
+    );
+  }
+  if (state.kind === 'error') {
+    return (
+      <p className="px-2 py-2 text-xs text-muted">{t('shell.backlinksError')}</p>
+    );
+  }
+  if (state.backlinks.length === 0) {
+    return (
+      <p className="px-2 py-2 text-xs text-muted">
+        {t('shell.backlinksEmpty')}
+      </p>
+    );
+  }
+
+  return (
+    <ul className="flex flex-col px-1 py-1">
+      {state.backlinks.map((backlink) => {
+        const title = backlinkDisplayTitle(backlink, t('notes.untitled'));
+        return (
+          <li key={backlink.id}>
+            <button
+              type="button"
+              onClick={() =>
+                openTab({ kind: 'note', id: backlink.id, title })
+              }
+              className="block w-full truncate rounded px-2 py-1 text-left text-xs text-muted transition-colors hover:bg-card hover:text-fg"
+            >
+              {title}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

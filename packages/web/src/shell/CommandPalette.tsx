@@ -98,6 +98,13 @@ export function CommandPalette({
       ),
     },
     {
+      id: 'open-graph',
+      label: t('command.openGraph'),
+      run: withClose(() =>
+        openTab({ kind: 'graph', id: 'graph', title: t('shell.graph') }),
+      ),
+    },
+    {
       id: 'open-settings',
       label: t('command.openSettings'),
       run: withClose(() =>

@@ -1,4 +1,4 @@
-import { EmptyState } from '@cerebro/ui';
+import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AgendaTab } from '../agenda/AgendaTab.js';
@@ -16,21 +16,23 @@ import { StudyItemDetailTab } from '../study/StudyItemDetailTab.js';
 import type { TabDescriptor, TabKind } from './tabs-reducer.js';
 
 /**
- * Registro kind → renderizador de conteúdo. Por enquanto cada kind mostra um
- * placeholder "em breve"; nas próximas fases trocamos a entrada do mapa pela
- * tela real, sem mexer no shell/abas.
+ * Registro kind → renderizador de conteúdo. Cada kind aponta para a tela real;
+ * trocar uma entrada do mapa não mexe no shell/abas.
  */
 type TabRenderer = (descriptor: TabDescriptor) => React.ReactElement;
 
-/** Placeholder genérico: título da seção + "em breve". */
-function ComingSoon({ titleKey }: { titleKey: string }) {
+// O grafo usa uma lib pesada (force-graph). Carrega sob demanda para não pesar
+// o bundle inicial de quem nunca abre a aba Grafo.
+const GraphTab = lazy(() =>
+  import('../graph/GraphTab.js').then((m) => ({ default: m.GraphTab })),
+);
+
+function TabFallback() {
   const { t } = useTranslation();
   return (
-    <EmptyState
-      title={t(titleKey)}
-      body={t('shell.comingSoon')}
-      className="h-full"
-    />
+    <div className="flex h-full items-center justify-center bg-bg text-fg">
+      <p className="text-sm text-muted">{t('agenda.loading')}</p>
+    </div>
   );
 }
 
@@ -42,8 +44,12 @@ const tabRenderers: Record<TabKind, TabRenderer> = {
   recaps: () => <RecapsTab />,
   assistant: () => <AssistantTab />,
   settings: () => <SettingsTab />,
-  graph: () => <ComingSoon titleKey="shell.graph" />,
-  // Kinds com identidade (id próprio) mostram o título da aba no placeholder.
+  graph: () => (
+    <Suspense fallback={<TabFallback />}>
+      <GraphTab />
+    </Suspense>
+  ),
+  // Kinds com identidade (id próprio) recebem o id do descriptor.
   note: (d) => <NoteEditorTab noteId={d.id} />,
   resource: (d) => <ResourceDetailTab resourceId={d.id} />,
   goal: (d) => <GoalDetailTab goalId={d.id} />,
