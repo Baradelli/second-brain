@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+@import '@cerebro/ui/theme.css';
+@import '@cerebro/ui/editor.css';
+
+/* Tailwind precisa escanear os componentes compartilhados de @cerebro/ui,
+   senão classes usadas só lá não entram no CSS. */
+@source "../../ui/src";
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+@theme inline {
+  --color-bg: var(--cerebro-bg);
+  --color-card: var(--cerebro-card);
+  --color-raised: var(--cerebro-raised);
+  --color-fg: var(--cerebro-fg);
+  --color-muted: var(--cerebro-muted);
+  --color-faint: var(--cerebro-faint);
+  --color-subtle: var(--cerebro-border);
+  --color-accent: var(--cerebro-accent);
+  --color-error: var(--cerebro-error);
+
+  --font-sans:
+    'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: Fraunces, ui-serif, Georgia, 'Times New Roman', serif;
+
+  --radius-card: 1.125rem;
+  --radius-card-lg: 1.5rem;
+}
+
+html {
+  /* Fundo papel também atrás do safe-area / overscroll */
+  background-color: var(--cerebro-bg);
+}
+
+body {
+  background-color: var(--cerebro-bg);
+  color: var(--cerebro-fg);
+  font-family:
+    'Hanken Grotesk',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv01';
+}
+
+/* Sutil grão de papel — quase imperceptível, dá vida ao fundo chapado */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(
+    rgba(120, 100, 70, 0.035) 1px,
+    transparent 1px
+  );
+  background-size: 4px 4px;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Serifa display com optical sizing alto fica elegante em títulos grandes */
+.font-display {
+  font-family: Fraunces, ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
