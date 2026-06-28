@@ -47,12 +47,15 @@
   Calendário, Assistente) + seções colapsáveis de entidades + Config no rodapé.
 - **Tab (Aba)** — uma coisa aberta no painel central. Tem `kind` (today, note, goal,
   resource, studyItem, publication, review, calendar, recaps, assistant, search,
-  settings, graph) e histórico back/forward próprio.
+  settings, labels, graph) e histórico back/forward próprio.
 - **Command palette (Cmd/Ctrl+P)** — paleta de **ações** (abrir views, criar, alternar
   tema/idioma, sair).
 - **Quick switcher (Cmd/Ctrl+O)** — busca incremental para **pular** para uma entidade.
 - **Outline** — índice de cabeçalhos derivado do doc da Note ativa (efêmero).
 - **Graph (Grafo)** — visão global força-dirigida: nós = Notes, arestas = Menções.
+- **Tour / Guia** — onboarding spotlight (balões sobre a UI real) que abre no primeiro
+  acesso e é reabrível pelo ícone `?` no header e pela paleta. "Visto" persiste em
+  `web.tour.seen`.
 
 ## Camadas (DDD-lite) — termos de arquitetura
 

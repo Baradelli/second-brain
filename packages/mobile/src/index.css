@@ -54,10 +54,32 @@ body::before {
   pointer-events: none;
   opacity: 0.5;
   background-image: radial-gradient(
-    rgba(120, 100, 70, 0.035) 1px,
+    rgba(70, 110, 85, 0.04) 1px,
     transparent 1px
   );
   background-size: 4px 4px;
+}
+
+/* Scrollbar fina e discreta (track transparente) — onde aparecer */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cerebro-scrollbar-thumb) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cerebro-scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 #root {

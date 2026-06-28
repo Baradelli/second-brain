@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { QuickCaptureModal } from '../capture/QuickCaptureModal.js';
+import { TourButton, TourProvider } from '../onboarding/AppTour.js';
 import { ActiveGoalsProvider } from '../goals/active-goal-context.js';
 import { ActiveNotesProvider } from '../notes/active-note-context.js';
 import { ActivePublicationsProvider } from '../publications/active-publication-context.js';
@@ -111,8 +112,9 @@ export function Shell() {
 
   return (
     <TabsProvider>
-      <AutoOpenHoje />
-      <ActiveNotesProvider>
+      <TourProvider>
+        <AutoOpenHoje />
+        <ActiveNotesProvider>
         <ActiveResourcesProvider>
           <ActiveGoalsProvider>
             <ActiveStudyProvider>
@@ -154,10 +156,12 @@ export function Shell() {
                           onClick={() => setOverlay('capture')}
                           aria-label={t('capture.section.input')}
                           title={t('capture.section.input')}
+                          data-tour="capture-btn"
                           className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
                         >
                           <PenLine size={16} strokeWidth={1.75} />
                         </button>
+                        <TourButton />
                         <ThemeToggle />
                         <button
                           type="button"
@@ -222,7 +226,8 @@ export function Shell() {
             </ActiveStudyProvider>
           </ActiveGoalsProvider>
         </ActiveResourcesProvider>
-      </ActiveNotesProvider>
+        </ActiveNotesProvider>
+      </TourProvider>
     </TabsProvider>
   );
 }

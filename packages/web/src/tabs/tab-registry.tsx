@@ -5,6 +5,7 @@ import { AgendaTab } from '../agenda/AgendaTab.js';
 import { AssistantTab } from '../assistant/AssistantTab.js';
 import { CalendarTab } from '../calendar/CalendarTab.js';
 import { GoalDetailTab } from '../goals/GoalDetailTab.js';
+import { LabelsTab } from '../labels/LabelsTab.js';
 import { NoteEditorTab } from '../notes/NoteEditorTab.js';
 import { PublicationDetailTab } from '../publications/PublicationDetailTab.js';
 import { RecapsTab } from '../recaps/RecapsTab.js';
@@ -44,6 +45,7 @@ const tabRenderers: Record<TabKind, TabRenderer> = {
   recaps: () => <RecapsTab />,
   assistant: () => <AssistantTab />,
   settings: () => <SettingsTab />,
+  labels: () => <LabelsTab />,
   graph: () => (
     <Suspense fallback={<TabFallback />}>
       <GraphTab />

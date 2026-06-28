@@ -21,6 +21,7 @@ import { useTabs } from '../tabs/tabs-context.js';
 import type { TabKind } from '../tabs/tabs-reducer.js';
 import { CollapsibleSection } from './CollapsibleSection.js';
 import { GoalsSection } from './GoalsSection.js';
+import { LabelsSection } from './LabelsSection.js';
 import { NotesSection } from './NotesSection.js';
 import { PublicationsSection } from './PublicationsSection.js';
 import { ResourcesSection } from './ResourcesSection.js';
@@ -98,6 +99,7 @@ export function ExplorerPanel() {
             key={kind}
             type="button"
             onClick={() => openTab({ kind, id: kind, title: t(labelKey) })}
+            data-tour={`nav-${kind}`}
             className="flex items-center gap-2.5 rounded px-2 py-1.5 text-sm text-fg transition-colors hover:bg-card"
           >
             <Icon size={16} strokeWidth={1.75} className="text-muted" />
@@ -108,29 +110,37 @@ export function ExplorerPanel() {
 
       <div className="mx-2 border-t border-subtle" />
 
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-2" data-tour="explorer-sections">
         {SECTIONS.map((section) => (
-          <CollapsibleSection
+          <div
             key={section.storageKey}
-            storageKey={section.storageKey}
-            label={t(section.labelKey)}
+            data-tour={
+              section.labelKey === 'shell.labels' ? 'nav-labels' : undefined
+            }
           >
-            {section.labelKey === 'shell.notes' ? (
-              <NotesSection />
-            ) : section.labelKey === 'shell.resources' ? (
-              <ResourcesSection />
-            ) : section.labelKey === 'shell.goals' ? (
-              <GoalsSection />
-            ) : section.labelKey === 'shell.study' ? (
-              <StudySection />
-            ) : section.labelKey === 'shell.publications' ? (
-              <PublicationsSection />
-            ) : (
-              <p className="px-2 py-2 text-xs text-muted">
-                {t('shell.sectionEmpty')}
-              </p>
-            )}
-          </CollapsibleSection>
+            <CollapsibleSection
+              storageKey={section.storageKey}
+              label={t(section.labelKey)}
+            >
+              {section.labelKey === 'shell.notes' ? (
+                <NotesSection />
+              ) : section.labelKey === 'shell.resources' ? (
+                <ResourcesSection />
+              ) : section.labelKey === 'shell.goals' ? (
+                <GoalsSection />
+              ) : section.labelKey === 'shell.study' ? (
+                <StudySection />
+              ) : section.labelKey === 'shell.publications' ? (
+                <PublicationsSection />
+              ) : section.labelKey === 'shell.labels' ? (
+                <LabelsSection />
+              ) : (
+                <p className="px-2 py-2 text-xs text-muted">
+                  {t('shell.sectionEmpty')}
+                </p>
+              )}
+            </CollapsibleSection>
+          </div>
         ))}
       </div>
 
@@ -146,6 +156,7 @@ export function ExplorerPanel() {
               title: t('shell.settings'),
             })
           }
+          data-tour="nav-settings"
           className="flex w-full items-center gap-2.5 rounded px-2 py-1.5 text-sm text-fg transition-colors hover:bg-card"
         >
           <Settings size={16} strokeWidth={1.75} className="text-muted" />

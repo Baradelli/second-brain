@@ -89,7 +89,7 @@ export function CalendarTab() {
   const weekdays = weekdayNarrowNames(locale);
 
   return (
-    <div className="mx-auto h-full max-w-5xl overflow-auto px-6 pb-16">
+    <div className="page-wide h-full overflow-auto px-6 pb-16 sm:px-8">
       <header className="flex items-center justify-between pt-8 pb-5">
         <h1 className="font-display text-3xl font-semibold capitalize leading-tight text-fg">
           {t('calendar.title')}
@@ -131,7 +131,7 @@ export function CalendarTab() {
         </Card>
       )}
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         {/* ── Grade do mês ──────────────────────────────────────────────── */}
         <section className="min-w-0 flex-1">
           <div className="mb-3 flex items-center justify-between">
@@ -201,7 +201,7 @@ export function CalendarTab() {
         </section>
 
         {/* ── Detalhe do dia selecionado ────────────────────────────────── */}
-        <aside className="lg:w-80 lg:flex-shrink-0">
+        <aside className="lg:w-96 lg:flex-shrink-0">
           {selectedDate ? (
             <DayDetail
               date={selectedDate}

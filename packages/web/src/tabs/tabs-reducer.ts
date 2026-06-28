@@ -11,6 +11,7 @@ export type TabKind =
   | 'recaps'
   | 'assistant'
   | 'settings'
+  | 'labels'
   | 'note'
   | 'resource'
   | 'goal'

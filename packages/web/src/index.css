@@ -55,7 +55,7 @@ body::before {
   pointer-events: none;
   opacity: 0.5;
   background-image: radial-gradient(
-    rgba(120, 100, 70, 0.035) 1px,
+    rgba(70, 110, 85, 0.04) 1px,
     transparent 1px
   );
   background-size: 4px 4px;
@@ -71,4 +71,51 @@ body::before {
   font-family: Fraunces, ui-serif, Georgia, serif;
   font-optical-sizing: auto;
   letter-spacing: -0.01em;
+}
+
+/* ── Scrollbar fina e discreta (track transparente, sem cinza feio) ──────────
+   Firefox usa scrollbar-width/-color; WebKit usa os pseudo-elementos abaixo. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cerebro-scrollbar-thumb) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cerebro-scrollbar-thumb);
+  border-radius: 9999px;
+  /* borda transparente + clip dá um respiro lateral, afinando o polegar */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cerebro-scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── Larguras de página (fim do "max-w-2xl" mágico espalhado) ────────────────
+   .page-reading: texto longo (medida confortável). .page-wide: dashboards/listas. */
+.page-reading {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 48rem;
+}
+
+.page-wide {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
 }

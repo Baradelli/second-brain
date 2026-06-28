@@ -3,6 +3,7 @@ import { useTheme } from '@cerebro/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useTour } from '../onboarding/AppTour.js';
 import { useTabs } from '../tabs/tabs-context.js';
 import { filterCommands } from './command-filter.js';
 import { type CommandItem, CommandMenu } from './CommandMenu.js';
@@ -30,6 +31,7 @@ export function CommandPalette({
   const { t, i18n } = useTranslation();
   const { openTab } = useTabs();
   const { toggle: toggleTheme } = useTheme();
+  const { startTour } = useTour();
   const [query, setQuery] = useState('');
 
   // Toda ação fecha a paleta antes de rodar — uma só overlay por vez.
@@ -105,6 +107,13 @@ export function CommandPalette({
       ),
     },
     {
+      id: 'open-labels',
+      label: t('command.openLabels'),
+      run: withClose(() =>
+        openTab({ kind: 'labels', id: 'labels', title: t('labels.title') }),
+      ),
+    },
+    {
       id: 'open-settings',
       label: t('command.openSettings'),
       run: withClose(() =>
@@ -114,6 +123,11 @@ export function CommandPalette({
           title: t('shell.settings'),
         }),
       ),
+    },
+    {
+      id: 'open-guide',
+      label: t('command.openGuide'),
+      run: withClose(startTour),
     },
     {
       id: 'new-note',

@@ -105,7 +105,7 @@ export function ReviewTab() {
   }
 
   return (
-    <div className="mx-auto h-full max-w-2xl overflow-auto px-6 pb-16">
+    <div className="page-wide h-full overflow-auto px-6 pb-16 sm:px-8">
       <header className="pt-10 pb-6">
         <h1 className="font-display text-3xl font-semibold leading-tight text-fg">
           {t('review.title')}
@@ -126,7 +126,8 @@ export function ReviewTab() {
               {pending.length}
             </span>
           </div>
-          <div className="space-y-3">
+          {/* Grade de triagem: visão geral no desktop, expande por card */}
+          <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {pending.map((capture) => (
               <CaptureCard
                 key={capture.id}

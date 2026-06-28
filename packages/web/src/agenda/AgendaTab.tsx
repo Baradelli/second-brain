@@ -111,7 +111,10 @@ export function AgendaTab() {
     agenda.recallsDue.length === 0;
 
   return (
-    <div className="mx-auto h-full max-w-2xl overflow-auto px-6 pb-16">
+    <div
+      className="page-wide h-full overflow-auto px-6 pb-16 sm:px-8"
+      data-tour="agenda"
+    >
       <header className="pt-10 pb-7">
         <p className="mb-1.5 text-xs font-semibold uppercase capitalize tracking-[0.14em] text-accent">
           {formatAgendaDate(agenda.date, i18n.language)}
@@ -124,10 +127,10 @@ export function AgendaTab() {
         </p>
       </header>
 
-      {/* ── Ritual (diário) ─────────────────────────────────────────────── */}
-      <section className="mb-8">
+      {/* ── Ritual (diário): faixa de largura total no topo ──────────────── */}
+      <section className="mb-9">
         <SectionHeader label={t('agenda.section.journal')} className="mb-3" />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           <RitualCard
             type="DEVOTIONAL"
             done={agenda.journal.devotional.done}
@@ -145,118 +148,123 @@ export function AgendaTab() {
         </div>
       </section>
 
-      {/* ── Objetivos de hoje ───────────────────────────────────────────── */}
-      <section className="mb-8">
-        <SectionHeader label={t('agenda.section.goals')} className="mb-3" />
-        {agenda.goals.length === 0 ? (
-          <EmptyState
-            icon={<Target size={20} strokeWidth={1.75} />}
-            title={t('agenda.goals.empty')}
-          />
-        ) : (
-          <div className="space-y-2.5">
-            {agenda.goals.map((goal) => (
-              <GoalRow
-                key={goal.goalId}
-                goal={goal}
-                onChanged={() => void refresh().catch(() => setError(true))}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      {/* ── Listas do dia em grade (usa a largura do desktop) ────────────── */}
+      <div className="grid gap-x-8 gap-y-9 lg:grid-cols-2 xl:grid-cols-3">
+        {/* Objetivos de hoje */}
+        <section>
+          <SectionHeader label={t('agenda.section.goals')} className="mb-3" />
+          {agenda.goals.length === 0 ? (
+            <EmptyState
+              icon={<Target size={20} strokeWidth={1.75} />}
+              title={t('agenda.goals.empty')}
+            />
+          ) : (
+            <div className="space-y-2.5">
+              {agenda.goals.map((goal) => (
+                <GoalRow
+                  key={goal.goalId}
+                  goal={goal}
+                  onChanged={() => void refresh().catch(() => setError(true))}
+                />
+              ))}
+            </div>
+          )}
+        </section>
 
-      {/* ── Capturas pendentes → abre a Revisão (triagem, Fase 1.3) ─────── */}
-      <section className="mb-8">
-        <SectionHeader label={t('agenda.section.captures')} className="mb-3" />
-        {agenda.capturesToReview.length === 0 ? (
-          <EmptyState
-            icon={<Inbox size={20} strokeWidth={1.75} />}
-            title={t('agenda.captures.empty')}
-          />
-        ) : (
-          <div className="space-y-2.5">
-            {agenda.capturesToReview.map((capture) => (
-              <Card key={capture.id} padding="sm">
-                <div className="flex items-start gap-3">
-                  <span
-                    className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
-                    aria-hidden
-                  />
-                  <p className="line-clamp-2 text-sm leading-snug text-fg">
-                    {firstLine(capture.text)}
-                  </p>
-                </div>
-              </Card>
-            ))}
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() =>
-                openTab({
-                  kind: 'review',
-                  id: 'review',
-                  title: t('review.title'),
-                })
-              }
-              data-testid="agenda-open-review"
-            >
-              {t('agenda.captures.viewAll', {
-                count: agenda.capturesToReview.length,
-              })}
-            </Button>
-          </div>
-        )}
-      </section>
+        {/* Capturas pendentes → abre a Revisão (triagem, Fase 1.3) */}
+        <section>
+          <SectionHeader label={t('agenda.section.captures')} className="mb-3" />
+          {agenda.capturesToReview.length === 0 ? (
+            <EmptyState
+              icon={<Inbox size={20} strokeWidth={1.75} />}
+              title={t('agenda.captures.empty')}
+            />
+          ) : (
+            <div className="space-y-2.5">
+              {agenda.capturesToReview.map((capture) => (
+                <Card key={capture.id} padding="sm">
+                  <div className="flex items-start gap-3">
+                    <span
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                      aria-hidden
+                    />
+                    <p className="line-clamp-2 text-sm leading-snug text-fg">
+                      {firstLine(capture.text)}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  openTab({
+                    kind: 'review',
+                    id: 'review',
+                    title: t('review.title'),
+                  })
+                }
+                data-testid="agenda-open-review"
+              >
+                {t('agenda.captures.viewAll', {
+                  count: agenda.capturesToReview.length,
+                })}
+              </Button>
+            </div>
+          )}
+        </section>
 
-      {/* ── Revisões de hoje → abre o item de estudo (entra no ritual de recall) ── */}
-      <section className="mb-4">
-        <SectionHeader label={t('agenda.section.reviews')} className="mb-3" />
-        {agenda.recallsDue.length === 0 ? (
-          <EmptyState
-            icon={<Brain size={20} strokeWidth={1.75} />}
-            title={t('agenda.reviews.empty')}
-          />
-        ) : (
-          <div className="space-y-2.5">
-            {agenda.recallsDue.map((recall) => (
-              <Card key={recall.studyItemId} padding="sm">
-                <button
-                  type="button"
-                  onClick={() =>
-                    openTab({
-                      kind: 'studyItem',
-                      id: recall.studyItemId,
+        {/* Revisões de hoje → abre o item de estudo (ritual de recall) */}
+        <section>
+          <SectionHeader label={t('agenda.section.reviews')} className="mb-3" />
+          {agenda.recallsDue.length === 0 ? (
+            <EmptyState
+              icon={<Brain size={20} strokeWidth={1.75} />}
+              title={t('agenda.reviews.empty')}
+            />
+          ) : (
+            <div className="space-y-2.5">
+              {agenda.recallsDue.map((recall) => (
+                <Card key={recall.studyItemId} padding="sm">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openTab({
+                        kind: 'studyItem',
+                        id: recall.studyItemId,
+                        title: recall.title,
+                      })
+                    }
+                    data-testid={`agenda-recall-${recall.studyItemId}`}
+                    aria-label={t('agenda.reviews.open', {
                       title: recall.title,
-                    })
-                  }
-                  data-testid={`agenda-recall-${recall.studyItemId}`}
-                  aria-label={t('agenda.reviews.open', { title: recall.title })}
-                  className="flex w-full items-center gap-3 text-left transition-transform duration-150 active:scale-[0.99]"
-                >
-                  <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted"
-                    aria-hidden
+                    })}
+                    className="flex w-full items-center gap-3 text-left transition-transform duration-150 active:scale-[0.99]"
                   >
-                    <Brain size={17} strokeWidth={1.75} />
-                  </span>
-                  <p className="min-w-0 flex-1 truncate text-sm font-medium text-fg">
-                    {recall.title}
-                  </p>
-                  {recall.overdue && (
-                    <span className="shrink-0 text-[0.6875rem] font-semibold text-error">
-                      {t('agenda.reviews.overdue')}
+                    <span
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted"
+                      aria-hidden
+                    >
+                      <Brain size={17} strokeWidth={1.75} />
                     </span>
-                  )}
-                </button>
-              </Card>
-            ))}
-          </div>
-        )}
-      </section>
+                    <p className="min-w-0 flex-1 truncate text-sm font-medium text-fg">
+                      {recall.title}
+                    </p>
+                    {recall.overdue && (
+                      <span className="shrink-0 text-[0.6875rem] font-semibold text-error">
+                        {t('agenda.reviews.overdue')}
+                      </span>
+                    )}
+                  </button>
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
 
       {isAllClear && (
-        <p className="font-serif mt-6 text-center text-sm italic text-muted">
+        <p className="font-serif mt-10 text-center text-sm italic text-muted">
           {t('agenda.empty.allClear')}
         </p>
       )}

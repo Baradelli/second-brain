@@ -86,7 +86,7 @@ export function RecapsTab() {
   }
 
   return (
-    <div className="mx-auto h-full max-w-2xl overflow-auto px-6 pb-16">
+    <div className="page-wide h-full overflow-auto px-6 pb-16 sm:px-8">
       <header className="pt-10 pb-7">
         <h1 className="font-display text-4xl font-semibold leading-tight text-fg">
           {t('recaps.title')}
@@ -96,7 +96,7 @@ export function RecapsTab() {
         </p>
       </header>
 
-      <div className="space-y-8">
+      <div className="grid gap-x-8 gap-y-9 lg:grid-cols-3">
         {RECAP_SCOPES.map((scope) => (
           <ScopeSection
             key={scope}
