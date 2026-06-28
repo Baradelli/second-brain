@@ -80,6 +80,13 @@ export function CommandPalette({
       ),
     },
     {
+      id: 'open-recaps',
+      label: t('command.openRecaps'),
+      run: withClose(() =>
+        openTab({ kind: 'recaps', id: 'recaps', title: t('shell.recaps') }),
+      ),
+    },
+    {
       id: 'open-assistant',
       label: t('command.openAssistant'),
       run: withClose(() =>

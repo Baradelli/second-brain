@@ -2,6 +2,7 @@ import {
   BookOpen,
   Brain,
   Calendar,
+  CalendarRange,
   FileText,
   FolderOpen,
   Inbox,
@@ -35,6 +36,7 @@ const PINNED: PinnedItem[] = [
   { kind: 'review', labelKey: 'review.title', icon: Inbox },
   { kind: 'search', labelKey: 'shell.search', icon: Search },
   { kind: 'calendar', labelKey: 'shell.calendar', icon: Calendar },
+  { kind: 'recaps', labelKey: 'shell.recaps', icon: CalendarRange },
   { kind: 'assistant', labelKey: 'shell.assistant', icon: Brain },
 ];
 

@@ -8,6 +8,7 @@ export type TabKind =
   | 'review'
   | 'search'
   | 'calendar'
+  | 'recaps'
   | 'assistant'
   | 'settings'
   | 'note'

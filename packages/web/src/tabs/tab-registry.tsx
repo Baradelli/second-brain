@@ -2,11 +2,16 @@ import { EmptyState } from '@cerebro/ui';
 import { useTranslation } from 'react-i18next';
 
 import { AgendaTab } from '../agenda/AgendaTab.js';
+import { AssistantTab } from '../assistant/AssistantTab.js';
+import { CalendarTab } from '../calendar/CalendarTab.js';
 import { GoalDetailTab } from '../goals/GoalDetailTab.js';
 import { NoteEditorTab } from '../notes/NoteEditorTab.js';
 import { PublicationDetailTab } from '../publications/PublicationDetailTab.js';
+import { RecapsTab } from '../recaps/RecapsTab.js';
 import { ResourceDetailTab } from '../resources/ResourceDetailTab.js';
 import { ReviewTab } from '../review/ReviewTab.js';
+import { SearchTab } from '../search/SearchTab.js';
+import { SettingsTab } from '../settings/SettingsTab.js';
 import { StudyItemDetailTab } from '../study/StudyItemDetailTab.js';
 import type { TabDescriptor, TabKind } from './tabs-reducer.js';
 
@@ -32,10 +37,11 @@ function ComingSoon({ titleKey }: { titleKey: string }) {
 const tabRenderers: Record<TabKind, TabRenderer> = {
   today: () => <AgendaTab />,
   review: () => <ReviewTab />,
-  search: () => <ComingSoon titleKey="shell.search" />,
-  calendar: () => <ComingSoon titleKey="shell.calendar" />,
-  assistant: () => <ComingSoon titleKey="shell.assistant" />,
-  settings: () => <ComingSoon titleKey="shell.settings" />,
+  search: () => <SearchTab />,
+  calendar: () => <CalendarTab />,
+  recaps: () => <RecapsTab />,
+  assistant: () => <AssistantTab />,
+  settings: () => <SettingsTab />,
   graph: () => <ComingSoon titleKey="shell.graph" />,
   // Kinds com identidade (id próprio) mostram o título da aba no placeholder.
   note: (d) => <NoteEditorTab noteId={d.id} />,
