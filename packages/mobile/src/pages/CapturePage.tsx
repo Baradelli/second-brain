@@ -1,5 +1,13 @@
 import { type CaptureResponse, type NoteType } from '@cerebro/shared';
 import {
+  archiveCapture,
+  type CreateGoalBody,
+  type CreateResourceBody,
+  listCaptures,
+  promoteCapture,
+  type PromoteCaptureBody,
+} from '@cerebro/shared/client';
+import {
   BottomSheet,
   Button,
   Card,
@@ -14,14 +22,6 @@ import { useNavigate } from 'react-router-dom';
 import { GoalForm } from '../components/GoalForm.js';
 import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
 import { ResourceForm } from '../components/ResourceForm.js';
-import {
-  archiveCapture,
-  type CreateGoalBody,
-  type CreateResourceBody,
-  listCaptures,
-  promoteCapture,
-  type PromoteCaptureBody,
-} from '../lib/api/endpoints.js';
 
 const PROMOTE_TYPES: Array<{
   type: NoteType;

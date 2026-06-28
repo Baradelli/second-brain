@@ -1,9 +1,8 @@
 import type { SettingsResponse } from '@cerebro/shared';
+import { getSettings, updateSettings } from '@cerebro/shared/client';
 import { Button } from '@cerebro/ui';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { getSettings, updateSettings } from '../lib/api/endpoints.js';
 
 const FALLBACK_TZ = [
   'America/Sao_Paulo',

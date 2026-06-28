@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import i18n from 'i18next';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import i18n from '../lib/i18n/index.js';
 import { AgendaPage } from '../pages/AgendaPage.js';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -31,13 +31,13 @@ vi.mock('../components/QuickCaptureForm.js', () => ({
   QuickCaptureForm: () => <div data-testid="quick-capture-form" />,
 }));
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   getAgenda: vi.fn(),
   createCapture: vi.fn(),
   listActiveGoals: vi.fn(),
 }));
 
-import * as endpoints from '../lib/api/endpoints.js';
+import * as endpoints from '@cerebro/shared/client';
 
 const TODAY_ISO = new Date('2026-06-04T12:00:00Z').toISOString();
 

@@ -4,13 +4,6 @@ import {
   noteType,
   type SuggestedQuestionsGroupResponse,
 } from '@cerebro/shared';
-import { BottomSheet, RichEditor } from '@cerebro/ui';
-import { ArrowLeft, Camera, HelpCircle, ImagePlus, Tag } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-
-import { LabelPicker } from '../components/LabelPicker.js';
 import {
   attachFileToNote,
   getNoteAttachments,
@@ -20,7 +13,14 @@ import {
   getTodayNote,
   listNotes,
   uploadAttachmentFile,
-} from '../lib/api/endpoints.js';
+} from '@cerebro/shared/client';
+import { BottomSheet, RichEditor } from '@cerebro/ui';
+import { ArrowLeft, Camera, HelpCircle, ImagePlus, Tag } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+
+import { LabelPicker } from '../components/LabelPicker.js';
 import {
   persistNoteCreate,
   persistNoteEdit,

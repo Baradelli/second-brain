@@ -1,3 +1,8 @@
+import {
+  getAgenda,
+  listActiveGoals,
+  type TodayAgenda,
+} from '@cerebro/shared/client';
 import { Card, EmptyState, SectionHeader } from '@cerebro/ui';
 import {
   ArrowRight,
@@ -13,11 +18,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
-import {
-  getAgenda,
-  listActiveGoals,
-  type TodayAgenda,
-} from '../lib/api/endpoints.js';
 
 function getGreetingKey(): string {
   const hour = new Date().getHours();

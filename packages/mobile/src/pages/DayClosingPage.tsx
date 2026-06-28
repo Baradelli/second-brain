@@ -1,10 +1,9 @@
 import type { DayClosingItemResponse } from '@cerebro/shared';
+import { checkGoal, getDayClosing, skipGoal } from '@cerebro/shared/client';
 import { Button, Card } from '@cerebro/ui';
 import { Check, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { checkGoal, getDayClosing, skipGoal } from '../lib/api/endpoints.js';
 
 export function DayClosingPage() {
   const { t } = useTranslation();

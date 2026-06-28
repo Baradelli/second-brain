@@ -1,3 +1,4 @@
+import type { LabelBody } from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check } from 'lucide-react';
@@ -5,8 +6,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-
-import type { LabelBody } from '../lib/api/endpoints.js';
 
 // Paleta fixa (~8 cores) — legíveis nos dois temas.
 export const LABEL_COLORS = [

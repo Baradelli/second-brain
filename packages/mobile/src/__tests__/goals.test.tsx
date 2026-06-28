@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import i18n from 'i18next';
 import { forwardRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import i18n from '../lib/i18n/index.js';
 import { GoalsPage } from '../pages/GoalsPage.js';
 
 vi.mock('@cerebro/ui', () => ({
@@ -39,7 +39,7 @@ vi.mock('@cerebro/ui', () => ({
   }) => (open ? <div>{children}</div> : null),
 }));
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   listActiveGoals: vi.fn(),
   createGoal: vi.fn(),
   getGoalProgress: vi.fn(),
@@ -53,7 +53,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
   undoCheck: vi.fn(),
 }));
 
-import * as endpoints from '../lib/api/endpoints.js';
+import * as endpoints from '@cerebro/shared/client';
 
 function makeGoal(overrides: Record<string, unknown> = {}) {
   return {

@@ -9,12 +9,11 @@ import {
   type QuizContext,
   type StudyQuestionsContext,
 } from '@cerebro/shared';
+import { getSettings, runAi } from '@cerebro/shared/client';
 import { BottomSheet, Button } from '@cerebro/ui';
 import { Check, ClipboardCopy, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { getSettings, runAi } from '../lib/api/endpoints.js';
 
 // Pedido controlado: a página guarda o estado e abre a folha com a skill + contexto já
 // resolvidos (o contexto pode exigir um fetch antes, ex.: texto do fichamento).

@@ -59,7 +59,7 @@ vi.mock('@cerebro/ui', () => ({
     ) : null,
 }));
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   createCapture: vi.fn(),
   createNote: vi.fn(),
   editNote: vi.fn(),
@@ -68,7 +68,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
   promoteCapture: vi.fn(),
 }));
 
-import * as endpoints from '../lib/api/endpoints.js';
+import * as endpoints from '@cerebro/shared/client';
 
 const STUB_CAPTURE = (overrides: object = {}) => ({
   id: 'cap-1',

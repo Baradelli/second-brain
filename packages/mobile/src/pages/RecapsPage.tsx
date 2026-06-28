@@ -1,4 +1,5 @@
 import type { NoteResponse, RecapScope } from '@cerebro/shared';
+import { createRecap, listNotes } from '@cerebro/shared/client';
 import { BottomSheet, Card, EmptyState } from '@cerebro/ui';
 import { CalendarRange, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -6,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { PublishTrigger } from '../components/PublishTrigger.js';
-import { createRecap, listNotes } from '../lib/api/endpoints.js';
 
 const SCOPES: RecapScope[] = ['WEEK', 'MONTH', 'YEAR'];
 

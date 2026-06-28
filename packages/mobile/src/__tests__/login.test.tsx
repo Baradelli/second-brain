@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import i18n from 'i18next';
 import { forwardRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import i18n from '../lib/i18n/index.js';
 import { LoginPage } from '../pages/LoginPage.js';
 
 vi.mock('@cerebro/ui', () => ({
@@ -29,11 +29,13 @@ vi.mock('@cerebro/ui', () => ({
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({ useNavigate: () => mockNavigate }));
 
-vi.mock('../lib/api/endpoints.js', () => ({ login: vi.fn() }));
-vi.mock('../lib/auth.js', () => ({ setToken: vi.fn() }));
+vi.mock('@cerebro/shared/client', () => ({
+  login: vi.fn(),
+  setToken: vi.fn(),
+}));
 
-import * as endpoints from '../lib/api/endpoints.js';
-import * as auth from '../lib/auth.js';
+import * as auth from '@cerebro/shared/client';
+import * as endpoints from '@cerebro/shared/client';
 
 beforeEach(() => {
   vi.clearAllMocks();

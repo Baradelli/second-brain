@@ -1,3 +1,4 @@
+import { login, setToken } from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -5,9 +6,6 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-
-import { login } from '../lib/api/endpoints.js';
-import { setToken } from '../lib/auth.js';
 
 const schema = z.object({
   email: z.string().email(),

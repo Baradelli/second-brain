@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { LanguageSwitcher } from '../components/LanguageSwitcher.js';
 import { AgendaPage } from '../pages/AgendaPage.js';
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   getAgenda: vi.fn().mockResolvedValue({
     date: new Date().toISOString(),
     journal: { devotional: { done: false }, reflection: { done: false } },

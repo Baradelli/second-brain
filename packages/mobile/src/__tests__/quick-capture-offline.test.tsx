@@ -20,13 +20,13 @@ vi.mock('@cerebro/ui', () => ({
   ),
 }));
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   createCapture: vi.fn(),
   createNote: vi.fn(),
   editNote: vi.fn(),
 }));
 
-import * as endpoints from '../lib/api/endpoints.js';
+import * as endpoints from '@cerebro/shared/client';
 
 const onLineSpy = vi.spyOn(navigator, 'onLine', 'get');
 

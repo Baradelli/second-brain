@@ -3,13 +3,6 @@ import type {
   PublicationResponse,
   PublicationStageInput,
 } from '@cerebro/shared';
-import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
-import { ArrowRight, FileText, Megaphone, Sparkles } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-
-import { type PromptRequest, PromptSheet } from '../components/PromptSheet.js';
 import {
   archivePublication,
   createNote,
@@ -17,8 +10,15 @@ import {
   editPublication,
   getNoteById,
   listPublications,
-} from '../lib/api/endpoints.js';
-import { textToDoc } from '../lib/text-to-doc.js';
+  textToDoc,
+} from '@cerebro/shared/client';
+import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
+import { ArrowRight, FileText, Megaphone, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
+import { type PromptRequest, PromptSheet } from '../components/PromptSheet.js';
 
 type FormatFilter = 'all' | PublicationFormatInput;
 

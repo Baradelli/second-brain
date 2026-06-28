@@ -1,4 +1,10 @@
 import type { ResourceResponse, ResourceStageInput } from '@cerebro/shared';
+import {
+  createResource,
+  type CreateResourceBody,
+  editResource,
+  listResources,
+} from '@cerebro/shared/client';
 import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
 import {
   BookOpen,
@@ -15,12 +21,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { LabelFilter } from '../components/LabelFilter.js';
 import { ResourceForm } from '../components/ResourceForm.js';
-import {
-  createResource,
-  type CreateResourceBody,
-  editResource,
-  listResources,
-} from '../lib/api/endpoints.js';
 
 type StageFilter = 'all' | ResourceStageInput;
 type TypeFilter = 'all' | ResourceResponse['type'];

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import {
   type AiRunRequest,
   type AiRunResponse,
@@ -57,9 +59,7 @@ import {
   suggestedQuestionsGroupResponseSchema,
   type UpdateSettingsBody,
   uploadResponseSchema,
-} from '@cerebro/shared';
-import { z } from 'zod';
-
+} from '../index.js';
 import { del, get, patch, post, postFile } from './client.js';
 
 // ── Auth ────────────────────────────────────────────────────────────────────
@@ -83,6 +83,15 @@ const agendaRecallSchema = z.object({
   nextRecallAt: z.string().nullable(),
 });
 
+const agendaGoalSchema = z.object({
+  goalId: z.string(),
+  title: z.string(),
+  kind: z.enum(['scheduled', 'invitation']),
+  resolvedToday: z.boolean(),
+});
+
+export type AgendaGoal = z.infer<typeof agendaGoalSchema>;
+
 export const todayAgendaSchema = z.object({
   date: z.string(),
   journal: z.object({
@@ -90,6 +99,7 @@ export const todayAgendaSchema = z.object({
     reflection: journalEntrySchema,
   }),
   capturesToReview: z.array(captureResponseSchema),
+  goals: z.array(agendaGoalSchema).default([]),
   recallsDue: z.array(agendaRecallSchema).default([]),
 });
 

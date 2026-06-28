@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { clearToken, getToken } from '../auth.js';
+import { clearToken, getToken } from './auth.js';
 
 const BASE_URL = import.meta.env['VITE_API_URL'] ?? 'http://localhost:3333';
 

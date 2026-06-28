@@ -4,13 +4,12 @@ import type {
   ResourceResponse,
   SearchResultResponse,
 } from '@cerebro/shared';
+import { getSearch } from '@cerebro/shared/client';
 import { Card, EmptyState } from '@cerebro/ui';
 import { BookOpen, Inbox, NotebookText, Search } from 'lucide-react';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-
-import { getSearch } from '../lib/api/endpoints.js';
 
 function noteLabel(n: NoteResponse): string {
   return (

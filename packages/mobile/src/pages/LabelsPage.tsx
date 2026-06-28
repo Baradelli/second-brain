@@ -1,17 +1,17 @@
 import type { LabelNodeResponse } from '@cerebro/shared';
-import { BottomSheet, Button } from '@cerebro/ui';
-import { Archive, Pencil, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import { LabelForm } from '../components/LabelForm.js';
 import {
   archiveLabel,
   createLabel,
   editLabel,
   type LabelBody,
   listLabels,
-} from '../lib/api/endpoints.js';
+} from '@cerebro/shared/client';
+import { BottomSheet, Button } from '@cerebro/ui';
+import { Archive, Pencil, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { LabelForm } from '../components/LabelForm.js';
 
 interface FlatLabel {
   id: string;

@@ -84,7 +84,7 @@ vi.mock('@cerebro/ui', () => ({
     ) : null,
 }));
 
-vi.mock('../lib/api/endpoints.js', () => ({
+vi.mock('@cerebro/shared/client', () => ({
   createCapture: vi.fn(),
   createNote: vi.fn(),
   editNote: vi.fn(),
@@ -97,7 +97,7 @@ vi.mock('../lib/api/endpoints.js', () => ({
   listLabels: vi.fn(),
 }));
 
-import * as endpoints from '../lib/api/endpoints.js';
+import * as endpoints from '@cerebro/shared/client';
 
 function renderEditor(path: string) {
   return render(
