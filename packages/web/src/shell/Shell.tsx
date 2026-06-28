@@ -6,7 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { QuickCaptureModal } from '../capture/QuickCaptureModal.js';
+import { ActiveGoalsProvider } from '../goals/active-goal-context.js';
 import { ActiveNotesProvider } from '../notes/active-note-context.js';
+import { ActivePublicationsProvider } from '../publications/active-publication-context.js';
+import { ActiveResourcesProvider } from '../resources/active-resource-context.js';
+import { ActiveStudyProvider } from '../study/active-study-context.js';
 import { TabsProvider, useTabs } from '../tabs/tabs-context.js';
 import { CommandPalette } from './CommandPalette.js';
 import { ExplorerPanel } from './ExplorerPanel.js';
@@ -109,107 +113,115 @@ export function Shell() {
     <TabsProvider>
       <AutoOpenHoje />
       <ActiveNotesProvider>
-        <div className="flex h-screen w-screen overflow-hidden bg-bg text-fg">
-          {!left.collapsed && (
-            <>
-              <div
-                className="flex-shrink-0 overflow-hidden"
-                style={{ width: left.width }}
-              >
-                <ExplorerPanel />
-              </div>
-              <PanelDivider
-                ariaLabel={t('shell.collapsePanel')}
-                onPointerDown={left.onDividerPointerDown}
-                onDoubleClick={left.resetWidth}
-              />
-            </>
-          )}
+        <ActiveResourcesProvider>
+          <ActiveGoalsProvider>
+            <ActiveStudyProvider>
+              <ActivePublicationsProvider>
+                <div className="flex h-screen w-screen overflow-hidden bg-bg text-fg">
+                  {!left.collapsed && (
+                    <>
+                      <div
+                        className="flex-shrink-0 overflow-hidden"
+                        style={{ width: left.width }}
+                      >
+                        <ExplorerPanel />
+                      </div>
+                      <PanelDivider
+                        ariaLabel={t('shell.collapsePanel')}
+                        onPointerDown={left.onDividerPointerDown}
+                        onDoubleClick={left.resetWidth}
+                      />
+                    </>
+                  )}
 
-          <div className="flex min-w-0 flex-1 flex-col">
-            <header className="flex h-10 flex-shrink-0 items-center justify-between border-b border-subtle bg-bg px-2">
-              <button
-                type="button"
-                onClick={left.toggleCollapsed}
-                aria-label={
-                  left.collapsed
-                    ? t('shell.expandPanel')
-                    : t('shell.collapsePanel')
-                }
-                className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
-              >
-                <PanelLeft size={16} strokeWidth={1.75} />
-              </button>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setOverlay('capture')}
-                  aria-label={t('capture.section.input')}
-                  title={t('capture.section.input')}
-                  className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
-                >
-                  <PenLine size={16} strokeWidth={1.75} />
-                </button>
-                <ThemeToggle />
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  aria-label={t('nav.logout')}
-                  title={t('nav.logout')}
-                  className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
-                >
-                  <LogOut size={16} strokeWidth={1.75} />
-                </button>
-                <button
-                  type="button"
-                  onClick={right.toggleCollapsed}
-                  aria-label={
-                    right.collapsed
-                      ? t('shell.expandPanel')
-                      : t('shell.collapsePanel')
-                  }
-                  className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
-                >
-                  <PanelRight size={16} strokeWidth={1.75} />
-                </button>
-              </div>
-            </header>
-            <TabBar />
-            <main className="min-h-0 flex-1">
-              <TabContent />
-            </main>
-          </div>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <header className="flex h-10 flex-shrink-0 items-center justify-between border-b border-subtle bg-bg px-2">
+                      <button
+                        type="button"
+                        onClick={left.toggleCollapsed}
+                        aria-label={
+                          left.collapsed
+                            ? t('shell.expandPanel')
+                            : t('shell.collapsePanel')
+                        }
+                        className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
+                      >
+                        <PanelLeft size={16} strokeWidth={1.75} />
+                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setOverlay('capture')}
+                          aria-label={t('capture.section.input')}
+                          title={t('capture.section.input')}
+                          className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
+                        >
+                          <PenLine size={16} strokeWidth={1.75} />
+                        </button>
+                        <ThemeToggle />
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          aria-label={t('nav.logout')}
+                          title={t('nav.logout')}
+                          className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
+                        >
+                          <LogOut size={16} strokeWidth={1.75} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={right.toggleCollapsed}
+                          aria-label={
+                            right.collapsed
+                              ? t('shell.expandPanel')
+                              : t('shell.collapsePanel')
+                          }
+                          className="flex h-7 w-7 items-center justify-center rounded text-muted transition-colors hover:bg-card"
+                        >
+                          <PanelRight size={16} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    </header>
+                    <TabBar />
+                    <main className="min-h-0 flex-1">
+                      <TabContent />
+                    </main>
+                  </div>
 
-          {!right.collapsed && (
-            <>
-              <PanelDivider
-                ariaLabel={t('shell.collapsePanel')}
-                onPointerDown={right.onDividerPointerDown}
-                onDoubleClick={right.resetWidth}
-              />
-              <div
-                className="flex-shrink-0 overflow-hidden"
-                style={{ width: right.width }}
-              >
-                <RightPanel />
-              </div>
-            </>
-          )}
-        </div>
-        <QuickCaptureModal
-          open={overlay === 'capture'}
-          onClose={() => setOverlay(null)}
-        />
-        <CommandPalette
-          open={overlay === 'palette'}
-          onClose={() => setOverlay(null)}
-          onOpenCapture={() => setOverlay('capture')}
-          onLogout={handleLogout}
-        />
-        <QuickSwitcher
-          open={overlay === 'switcher'}
-          onClose={() => setOverlay(null)}
-        />
+                  {!right.collapsed && (
+                    <>
+                      <PanelDivider
+                        ariaLabel={t('shell.collapsePanel')}
+                        onPointerDown={right.onDividerPointerDown}
+                        onDoubleClick={right.resetWidth}
+                      />
+                      <div
+                        className="flex-shrink-0 overflow-hidden"
+                        style={{ width: right.width }}
+                      >
+                        <RightPanel />
+                      </div>
+                    </>
+                  )}
+                </div>
+                <QuickCaptureModal
+                  open={overlay === 'capture'}
+                  onClose={() => setOverlay(null)}
+                />
+                <CommandPalette
+                  open={overlay === 'palette'}
+                  onClose={() => setOverlay(null)}
+                  onOpenCapture={() => setOverlay('capture')}
+                  onLogout={handleLogout}
+                />
+                <QuickSwitcher
+                  open={overlay === 'switcher'}
+                  onClose={() => setOverlay(null)}
+                />
+              </ActivePublicationsProvider>
+            </ActiveStudyProvider>
+          </ActiveGoalsProvider>
+        </ActiveResourcesProvider>
       </ActiveNotesProvider>
     </TabsProvider>
   );

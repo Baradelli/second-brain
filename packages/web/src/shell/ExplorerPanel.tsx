@@ -18,7 +18,11 @@ import { useTranslation } from 'react-i18next';
 import { useTabs } from '../tabs/tabs-context.js';
 import type { TabKind } from '../tabs/tabs-reducer.js';
 import { CollapsibleSection } from './CollapsibleSection.js';
+import { GoalsSection } from './GoalsSection.js';
 import { NotesSection } from './NotesSection.js';
+import { PublicationsSection } from './PublicationsSection.js';
+import { ResourcesSection } from './ResourcesSection.js';
+import { StudySection } from './StudySection.js';
 
 interface PinnedItem {
   kind: TabKind;
@@ -109,6 +113,14 @@ export function ExplorerPanel() {
           >
             {section.labelKey === 'shell.notes' ? (
               <NotesSection />
+            ) : section.labelKey === 'shell.resources' ? (
+              <ResourcesSection />
+            ) : section.labelKey === 'shell.goals' ? (
+              <GoalsSection />
+            ) : section.labelKey === 'shell.study' ? (
+              <StudySection />
+            ) : section.labelKey === 'shell.publications' ? (
+              <PublicationsSection />
             ) : (
               <p className="px-2 py-2 text-xs text-muted">
                 {t('shell.sectionEmpty')}

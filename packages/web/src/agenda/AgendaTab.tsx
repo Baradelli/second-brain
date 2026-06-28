@@ -209,7 +209,7 @@ export function AgendaTab() {
         )}
       </section>
 
-      {/* ── Revisões de hoje (display-only; recall é Fase 2) ────────────── */}
+      {/* ── Revisões de hoje → abre o item de estudo (entra no ritual de recall) ── */}
       <section className="mb-4">
         <SectionHeader label={t('agenda.section.reviews')} className="mb-3" />
         {agenda.recallsDue.length === 0 ? (
@@ -221,7 +221,19 @@ export function AgendaTab() {
           <div className="space-y-2.5">
             {agenda.recallsDue.map((recall) => (
               <Card key={recall.studyItemId} padding="sm">
-                <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    openTab({
+                      kind: 'studyItem',
+                      id: recall.studyItemId,
+                      title: recall.title,
+                    })
+                  }
+                  data-testid={`agenda-recall-${recall.studyItemId}`}
+                  aria-label={t('agenda.reviews.open', { title: recall.title })}
+                  className="flex w-full items-center gap-3 text-left transition-transform duration-150 active:scale-[0.99]"
+                >
                   <span
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted"
                     aria-hidden
@@ -236,7 +248,7 @@ export function AgendaTab() {
                       {t('agenda.reviews.overdue')}
                     </span>
                   )}
-                </div>
+                </button>
               </Card>
             ))}
           </div>

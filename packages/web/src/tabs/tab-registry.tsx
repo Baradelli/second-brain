@@ -2,8 +2,12 @@ import { EmptyState } from '@cerebro/ui';
 import { useTranslation } from 'react-i18next';
 
 import { AgendaTab } from '../agenda/AgendaTab.js';
+import { GoalDetailTab } from '../goals/GoalDetailTab.js';
 import { NoteEditorTab } from '../notes/NoteEditorTab.js';
+import { PublicationDetailTab } from '../publications/PublicationDetailTab.js';
+import { ResourceDetailTab } from '../resources/ResourceDetailTab.js';
 import { ReviewTab } from '../review/ReviewTab.js';
+import { StudyItemDetailTab } from '../study/StudyItemDetailTab.js';
 import type { TabDescriptor, TabKind } from './tabs-reducer.js';
 
 /**
@@ -35,34 +39,11 @@ const tabRenderers: Record<TabKind, TabRenderer> = {
   graph: () => <ComingSoon titleKey="shell.graph" />,
   // Kinds com identidade (id próprio) mostram o título da aba no placeholder.
   note: (d) => <NoteEditorTab noteId={d.id} />,
-  resource: (d) => (
-    <EntityComingSoon labelKey="shell.resourcePrefix" title={d.title} />
-  ),
-  goal: (d) => <EntityComingSoon labelKey="shell.goalPrefix" title={d.title} />,
-  studyItem: (d) => (
-    <EntityComingSoon labelKey="shell.studyItemPrefix" title={d.title} />
-  ),
-  publication: (d) => (
-    <EntityComingSoon labelKey="shell.publicationPrefix" title={d.title} />
-  ),
+  resource: (d) => <ResourceDetailTab resourceId={d.id} />,
+  goal: (d) => <GoalDetailTab goalId={d.id} />,
+  studyItem: (d) => <StudyItemDetailTab studyItemId={d.id} />,
+  publication: (d) => <PublicationDetailTab publicationId={d.id} />,
 };
-
-function EntityComingSoon({
-  labelKey,
-  title,
-}: {
-  labelKey: string;
-  title: string;
-}) {
-  const { t } = useTranslation();
-  return (
-    <EmptyState
-      title={t(labelKey, { title })}
-      body={t('shell.comingSoon')}
-      className="h-full"
-    />
-  );
-}
 
 export function renderTabContent(
   descriptor: TabDescriptor,
