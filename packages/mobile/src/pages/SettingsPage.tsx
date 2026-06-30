@@ -4,6 +4,8 @@ import { Button } from '@cerebro/ui';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { HighlightColorsEditor } from '../components/HighlightColorsEditor.js';
+
 const FALLBACK_TZ = [
   'America/Sao_Paulo',
   'UTC',
@@ -236,6 +238,8 @@ export function SettingsPage() {
               </span>
             )}
           </div>
+
+          <HighlightColorsEditor />
         </div>
       )}
     </main>

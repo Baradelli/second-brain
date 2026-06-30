@@ -3,6 +3,7 @@ import {
   archiveGoal,
   checkGoal,
   completeGoal,
+  deleteGoal,
   editGoal,
   getGoalProgress,
   listActiveGoals,
@@ -18,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { ConfirmDialog } from '../shared/ConfirmDialog.js';
 import { useTabs } from '../tabs/tabs-context.js';
 import { useActiveGoals } from './active-goal-context.js';
 import {
@@ -61,8 +63,9 @@ async function loadGoal(goalId: string): Promise<GoalResponse | null> {
  */
 export function GoalDetailTab({ goalId }: { goalId: string }) {
   const { t } = useTranslation();
-  const { renameTab, tabs } = useTabs();
+  const { renameTab, closeTab, tabs } = useTabs();
   const { set, clear } = useActiveGoals();
+  const [confirm, setConfirm] = useState<'archive' | 'delete' | null>(null);
 
   const [goal, setGoal] = useState<GoalResponse | null>(null);
   const [progress, setProgress] = useState<GoalProgressResponse | undefined>();
@@ -334,25 +337,61 @@ export function GoalDetailTab({ goalId }: { goalId: string }) {
               {t('goals.skip')}
             </Button>
           )}
-          <Button
-            variant="secondary"
-            onClick={() => void runAction(() => archiveGoal(goal.id))}
-          >
+          <Button variant="secondary" onClick={() => setConfirm('archive')}>
             {t('goals.archive')}
           </Button>
         </div>
       )}
 
       {archived && (
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap gap-2">
           <Button
             variant="primary"
             onClick={() => void runAction(() => unarchiveGoal(goal.id))}
           >
             {t('goals.restore')}
           </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setConfirm('delete')}
+            style={{ color: 'var(--cerebro-error)' }}
+          >
+            {t('common.deletePermanently')}
+          </Button>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirm === 'archive'}
+        tone="default"
+        title={t('goals.archiveConfirm.title')}
+        body={t('goals.archiveConfirm.body')}
+        confirmLabel={t('goals.archiveConfirm.confirm')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          await archiveGoal(goal.id);
+          setConfirm(null);
+          await refresh();
+        }}
+      />
+      <ConfirmDialog
+        open={confirm === 'delete'}
+        tone="danger"
+        title={t('goals.deleteConfirm.title')}
+        body={t('goals.deleteConfirm.body')}
+        confirmLabel={t('goals.deleteConfirm.confirm')}
+        blockedMessage={t('goals.deleteBlocked')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          await deleteGoal(goal.id);
+          setConfirm(null);
+          const own = tabs.find(
+            (tab) =>
+              tab.descriptor.kind === 'goal' && tab.descriptor.id === goalId,
+          );
+          if (own) closeTab(own.tabId);
+        }}
+      />
 
       {/* Valor do check (TARGET/PROJECT) */}
       {showCheckValue && (

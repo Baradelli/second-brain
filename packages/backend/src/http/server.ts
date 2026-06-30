@@ -24,6 +24,7 @@ import { eventRoutes } from '../routes/event-routes.js';
 import { goalRoutes } from '../routes/goal-routes.js';
 import { graphRoutes } from '../routes/graph-routes.js';
 import { guideQuestionRoutes } from '../routes/guide-question-routes.js';
+import { highlightRoutes } from '../routes/highlight-routes.js';
 import { labelRoutes } from '../routes/label-routes.js';
 import { noteRoutes } from '../routes/note-routes.js';
 import { publicationRoutes } from '../routes/publication-routes.js';
@@ -99,6 +100,7 @@ export async function buildServer() {
     await api.register(guideQuestionRoutes, { prisma });
     await api.register(agendaRoutes, { prisma });
     await api.register(resourceRoutes, { prisma });
+    await api.register(highlightRoutes, { prisma });
     await api.register(goalRoutes, { prisma });
     await api.register(eventRoutes, { prisma });
     await api.register(dayClosingRoutes, { prisma });

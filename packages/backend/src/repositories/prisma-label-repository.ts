@@ -79,6 +79,15 @@ export class PrismaLabelRepository implements LabelRepository {
     return toDomain(record);
   }
 
+  async delete(id: string): Promise<void> {
+    // GuideQuestion.labelId é FK obrigatória (Restrict); as perguntas-guia são
+    // derivadas da label, então removemos junto, numa transação atômica.
+    await this.prisma.$transaction([
+      this.prisma.guideQuestion.deleteMany({ where: { labelId: id } }),
+      this.prisma.label.delete({ where: { id } }),
+    ]);
+  }
+
   async usageCount(labelId: string): Promise<LabelUsage> {
     const label = await this.prisma.label.findUnique({
       where: { id: labelId },

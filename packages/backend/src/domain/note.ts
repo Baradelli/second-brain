@@ -14,6 +14,6 @@ export interface Note {
   eventId?: string;
   labelIds?: string[];
   status: 'ACTIVE' | 'ARCHIVED';
-  archivedAt?: Date;
+  archivedAt?: Date | null;
   createdAt: Date;
 }

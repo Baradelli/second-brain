@@ -42,6 +42,11 @@ vi.mock('@cerebro/shared/client', () => ({
   archiveNote: vi.fn(),
   editResource: vi.fn(),
   listLabels: vi.fn(),
+  listHighlights: vi.fn(),
+  listHighlightColors: vi.fn(),
+  createHighlight: vi.fn(),
+  editHighlight: vi.fn(),
+  archiveHighlight: vi.fn(),
 }));
 
 import * as endpoints from '@cerebro/shared/client';
@@ -96,6 +101,8 @@ beforeEach(() => {
   vi.mocked(endpoints.getResource).mockResolvedValue(RESOURCE as never);
   vi.mocked(endpoints.listNotes).mockResolvedValue([]);
   vi.mocked(endpoints.listLabels).mockResolvedValue([]);
+  vi.mocked(endpoints.listHighlights).mockResolvedValue([]);
+  vi.mocked(endpoints.listHighlightColors).mockResolvedValue([]);
 });
 
 afterEach(async () => {

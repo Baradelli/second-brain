@@ -28,6 +28,14 @@ import {
   type GoalResponse,
   goalResponseSchema,
   type GoalTypeInput,
+  type AddHighlightColorBody,
+  type CreateHighlightBody,
+  type EditHighlightBody,
+  type EditHighlightColorBody,
+  type HighlightColorInput,
+  highlightColorSchema,
+  type HighlightResponse,
+  highlightResponseSchema,
   type LabelNodeResponse,
   labelNodeResponseSchema,
   type LabelResponse,
@@ -153,6 +161,16 @@ export function archiveStudyItem(id: string): Promise<StudyItemResponse> {
   return post(`/study-items/${id}/archive`, {}, studyItemResponseSchema);
 }
 
+/** Restaura um item de estudo arquivado (volta para ACTIVE). */
+export function unarchiveStudyItem(id: string): Promise<StudyItemResponse> {
+  return post(`/study-items/${id}/unarchive`, {}, studyItemResponseSchema);
+}
+
+/** Hard delete — só itens arquivados e sem histórico de recall (409 se bloqueado). */
+export function deleteStudyItem(id: string): Promise<StudyItemResponse> {
+  return post(`/study-items/${id}/delete`, {}, studyItemResponseSchema);
+}
+
 export function logRecall(
   studyItemId: string,
   body: LogRecallInput,
@@ -221,6 +239,16 @@ export function archiveCapture(
   return post(`/captures/${id}/archive`, { reason }, captureResponseSchema);
 }
 
+/** Restaura uma captura arquivada (volta para a fila de revisão). */
+export function unarchiveCapture(id: string): Promise<CaptureResponse> {
+  return post(`/captures/${id}/unarchive`, {}, captureResponseSchema);
+}
+
+/** Hard delete — só capturas arquivadas e sem anexos (backend valida; 409 se bloqueado). */
+export function deleteCapture(id: string): Promise<CaptureResponse> {
+  return post(`/captures/${id}/delete`, {}, captureResponseSchema);
+}
+
 export function promoteCapture(
   id: string,
   body: PromoteCaptureBody,
@@ -274,6 +302,16 @@ export function getNoteById(id: string): Promise<NoteResponse> {
 /** Soft delete: arquiva a nota (sai da lista ACTIVE). */
 export function archiveNote(id: string): Promise<NoteResponse> {
   return post(`/notes/${id}/archive`, {}, noteResponseSchema);
+}
+
+/** Restaura uma nota arquivada (volta para ACTIVE). */
+export function unarchiveNote(id: string): Promise<NoteResponse> {
+  return post(`/notes/${id}/unarchive`, {}, noteResponseSchema);
+}
+
+/** Hard delete — só notas arquivadas e sem referências (backend valida; 409 se bloqueado). */
+export function deleteNote(id: string): Promise<NoteResponse> {
+  return post(`/notes/${id}/delete`, {}, noteResponseSchema);
 }
 
 export function listNotes(
@@ -388,6 +426,70 @@ export function editResource(
   body: Partial<CreateResourceBody> & { stage?: ResourceStageInput },
 ): Promise<ResourceResponse> {
   return patch(`/resources/${id}`, body, resourceResponseSchema);
+}
+
+/** Soft delete: arquiva o recurso (sai da lista ACTIVE). */
+export function archiveResource(id: string): Promise<ResourceResponse> {
+  return post(`/resources/${id}/archive`, {}, resourceResponseSchema);
+}
+
+/** Restaura um recurso arquivado (volta para ACTIVE). */
+export function unarchiveResource(id: string): Promise<ResourceResponse> {
+  return post(`/resources/${id}/unarchive`, {}, resourceResponseSchema);
+}
+
+/** Hard delete — só recursos arquivados e sem referências (409 se bloqueado). */
+export function deleteResource(id: string): Promise<ResourceResponse> {
+  return post(`/resources/${id}/delete`, {}, resourceResponseSchema);
+}
+
+// ── Highlights (Grifos) ───────────────────────────────────────────────────────
+
+export type CreateHighlightInput = Omit<CreateHighlightBody, 'userId'>;
+export type EditHighlightInput = Omit<EditHighlightBody, 'userId'>;
+
+export function listHighlights(params: {
+  resourceId: string;
+  colorId?: string;
+  status?: 'ACTIVE' | 'ARCHIVED';
+}): Promise<HighlightResponse[]> {
+  const query = new URLSearchParams();
+  query.set('resourceId', params.resourceId);
+  if (params.colorId) query.set('colorId', params.colorId);
+  query.set('status', params.status ?? 'ACTIVE');
+  return get(`/highlights?${query.toString()}`, z.array(highlightResponseSchema));
+}
+
+export function getHighlight(id: string): Promise<HighlightResponse> {
+  return get(`/highlights/${id}`, highlightResponseSchema);
+}
+
+export function createHighlight(
+  body: CreateHighlightInput,
+): Promise<HighlightResponse> {
+  return post('/highlights', body, highlightResponseSchema);
+}
+
+export function editHighlight(
+  id: string,
+  body: EditHighlightInput,
+): Promise<HighlightResponse> {
+  return patch(`/highlights/${id}`, body, highlightResponseSchema);
+}
+
+/** Soft delete: arquiva o grifo (sai da lista ACTIVE). */
+export function archiveHighlight(id: string): Promise<HighlightResponse> {
+  return post(`/highlights/${id}/archive`, {}, highlightResponseSchema);
+}
+
+/** Restaura um grifo arquivado (volta para ACTIVE). */
+export function unarchiveHighlight(id: string): Promise<HighlightResponse> {
+  return post(`/highlights/${id}/unarchive`, {}, highlightResponseSchema);
+}
+
+/** Hard delete — só grifos arquivados. */
+export function deleteHighlight(id: string): Promise<HighlightResponse> {
+  return post(`/highlights/${id}/delete`, {}, highlightResponseSchema);
 }
 
 // ── Goals ─────────────────────────────────────────────────────────────────────
@@ -523,6 +625,30 @@ export function updateSettings(
   return patch('/settings', body, settingsResponseSchema);
 }
 
+// ── Paleta de grifos (cores de marca-texto) ───────────────────────────────────
+
+export function listHighlightColors(): Promise<HighlightColorInput[]> {
+  return get('/settings/highlight-colors', z.array(highlightColorSchema));
+}
+
+export function addHighlightColor(
+  body: AddHighlightColorBody,
+): Promise<HighlightColorInput> {
+  return post('/settings/highlight-colors', body, highlightColorSchema);
+}
+
+export function editHighlightColor(
+  id: string,
+  body: EditHighlightColorBody,
+): Promise<HighlightColorInput> {
+  return patch(`/settings/highlight-colors/${id}`, body, highlightColorSchema);
+}
+
+/** Remove uma cor da paleta. 409 se algum grifo ainda a usa. */
+export function removeHighlightColor(id: string): Promise<void> {
+  return del(`/settings/highlight-colors/${id}`);
+}
+
 // ── Labels ──────────────────────────────────────────────────────────────────
 
 export function listLabels(): Promise<LabelNodeResponse[]> {
@@ -545,6 +671,21 @@ export function editLabel(id: string, body: LabelBody): Promise<LabelResponse> {
 
 export function archiveLabel(id: string): Promise<LabelResponse> {
   return post(`/labels/${id}/archive`, {}, labelResponseSchema);
+}
+
+/** Lista labels arquivadas (árvore). */
+export function listArchivedLabels(): Promise<LabelNodeResponse[]> {
+  return get(`/labels?status=ARCHIVED`, z.array(labelNodeResponseSchema));
+}
+
+/** Restaura uma label arquivada (volta para ACTIVE). */
+export function unarchiveLabel(id: string): Promise<LabelResponse> {
+  return post(`/labels/${id}/unarchive`, {}, labelResponseSchema);
+}
+
+/** Hard delete — só labels arquivadas e sem uso/filhas (409 se bloqueado). */
+export function deleteLabel(id: string): Promise<LabelResponse> {
+  return post(`/labels/${id}/delete`, {}, labelResponseSchema);
 }
 
 /** Achata a árvore de labels para uma lista plana (id + name), p/ filtros simples. */
@@ -652,6 +793,16 @@ export function editPublication(
 
 export function archivePublication(id: string): Promise<PublicationResponse> {
   return post(`/publications/${id}/archive`, {}, publicationResponseSchema);
+}
+
+/** Restaura uma publicação arquivada (volta para ACTIVE). */
+export function unarchivePublication(id: string): Promise<PublicationResponse> {
+  return post(`/publications/${id}/unarchive`, {}, publicationResponseSchema);
+}
+
+/** Hard delete — só publicações arquivadas (409 se não estiver arquivada). */
+export function deletePublication(id: string): Promise<PublicationResponse> {
+  return post(`/publications/${id}/delete`, {}, publicationResponseSchema);
 }
 
 // ── AI (modo conectado) ──────────────────────────────────────────────────────

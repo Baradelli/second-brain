@@ -23,6 +23,7 @@ describe('GetSettings', () => {
       devotionalTime: '07:00',
       reflectionTime: '21:00',
       aiMode: 'cheap',
+      highlightColors: [],
     });
   });
 

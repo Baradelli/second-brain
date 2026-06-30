@@ -77,6 +77,41 @@ export class GuideQuestionNotFoundError extends Error {
   }
 }
 
+export class HighlightNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Highlight not found: ${id}`);
+    this.name = 'HighlightNotFoundError';
+  }
+}
+
+export class InvalidHighlightError extends Error {
+  constructor(message: string) {
+    super(`Invalid highlight: ${message}`);
+    this.name = 'InvalidHighlightError';
+  }
+}
+
+export class HighlightNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`Highlight '${id}' must be archived before it can be deleted.`);
+    this.name = 'HighlightNotArchivedError';
+  }
+}
+
+export class HighlightColorNotFoundError extends Error {
+  constructor(colorId: string) {
+    super(`Highlight color not found in palette: ${colorId}`);
+    this.name = 'HighlightColorNotFoundError';
+  }
+}
+
+export class HighlightColorInUseError extends Error {
+  constructor(public readonly count: number) {
+    super(`Cannot remove highlight color: it is used by ${count} highlight(s).`);
+    this.name = 'HighlightColorInUseError';
+  }
+}
+
 export class ResourceNotFoundError extends Error {
   constructor(id: string) {
     super(`Resource not found: ${id}`);
@@ -193,5 +228,97 @@ export class InvalidPublicationError extends Error {
   constructor(message: string) {
     super(`Invalid publication: ${message}`);
     this.name = 'InvalidPublicationError';
+  }
+}
+
+// ── Hard delete: só itens arquivados, e bloqueado se houver referência ───────
+// Generaliza a regra do DeleteGoal (ver docs/adr/0004-politica-de-exclusao.md).
+
+export class NoteNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`Note '${id}' must be archived before it can be deleted.`);
+    this.name = 'NoteNotArchivedError';
+  }
+}
+
+export class NoteHasReferencesError extends Error {
+  constructor(
+    public readonly reason: 'backlinks' | 'attachments' | 'studyItem' | 'draft',
+    public readonly count: number,
+  ) {
+    const detail = {
+      backlinks: `${count} other note(s) link to it`,
+      attachments: `it has ${count} attachment(s)`,
+      studyItem: `it is the fichamento of ${count} study item(s)`,
+      draft: `it is the draft of ${count} publication(s)`,
+    }[reason];
+    super(`Cannot delete note: ${detail}.`);
+    this.name = 'NoteHasReferencesError';
+  }
+}
+
+export class CaptureNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`Capture '${id}' must be archived before it can be deleted.`);
+    this.name = 'CaptureNotArchivedError';
+  }
+}
+
+export class CaptureHasReferencesError extends Error {
+  constructor(public readonly count: number) {
+    super(`Cannot delete capture: it has ${count} attachment(s).`);
+    this.name = 'CaptureHasReferencesError';
+  }
+}
+
+export class LabelNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`Label '${id}' must be archived before it can be deleted.`);
+    this.name = 'LabelNotArchivedError';
+  }
+}
+
+export class StudyItemNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`StudyItem '${id}' must be archived before it can be deleted.`);
+    this.name = 'StudyItemNotArchivedError';
+  }
+}
+
+export class StudyItemHasHistoryError extends Error {
+  constructor(public readonly count: number) {
+    super(
+      `Cannot delete study item: it has ${count} recall(s) in its history.`,
+    );
+    this.name = 'StudyItemHasHistoryError';
+  }
+}
+
+export class PublicationNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`Publication '${id}' must be archived before it can be deleted.`);
+    this.name = 'PublicationNotArchivedError';
+  }
+}
+
+export class ResourceNotArchivedError extends Error {
+  constructor(id: string) {
+    super(`Resource '${id}' must be archived before it can be deleted.`);
+    this.name = 'ResourceNotArchivedError';
+  }
+}
+
+export class ResourceHasReferencesError extends Error {
+  constructor(
+    public readonly reason: 'notes' | 'studyItems' | 'highlights',
+    public readonly count: number,
+  ) {
+    const detail = {
+      notes: `${count} note(s) reference it`,
+      studyItems: `${count} study item(s) reference it`,
+      highlights: `${count} highlight(s) reference it`,
+    }[reason];
+    super(`Cannot delete resource: ${detail}.`);
+    this.name = 'ResourceHasReferencesError';
   }
 }

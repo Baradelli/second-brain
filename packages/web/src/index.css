@@ -106,6 +106,43 @@ body::before {
   background: transparent;
 }
 
+/* ── Modal de confirmação (entrada sutil; respeita prefers-reduced-motion) ───── */
+@keyframes cb-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cb-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cb-backdrop {
+  animation: cb-backdrop-in 160ms ease-out;
+}
+
+.cb-dialog {
+  /* ease-out-quart: chega rápido e assenta, sem bounce */
+  animation: cb-dialog-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-backdrop,
+  .cb-dialog {
+    animation: none;
+  }
+}
+
 /* ── Larguras de página (fim do "max-w-2xl" mágico espalhado) ────────────────
    .page-reading: texto longo (medida confortável). .page-wide: dashboards/listas. */
 .page-reading {

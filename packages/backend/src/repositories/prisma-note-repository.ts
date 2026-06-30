@@ -121,4 +121,10 @@ export class PrismaNoteRepository implements NoteRepository {
     });
     return toDomain(record);
   }
+
+  async delete(id: string): Promise<void> {
+    // Os NoteLink (saída/entrada) têm onDelete: Cascade no schema; o usecase já
+    // bloqueia se há backlinks/anexos, então a remoção não deixa referências órfãs.
+    await this.prisma.note.delete({ where: { id } });
+  }
 }

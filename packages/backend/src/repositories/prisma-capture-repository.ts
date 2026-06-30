@@ -120,4 +120,8 @@ export class PrismaCaptureRepository implements CaptureRepository {
     });
     return toDomain(record);
   }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.capture.delete({ where: { id } });
+  }
 }

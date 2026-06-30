@@ -6,9 +6,11 @@ import type {
 import {
   archiveStudyItem,
   createNote,
+  deleteStudyItem,
   editStudyItem,
   getStudyItem,
   logRecall,
+  unarchiveStudyItem,
   undoRecall,
 } from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
@@ -19,6 +21,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { ConfirmDialog } from '../shared/ConfirmDialog.js';
 import { useTabs } from '../tabs/tabs-context.js';
 import { useActiveStudy } from './active-study-context.js';
 import { durabilityKey, isDue, studyItemLabel } from './study-display.js';
@@ -60,8 +63,9 @@ type StudyFormValues = z.infer<typeof studyFormSchema>;
  */
 export function StudyItemDetailTab({ studyItemId }: { studyItemId: string }) {
   const { t } = useTranslation();
-  const { openTab, renameTab, tabs } = useTabs();
+  const { openTab, renameTab, closeTab, tabs } = useTabs();
   const { set, clear } = useActiveStudy();
+  const [confirm, setConfirm] = useState<'archive' | 'delete' | null>(null);
 
   const [item, setItem] = useState<StudyItemResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -211,16 +215,6 @@ export function StudyItemDetailTab({ studyItemId }: { studyItemId: string }) {
       setRecalling(false);
     }
   }, [lastRecall, undoConfidence, load]);
-
-  const archive = useCallback(async () => {
-    if (!item) return;
-    try {
-      const updated = await archiveStudyItem(item.id);
-      setItem(updated);
-    } catch {
-      setSaveStatus('error');
-    }
-  }, [item]);
 
   if (loading) {
     return (
@@ -392,11 +386,66 @@ export function StudyItemDetailTab({ studyItemId }: { studyItemId: string }) {
 
       {!archived && (
         <div className="mt-8">
-          <Button variant="secondary" onClick={() => void archive()}>
+          <Button variant="secondary" onClick={() => setConfirm('archive')}>
             {t('common.archive')}
           </Button>
         </div>
       )}
+
+      {archived && (
+        <div className="mt-8 flex flex-wrap gap-2">
+          <Button
+            variant="primary"
+            onClick={() =>
+              void unarchiveStudyItem(item.id)
+                .then(setItem)
+                .catch(() => {})
+            }
+          >
+            {t('common.restore')}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setConfirm('delete')}
+            style={{ color: 'var(--cerebro-error)' }}
+          >
+            {t('common.deletePermanently')}
+          </Button>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirm === 'archive'}
+        tone="default"
+        title={t('study.archiveConfirm.title')}
+        body={t('study.archiveConfirm.body')}
+        confirmLabel={t('study.archiveConfirm.confirm')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          const updated = await archiveStudyItem(item.id);
+          setItem(updated);
+          setConfirm(null);
+        }}
+      />
+      <ConfirmDialog
+        open={confirm === 'delete'}
+        tone="danger"
+        title={t('study.deleteConfirm.title')}
+        body={t('study.deleteConfirm.body')}
+        confirmLabel={t('study.deleteConfirm.confirm')}
+        blockedMessage={t('study.deleteBlocked')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          await deleteStudyItem(item.id);
+          setConfirm(null);
+          const own = tabs.find(
+            (tab) =>
+              tab.descriptor.kind === 'studyItem' &&
+              tab.descriptor.id === studyItemId,
+          );
+          if (own) closeTab(own.tabId);
+        }}
+      />
     </div>
   );
 }

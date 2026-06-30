@@ -163,3 +163,27 @@ vira um `StudyItem` que o app me devolve para **revisar em 2 dias, 1 semana e 1 
 começando por tentar lembrar; marco **A/B/C** e o app destaca o que sei menos. Quando algo vale,
 **viro num rascunho de post/aula** com um clique. Tudo com domínio coberto por testes, sem IA
 obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo **modo cheap**.
+
+## Excluir/arquivar + melhorias no editor
+
+- [x] **Editor**: marcador de listas (Tailwind v4 zerava `list-style`), código (bloco + inline) + botão divisor na toolbar e no menu `/`. (`packages/ui` — `editor.css`, `RichEditor.tsx`,
+      `slash-command.ts`; pega web e mobile)
+- [x] **Exclusão (ADR 0004)** — arquivar reversível + hard delete bloqueado por referência,
+      generalizando a regra do `Goal` para todas as entidades; modal de confirmação nas duas
+      ações. Backend TDD: `unarchive-*`/`delete-*` para Note, Capture, Label, StudyItem,
+      Publication; `archive`/`unarchive`/`delete` de `Resource` do zero; rotas (`/…/unarchive`,
+      `/…/delete` → 409 se bloqueado) + endpoints no `shared`. (446 testes unit verdes)
+- [x] **Frontend web** — `ConfirmDialog` reutilizável + `ArchivedToggle`; ações de arquivar/
+      restaurar/excluir nas abas de detalhe (Note, Goal, Resource, StudyItem, Publication) e
+      inline em Label/Capture; visões de arquivados nas seções do explorador.
+
+## Grifos (Highlights) por Recurso + paleta global de cores
+
+- [x] **74** — Tabela de grifos por Recurso (cor com significado + trecho + comentário + local)
+      e **paleta global** customizável de cores no Settings. Entrada manual, desacoplada do
+      editor; o comentário é a nota ancorada (sem Note separada). Backend TDD
+      (`Highlight` + usecases de grifo e de paleta; `remove` de cor bloqueado se em uso →
+      409); paleta como JSON no `Settings` (**ADR 0005**); migração via Prisma; contrato do
+      repo. Web (seção Grifos no detalhe + editor de paleta no Settings) e mobile (cards +
+      BottomSheet). Verbetes no `CONTEXT.md`. → `tasks/74-grifos-highlights.md`
+      (659 testes backend verdes; web 157; mobile 123)

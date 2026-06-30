@@ -63,6 +63,7 @@ model User {
   recalls      Recall[]
   publications Publication[]
   noteLinks    NoteLink[]
+  highlights   Highlight[]
 }
 
 model Settings {
@@ -75,6 +76,7 @@ model Settings {
   devotionalTime String @default("07:00") // HH:mm (validado na API)
   reflectionTime String @default("21:00") // HH:mm (validado na API)
   aiMode         String @default("cheap") // "cheap"|"connected" (z.enum) — modo do agente (Bloco P)
+  highlightColors Json  @default("[]") // paleta de grifos: [{id,color,name,order}] (ver ADR 0005)
 }
 
 model Label {
@@ -190,6 +192,27 @@ model Resource {
   labels     Label[]     @relation("ResourceLabels")
   notes      Note[]
   studyItems StudyItem[]
+  highlights Highlight[]
+}
+
+// Grifo (marca-texto) de um Recurso. Entrada manual: cor (significado) + trecho +
+// comentário. A cor referencia Settings.highlightColors[].id (ver ADR 0005).
+model Highlight {
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  resourceId String
+  resource   Resource      @relation(fields: [resourceId], references: [id])
+  colorId    String
+  location   String?
+  quote      String
+  comment    String?
+  status     GeneralStatus @default(ACTIVE)
+  archivedAt DateTime?
+  createdAt  DateTime      @default(now())
+
+  @@index([userId, resourceId])
+  @@index([userId, colorId])
 }
 
 model Goal {

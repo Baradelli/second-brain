@@ -6,15 +6,18 @@ import {
 } from '@cerebro/shared';
 import {
   archiveCapture,
+  deleteCapture,
   listCaptures,
   promoteCapture,
   type PromoteCaptureBody,
+  unarchiveCapture,
 } from '@cerebro/shared/client';
 import { Button, Card, EmptyState, Input, SectionHeader } from '@cerebro/ui';
-import { Archive, Inbox } from 'lucide-react';
+import { Archive, Inbox, RotateCcw, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ConfirmDialog } from '../shared/ConfirmDialog.js';
 import { useTabs } from '../tabs/tabs-context.js';
 import { tabForPromoteResult } from './promote-target.js';
 
@@ -54,6 +57,10 @@ export function ReviewTab() {
   const [error, setError] = useState(false);
   const [promoteId, setPromoteId] = useState<string | null>(null);
 
+  const [showArchived, setShowArchived] = useState(false);
+  const [archived, setArchived] = useState<CaptureResponse[]>([]);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     setError(false);
     setLoading(true);
@@ -71,10 +78,27 @@ export function ReviewTab() {
     void load();
   }, [load]);
 
+  const loadArchived = useCallback(async () => {
+    setArchived(await listCaptures('ARCHIVED'));
+  }, []);
+
+  async function toggleArchived() {
+    const next = !showArchived;
+    setShowArchived(next);
+    if (next) {
+      try {
+        await loadArchived();
+      } catch {
+        setArchived([]);
+      }
+    }
+  }
+
   async function handleArchive(id: string) {
     await archiveCapture(id);
     setPending((prev) => prev.filter((c) => c.id !== id));
     if (promoteId === id) setPromoteId(null);
+    if (showArchived) await loadArchived();
   }
 
   async function handlePromote(
@@ -145,6 +169,72 @@ export function ReviewTab() {
           </div>
         </>
       )}
+
+      <button
+        type="button"
+        onClick={() => void toggleArchived()}
+        className="mt-6 px-1 py-1.5 text-left text-xs font-medium text-accent transition-colors hover:underline"
+      >
+        {showArchived ? t('capture.archived.hide') : t('capture.archived.show')}
+      </button>
+
+      {showArchived && (
+        <div className="mt-1 flex flex-col gap-1.5">
+          {archived.length === 0 ? (
+            <p className="px-1 py-2 text-xs text-muted">
+              {t('capture.archived.empty')}
+            </p>
+          ) : (
+            archived.map((capture) => (
+              <div
+                key={capture.id}
+                className="flex items-start gap-3 rounded-[var(--radius-card)] border border-subtle px-3 py-2.5"
+              >
+                <p className="min-w-0 flex-1 truncate text-sm text-muted">
+                  {capture.text}
+                </p>
+                <button
+                  type="button"
+                  aria-label={t('capture.restore')}
+                  onClick={() =>
+                    void unarchiveCapture(capture.id)
+                      .then(() => Promise.all([load(), loadArchived()]))
+                      .catch(() => {})
+                  }
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-raised"
+                >
+                  <RotateCcw size={15} strokeWidth={1.85} />
+                </button>
+                <button
+                  type="button"
+                  aria-label={t('common.deletePermanently')}
+                  onClick={() => setDeleteId(capture.id)}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-raised"
+                  style={{ color: 'var(--cerebro-error)' }}
+                >
+                  <Trash2 size={15} strokeWidth={1.85} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={deleteId !== null}
+        tone="danger"
+        title={t('capture.deleteConfirm.title')}
+        body={t('capture.deleteConfirm.body')}
+        confirmLabel={t('capture.deleteConfirm.confirm')}
+        blockedMessage={t('capture.deleteBlocked')}
+        onCancel={() => setDeleteId(null)}
+        onConfirm={async () => {
+          if (!deleteId) return;
+          await deleteCapture(deleteId);
+          setDeleteId(null);
+          await loadArchived();
+        }}
+      />
     </div>
   );
 }

@@ -17,4 +17,5 @@ export interface NoteRepository {
   byId(id: string): Promise<Note | null>;
   find(filter: NoteFilter): Promise<Note[]>;
   update(id: string, patch: Partial<Note>): Promise<Note>;
+  delete(id: string): Promise<void>; // hard delete — só notas arquivadas e sem referências
 }

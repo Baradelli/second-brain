@@ -29,6 +29,10 @@ export class StudyItemRepositoryFake implements StudyItemRepository {
     return { ...updated };
   }
 
+  async delete(id: string): Promise<void> {
+    this.store.delete(id);
+  }
+
   async find(filter: StudyItemFilter): Promise<StudyItem[]> {
     return Array.from(this.store.values())
       .filter((i) => {

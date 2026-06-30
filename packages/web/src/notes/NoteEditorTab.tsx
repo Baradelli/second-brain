@@ -1,8 +1,16 @@
-import { editNote, getNoteById, listNotes } from '@cerebro/shared/client';
-import { RichEditor } from '@cerebro/ui';
+import {
+  archiveNote,
+  deleteNote,
+  editNote,
+  getNoteById,
+  listNotes,
+  unarchiveNote,
+} from '@cerebro/shared/client';
+import { Button, RichEditor } from '@cerebro/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ConfirmDialog } from '../shared/ConfirmDialog.js';
 import { useTabs } from '../tabs/tabs-context.js';
 import { useActiveNotes } from './active-note-context.js';
 
@@ -33,7 +41,7 @@ function noteDisplayTitle(
  */
 export function NoteEditorTab({ noteId }: { noteId: string }) {
   const { t } = useTranslation();
-  const { openTab, renameTab, tabs } = useTabs();
+  const { openTab, renameTab, closeTab, tabs } = useTabs();
   const { setNote, setDoc, clear, registerScroller } = useActiveNotes();
 
   const [doc, setDocState] = useState<Record<string, unknown> | undefined>();
@@ -41,6 +49,8 @@ export function NoteEditorTab({ noteId }: { noteId: string }) {
   const [error, setError] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [loadedTitle, setLoadedTitle] = useState<string | null>(null);
+  const [archived, setArchived] = useState(false);
+  const [confirm, setConfirm] = useState<'archive' | 'delete' | null>(null);
 
   const editorRootRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -56,6 +66,7 @@ export function NoteEditorTab({ noteId }: { noteId: string }) {
         if (cancelled) return;
         setDocState(note.doc);
         setNote(noteId, note);
+        setArchived(note.status === 'ARCHIVED');
         setLoadedTitle(noteDisplayTitle(note, t('notes.untitled')));
       })
       .catch(() => {
@@ -160,7 +171,40 @@ export function NoteEditorTab({ noteId }: { noteId: string }) {
 
   return (
     <div className="mx-auto flex h-full max-w-2xl flex-col">
-      <div className="flex h-8 shrink-0 items-center justify-end px-4">
+      <div className="flex h-10 shrink-0 items-center justify-between gap-2 px-4">
+        <div className="flex items-center gap-2">
+          {archived ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  void unarchiveNote(noteId)
+                    .then(() => setArchived(false))
+                    .catch(() => {})
+                }
+              >
+                {t('common.restore')}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirm('delete')}
+                style={{ color: 'var(--cerebro-error)' }}
+              >
+                {t('common.deletePermanently')}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setConfirm('archive')}
+            >
+              {t('notes.archive')}
+            </Button>
+          )}
+        </div>
         <SaveIndicator status={saveStatus} t={t} />
       </div>
       <div ref={editorRootRef} className="min-h-0 flex-1 overflow-auto">
@@ -175,6 +219,38 @@ export function NoteEditorTab({ noteId }: { noteId: string }) {
           }
         />
       </div>
+
+      <ConfirmDialog
+        open={confirm === 'archive'}
+        tone="default"
+        title={t('notes.archiveConfirm.title')}
+        body={t('notes.archiveConfirm.body')}
+        confirmLabel={t('notes.archiveConfirm.confirm')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          await archiveNote(noteId);
+          setArchived(true);
+          setConfirm(null);
+        }}
+      />
+      <ConfirmDialog
+        open={confirm === 'delete'}
+        tone="danger"
+        title={t('notes.deleteConfirm.title')}
+        body={t('notes.deleteConfirm.body')}
+        confirmLabel={t('notes.deleteConfirm.confirm')}
+        blockedMessage={t('notes.deleteBlocked')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          await deleteNote(noteId);
+          setConfirm(null);
+          const own = tabs.find(
+            (tab) =>
+              tab.descriptor.kind === 'note' && tab.descriptor.id === noteId,
+          );
+          if (own) closeTab(own.tabId);
+        }}
+      />
     </div>
   );
 }

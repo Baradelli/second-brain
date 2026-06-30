@@ -12,4 +12,5 @@ export interface StudyItemRepository {
   byId(id: string): Promise<StudyItem | null>;
   update(id: string, patch: Partial<StudyItem>): Promise<StudyItem>;
   find(filter: StudyItemFilter): Promise<StudyItem[]>;
+  delete(id: string): Promise<void>; // hard delete — só itens arquivados e sem recalls
 }

@@ -9,6 +9,7 @@ export * from './event.js';
 export * from './goal.js';
 export * from './graph.js';
 export * from './guide-question.js';
+export * from './highlight.js';
 export * from './label.js';
 export * from './note.js';
 export * from './prompt/index.js';

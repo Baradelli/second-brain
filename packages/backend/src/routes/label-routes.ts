@@ -14,6 +14,7 @@ import { z } from 'zod';
 import {
   LabelCycleError,
   LabelInUseError,
+  LabelNotArchivedError,
   LabelNotFoundError,
   LabelParentInvalidError,
 } from '../domain/errors.js';
@@ -21,8 +22,10 @@ import type { Label, LabelNode } from '../domain/label.js';
 import { PrismaLabelRepository } from '../repositories/prisma-label-repository.js';
 import { ArchiveLabel } from '../usecases/archive-label.js';
 import { CreateLabel } from '../usecases/create-label.js';
+import { DeleteLabel } from '../usecases/delete-label.js';
 import { EditLabel } from '../usecases/edit-label.js';
 import { ListLabelTree } from '../usecases/list-label-tree.js';
+import { UnarchiveLabel } from '../usecases/unarchive-label.js';
 
 function toResponse(label: Label): LabelResponse {
   return {
@@ -51,6 +54,8 @@ export const labelRoutes: FastifyPluginAsyncZod<{
   const createLabel = new CreateLabel(repo);
   const listLabelTree = new ListLabelTree(repo);
   const archiveLabel = new ArchiveLabel(repo);
+  const unarchiveLabel = new UnarchiveLabel(repo);
+  const deleteLabel = new DeleteLabel(repo);
   const editLabel = new EditLabel(repo);
 
   app.post(
@@ -84,14 +89,16 @@ export const labelRoutes: FastifyPluginAsyncZod<{
     '/labels',
     {
       schema: {
-        querystring: z.object({}),
+        querystring: z.object({
+          status: z.enum(['ACTIVE', 'ARCHIVED']).optional(),
+        }),
         response: { 200: z.array(labelNodeResponseSchema) },
       },
     },
     async (req) => {
       const labels = await listLabelTree.execute({
         userId: req.user.sub,
-        status: 'ACTIVE',
+        status: req.query.status ?? 'ACTIVE',
       });
       return labels.map(toNodeResponse);
     },
@@ -155,6 +162,69 @@ export const labelRoutes: FastifyPluginAsyncZod<{
           return reply.status(404).send({ error: error.message });
         }
         if (error instanceof LabelInUseError) {
+          return reply.status(409).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/labels/:id/unarchive',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: labelResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const label = await unarchiveLabel.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return toResponse(label);
+      } catch (error) {
+        if (error instanceof LabelNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/labels/:id/delete',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: labelResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const label = await deleteLabel.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return toResponse(label);
+      } catch (error) {
+        if (error instanceof LabelNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (
+          error instanceof LabelNotArchivedError ||
+          error instanceof LabelInUseError
+        ) {
           return reply.status(409).send({ error: error.message });
         }
         throw error;

@@ -113,4 +113,8 @@ export class PrismaPublicationRepository implements PublicationRepository {
     });
     return toDomain(record);
   }
+
+  async delete(id: string): Promise<void> {
+    await this.prisma.publication.delete({ where: { id } });
+  }
 }

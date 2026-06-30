@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { resourceLabel } from '../resources/resource-display.js';
+import { ArchivedToggle } from '../shared/ArchivedToggle.js';
 import { useTabs } from '../tabs/tabs-context.js';
 
 /** Ícone por tipo de recurso — mesmo mapa do mobile (LibraryPage). */
@@ -143,6 +144,23 @@ export function ResourcesSection() {
           })}
         </ul>
       )}
+
+      <ArchivedToggle
+        labels={{
+          show: t('resources.archived.show'),
+          hide: t('resources.archived.hide'),
+          empty: t('resources.archived.empty'),
+        }}
+        load={async () =>
+          (await listResources({ status: 'ARCHIVED' })).map((r) => ({
+            id: r.id,
+            title: resourceLabel(r, t('library.untitled')),
+          }))
+        }
+        onOpen={(id) =>
+          openTab({ kind: 'resource', id, title: t('library.untitled') })
+        }
+      />
     </div>
   );
 }

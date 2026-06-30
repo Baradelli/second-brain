@@ -110,4 +110,9 @@ export class PrismaResourceRepository implements ResourceRepository {
     });
     return toDomain(record);
   }
+
+  async delete(id: string): Promise<void> {
+    // O usecase já bloqueia se há notas/itens de estudo apontando para o recurso.
+    await this.prisma.resource.delete({ where: { id } });
+  }
 }

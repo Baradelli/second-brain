@@ -24,6 +24,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { HighlightsSection } from '../components/HighlightsSection.js';
 import { ResourceForm } from '../components/ResourceForm.js';
 
 const TYPE_ICON: Record<string, LucideIcon> = {
@@ -260,6 +261,8 @@ export function ResourceDetailPage() {
               ))}
             </div>
           )}
+
+          <HighlightsSection resourceId={id} />
         </>
       )}
 

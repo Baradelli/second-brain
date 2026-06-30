@@ -16,9 +16,15 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 import type { Capture } from '../domain/capture.js';
+import {
+  CaptureHasReferencesError,
+  CaptureNotArchivedError,
+  CaptureNotFoundError,
+} from '../domain/errors.js';
 import type { Goal } from '../domain/goal.js';
 import type { Note } from '../domain/note.js';
 import type { Resource } from '../domain/resource.js';
+import { PrismaAttachmentRepository } from '../repositories/prisma-attachment-repository.js';
 import { PrismaCaptureRepository } from '../repositories/prisma-capture-repository.js';
 import { PrismaEventRepository } from '../repositories/prisma-event-repository.js';
 import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
@@ -33,6 +39,7 @@ import { BuildTodayAgenda } from '../usecases/build-today-agenda.js';
 import { CreateGoal } from '../usecases/create-goal.js';
 import { CreateNote } from '../usecases/create-note.js';
 import { CreateResource } from '../usecases/create-resource.js';
+import { DeleteCapture } from '../usecases/delete-capture.js';
 import { FindNoteOfTheDay } from '../usecases/find-note-of-the-day.js';
 import { ListPendingCaptures } from '../usecases/list-pending-captures.js';
 import { PromoteCaptureToGoal } from '../usecases/promote-capture-to-goal.js';
@@ -40,6 +47,7 @@ import { PromoteCaptureToNote } from '../usecases/promote-capture-to-note.js';
 import { PromoteCaptureToResource } from '../usecases/promote-capture-to-resource.js';
 import { SelectDueRecalls } from '../usecases/select-due-recalls.js';
 import { SelectTodaysGoals } from '../usecases/select-todays-goals.js';
+import { UnarchiveCapture } from '../usecases/unarchive-capture.js';
 
 function captureToResponse(c: Capture): CaptureResponse {
   return {
@@ -184,6 +192,11 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
     new SelectDueRecalls(studyItemRepo, recallRepo),
   );
   const archiveCapture = new ArchiveCapture(captureRepo);
+  const unarchiveCapture = new UnarchiveCapture(captureRepo);
+  const deleteCapture = new DeleteCapture(
+    captureRepo,
+    new PrismaAttachmentRepository(options.prisma),
+  );
   const promoteCaptureToNote = new PromoteCaptureToNote(
     captureRepo,
     new CreateNote(noteRepo, new PrismaNoteLinkRepository(options.prisma)),
@@ -236,6 +249,69 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
         reason: req.body.reason,
       });
       return reply.status(200).send(captureToResponse(capture));
+    },
+  );
+
+  app.post(
+    '/captures/:id/unarchive',
+    {
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: z.object({}),
+        response: {
+          200: captureResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const capture = await unarchiveCapture.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return reply.status(200).send(captureToResponse(capture));
+      } catch (err) {
+        if (err instanceof CaptureNotFoundError) {
+          return reply.status(404).send({ error: err.message });
+        }
+        throw err;
+      }
+    },
+  );
+
+  app.post(
+    '/captures/:id/delete',
+    {
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: z.object({}),
+        response: {
+          200: captureResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const capture = await deleteCapture.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return reply.status(200).send(captureToResponse(capture));
+      } catch (err) {
+        if (err instanceof CaptureNotFoundError) {
+          return reply.status(404).send({ error: err.message });
+        }
+        if (
+          err instanceof CaptureNotArchivedError ||
+          err instanceof CaptureHasReferencesError
+        ) {
+          return reply.status(409).send({ error: err.message });
+        }
+        throw err;
+      }
     },
   );
 

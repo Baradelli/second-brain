@@ -6,8 +6,10 @@ import type {
 import {
   archivePublication,
   createNote,
+  deletePublication,
   editPublication,
   getPublication,
+  unarchivePublication,
 } from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { ConfirmDialog } from '../shared/ConfirmDialog.js';
 import { useTabs } from '../tabs/tabs-context.js';
 import { useActivePublications } from './active-publication-context.js';
 import {
@@ -55,8 +58,9 @@ export function PublicationDetailTab({
   publicationId: string;
 }) {
   const { t } = useTranslation();
-  const { openTab, renameTab, tabs } = useTabs();
+  const { openTab, renameTab, closeTab, tabs } = useTabs();
   const { set, clear } = useActivePublications();
+  const [confirm, setConfirm] = useState<'archive' | 'delete' | null>(null);
 
   const [publication, setPublication] = useState<PublicationResponse | null>(
     null,
@@ -172,16 +176,6 @@ export function PublicationDetailTab({
     openTab({ kind: 'note', id: noteId, title: publication.title });
   }, [publication, openTab]);
 
-  const archive = useCallback(async () => {
-    if (!publication) return;
-    try {
-      const updated = await archivePublication(publication.id);
-      setPublication(updated);
-    } catch {
-      setSaveStatus('error');
-    }
-  }, [publication]);
-
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -289,11 +283,66 @@ export function PublicationDetailTab({
 
       {!archived && (
         <div className="mt-8">
-          <Button variant="secondary" onClick={() => void archive()}>
+          <Button variant="secondary" onClick={() => setConfirm('archive')}>
             {t('common.archive')}
           </Button>
         </div>
       )}
+
+      {archived && (
+        <div className="mt-8 flex flex-wrap gap-2">
+          <Button
+            variant="primary"
+            onClick={() =>
+              void unarchivePublication(publication.id)
+                .then(setPublication)
+                .catch(() => {})
+            }
+          >
+            {t('common.restore')}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setConfirm('delete')}
+            style={{ color: 'var(--cerebro-error)' }}
+          >
+            {t('common.deletePermanently')}
+          </Button>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirm === 'archive'}
+        tone="default"
+        title={t('publications.archiveConfirm.title')}
+        body={t('publications.archiveConfirm.body')}
+        confirmLabel={t('publications.archiveConfirm.confirm')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          const updated = await archivePublication(publication.id);
+          setPublication(updated);
+          setConfirm(null);
+        }}
+      />
+      <ConfirmDialog
+        open={confirm === 'delete'}
+        tone="danger"
+        title={t('publications.deleteConfirm.title')}
+        body={t('publications.deleteConfirm.body')}
+        confirmLabel={t('publications.deleteConfirm.confirm')}
+        blockedMessage={t('publications.deleteBlocked')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          await deletePublication(publication.id);
+          setConfirm(null);
+          const own = tabs.find(
+            (tab) =>
+              tab.descriptor.kind === 'publication' &&
+              tab.descriptor.id === publicationId,
+          );
+          if (own) closeTab(own.tabId);
+        }}
+      />
     </div>
   );
 }

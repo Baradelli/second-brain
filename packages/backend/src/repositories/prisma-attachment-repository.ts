@@ -63,4 +63,12 @@ export class PrismaAttachmentRepository implements AttachmentRepository {
     });
     return records.map(toDomain);
   }
+
+  async listByCapture(captureId: string): Promise<Attachment[]> {
+    const records = await this.prisma.attachment.findMany({
+      where: { captureId },
+      orderBy: { createdAt: 'asc' },
+    });
+    return records.map(toDomain);
+  }
 }

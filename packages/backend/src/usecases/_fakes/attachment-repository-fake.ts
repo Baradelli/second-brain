@@ -16,4 +16,8 @@ export class AttachmentRepositoryFake implements AttachmentRepository {
   async listByNote(noteId: string): Promise<Attachment[]> {
     return this.store.filter((a) => a.noteId === noteId);
   }
+
+  async listByCapture(captureId: string): Promise<Attachment[]> {
+    return this.store.filter((a) => a.captureId === captureId);
+  }
 }

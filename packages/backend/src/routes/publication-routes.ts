@@ -11,14 +11,17 @@ import { z } from 'zod';
 
 import {
   InvalidPublicationError,
+  PublicationNotArchivedError,
   PublicationNotFoundError,
 } from '../domain/errors.js';
 import type { Publication } from '../domain/publication.js';
 import { PrismaPublicationRepository } from '../repositories/prisma-publication-repository.js';
 import { ArchivePublication } from '../usecases/archive-publication.js';
 import { CreatePublication } from '../usecases/create-publication.js';
+import { DeletePublication } from '../usecases/delete-publication.js';
 import { EditPublication } from '../usecases/edit-publication.js';
 import { ListPublications } from '../usecases/list-publications.js';
+import { UnarchivePublication } from '../usecases/unarchive-publication.js';
 
 function toResponse(p: Publication): PublicationResponse {
   return {
@@ -46,6 +49,8 @@ export const publicationRoutes: FastifyPluginAsyncZod<{
   const editPublication = new EditPublication(repo);
   const listPublications = new ListPublications(repo);
   const archivePublication = new ArchivePublication(repo);
+  const unarchivePublication = new UnarchivePublication(repo);
+  const deletePublication = new DeletePublication(repo);
 
   app.post(
     '/publications',
@@ -165,6 +170,66 @@ export const publicationRoutes: FastifyPluginAsyncZod<{
       } catch (error) {
         if (error instanceof PublicationNotFoundError) {
           return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/publications/:id/unarchive',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: publicationResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const publication = await unarchivePublication.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return toResponse(publication);
+      } catch (error) {
+        if (error instanceof PublicationNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/publications/:id/delete',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: publicationResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const publication = await deletePublication.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return toResponse(publication);
+      } catch (error) {
+        if (error instanceof PublicationNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (error instanceof PublicationNotArchivedError) {
+          return reply.status(409).send({ error: error.message });
         }
         throw error;
       }

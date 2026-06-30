@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ArchivedToggle } from '../shared/ArchivedToggle.js';
 import { useTabs } from '../tabs/tabs-context.js';
 
 const LABEL_BY_TYPE: Record<NoteType, string> = {
@@ -136,6 +137,23 @@ export function NotesSection() {
           ))}
         </ul>
       )}
+
+      <ArchivedToggle
+        labels={{
+          show: t('common.archivedShow'),
+          hide: t('common.archivedHide'),
+          empty: t('common.archivedEmpty'),
+        }}
+        load={async () =>
+          (await listNotes({ status: 'ARCHIVED' })).map((n) => ({
+            id: n.id,
+            title: noteLabel(n, t('notes.untitled')),
+          }))
+        }
+        onOpen={(id) =>
+          openTab({ kind: 'note', id, title: t('notes.untitled') })
+        }
+      />
     </div>
   );
 }

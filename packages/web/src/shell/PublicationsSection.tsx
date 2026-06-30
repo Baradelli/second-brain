@@ -15,6 +15,7 @@ import {
   publicationLabel,
   stageLabelKey,
 } from '../publications/publication-display.js';
+import { ArchivedToggle } from '../shared/ArchivedToggle.js';
 import { useTabs } from '../tabs/tabs-context.js';
 
 /**
@@ -146,6 +147,23 @@ export function PublicationsSection() {
           ))}
         </ul>
       )}
+
+      <ArchivedToggle
+        labels={{
+          show: t('publications.archived.show'),
+          hide: t('publications.archived.hide'),
+          empty: t('publications.archived.empty'),
+        }}
+        load={async () =>
+          (await listPublications({ status: 'ARCHIVED' })).map((p) => ({
+            id: p.id,
+            title: publicationLabel(p, t('publish.create.title')),
+          }))
+        }
+        onOpen={(id) =>
+          openTab({ kind: 'publication', id, title: t('publish.create.title') })
+        }
+      />
     </div>
   );
 }

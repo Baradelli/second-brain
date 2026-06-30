@@ -111,4 +111,9 @@ export class PrismaStudyItemRepository implements StudyItemRepository {
     });
     return toDomain(record);
   }
+
+  async delete(id: string): Promise<void> {
+    // O usecase já bloqueia se há Recall (log imutável); aqui só remove o item.
+    await this.prisma.studyItem.delete({ where: { id } });
+  }
 }

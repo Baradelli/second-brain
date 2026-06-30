@@ -5,13 +5,16 @@ import type {
   StudyItemResponse,
 } from '@cerebro/shared';
 import {
+  archiveResource,
   createLabel,
+  deleteResource,
   editResource,
   flattenLabels,
   getResource,
   listLabels,
   listNotes,
   listStudyItems,
+  unarchiveResource,
 } from '@cerebro/shared/client';
 import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,6 +24,8 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { ConfirmDialog } from '../shared/ConfirmDialog.js';
+import { HighlightsSection } from './HighlightsSection.js';
 import { useTabs } from '../tabs/tabs-context.js';
 import { useActiveResources } from './active-resource-context.js';
 import { nextStage, resourceLabel } from './resource-display.js';
@@ -72,8 +77,9 @@ function notePreview(note: NoteResponse): string {
  */
 export function ResourceDetailTab({ resourceId }: { resourceId: string }) {
   const { t } = useTranslation();
-  const { openTab, renameTab, tabs } = useTabs();
+  const { openTab, renameTab, closeTab, tabs } = useTabs();
   const { set, clear } = useActiveResources();
+  const [confirm, setConfirm] = useState<'archive' | 'delete' | null>(null);
 
   const [resource, setResource] = useState<ResourceResponse | null>(null);
   const [notes, setNotes] = useState<NoteResponse[]>([]);
@@ -284,6 +290,9 @@ export function ResourceDetailTab({ resourceId }: { resourceId: string }) {
         )}
       </section>
 
+      {/* Grifos (marca-textos) do recurso */}
+      <HighlightsSection resourceId={resourceId} />
+
       {/* Itens de estudo vinculados (a aba de estudo chega na Fase 2.3) */}
       {studyItems.length > 0 && (
         <section className="mt-6">
@@ -319,6 +328,68 @@ export function ResourceDetailTab({ resourceId }: { resourceId: string }) {
           </ul>
         </section>
       )}
+
+      {/* Arquivar / restaurar / excluir */}
+      {resource.status === 'ARCHIVED' ? (
+        <div className="mt-8 flex flex-wrap gap-2">
+          <Button
+            variant="primary"
+            onClick={() =>
+              void unarchiveResource(resource.id)
+                .then(setResource)
+                .catch(() => {})
+            }
+          >
+            {t('common.restore')}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setConfirm('delete')}
+            style={{ color: 'var(--cerebro-error)' }}
+          >
+            {t('common.deletePermanently')}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-8">
+          <Button variant="secondary" onClick={() => setConfirm('archive')}>
+            {t('resources.archive')}
+          </Button>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirm === 'archive'}
+        tone="default"
+        title={t('resources.archiveConfirm.title')}
+        body={t('resources.archiveConfirm.body')}
+        confirmLabel={t('resources.archiveConfirm.confirm')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          const updated = await archiveResource(resource.id);
+          setResource(updated);
+          setConfirm(null);
+        }}
+      />
+      <ConfirmDialog
+        open={confirm === 'delete'}
+        tone="danger"
+        title={t('resources.deleteConfirm.title')}
+        body={t('resources.deleteConfirm.body')}
+        confirmLabel={t('resources.deleteConfirm.confirm')}
+        blockedMessage={t('resources.deleteBlocked')}
+        onCancel={() => setConfirm(null)}
+        onConfirm={async () => {
+          await deleteResource(resource.id);
+          setConfirm(null);
+          const own = tabs.find(
+            (tab) =>
+              tab.descriptor.kind === 'resource' &&
+              tab.descriptor.id === resourceId,
+          );
+          if (own) closeTab(own.tabId);
+        }}
+      />
     </div>
   );
 }

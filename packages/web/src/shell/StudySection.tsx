@@ -5,6 +5,7 @@ import { Brain, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ArchivedToggle } from '../shared/ArchivedToggle.js';
 import { scheduleHint, studyItemLabel } from '../study/study-display.js';
 import { useTabs } from '../tabs/tabs-context.js';
 
@@ -115,6 +116,23 @@ export function StudySection() {
           ))}
         </ul>
       )}
+
+      <ArchivedToggle
+        labels={{
+          show: t('study.archived.show'),
+          hide: t('study.archived.hide'),
+          empty: t('study.archived.empty'),
+        }}
+        load={async () =>
+          (await listStudyItems({ status: 'ARCHIVED' })).map((item) => ({
+            id: item.id,
+            title: studyItemLabel(item, t('study.fromResource')),
+          }))
+        }
+        onOpen={(id) =>
+          openTab({ kind: 'studyItem', id, title: t('study.fromResource') })
+        }
+      />
     </div>
   );
 }

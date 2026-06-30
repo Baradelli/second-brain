@@ -58,6 +58,11 @@ const ITEMS: SlashItem[] = [
       editor.chain().focus().deleteRange(range).toggleTaskList().run(),
   },
   {
+    title: 'Código',
+    run: (editor, range) =>
+      editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
+  },
+  {
     title: 'Alternável',
     run: (editor, range) =>
       editor.chain().focus().deleteRange(range).setDetails().run(),

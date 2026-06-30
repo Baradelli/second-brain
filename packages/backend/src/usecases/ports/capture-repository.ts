@@ -11,4 +11,5 @@ export interface CaptureRepository {
   byId(id: string): Promise<Capture | null>;
   find(filter: CaptureFilter): Promise<Capture[]>;
   update(id: string, patch: Partial<Capture>): Promise<Capture>;
+  delete(id: string): Promise<void>; // hard delete — só capturas arquivadas e sem anexos
 }

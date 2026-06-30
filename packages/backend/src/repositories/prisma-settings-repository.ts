@@ -1,6 +1,6 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient, Prisma } from '@prisma/client';
 
-import type { Settings } from '../domain/settings.js';
+import type { HighlightColor, Settings } from '../domain/settings.js';
 import type {
   SettingsPatch,
   SettingsRepository,
@@ -14,6 +14,7 @@ function toDomain(s: {
   devotionalTime: string;
   reflectionTime: string;
   aiMode: string;
+  highlightColors: Prisma.JsonValue;
 }): Settings {
   return {
     userId: s.userId,
@@ -23,7 +24,24 @@ function toDomain(s: {
     devotionalTime: s.devotionalTime,
     reflectionTime: s.reflectionTime,
     aiMode: s.aiMode as Settings['aiMode'],
+    highlightColors: Array.isArray(s.highlightColors)
+      ? (s.highlightColors as unknown as HighlightColor[])
+      : [],
   };
+}
+
+/** Mapeia o patch de domínio para o `data` do Prisma (highlightColors é Json). */
+function toData(
+  patch: SettingsPatch,
+): Prisma.SettingsUncheckedUpdateInput & Prisma.SettingsUncheckedCreateInput {
+  const { highlightColors, ...rest } = patch;
+  return {
+    ...rest,
+    ...(highlightColors !== undefined
+      ? { highlightColors: highlightColors as unknown as Prisma.InputJsonValue }
+      : {}),
+  } as Prisma.SettingsUncheckedUpdateInput &
+    Prisma.SettingsUncheckedCreateInput;
 }
 
 export class PrismaSettingsRepository implements SettingsRepository {
@@ -35,10 +53,11 @@ export class PrismaSettingsRepository implements SettingsRepository {
   }
 
   async upsert(userId: string, patch: SettingsPatch): Promise<Settings> {
+    const data = toData(patch);
     const s = await this.prisma.settings.upsert({
       where: { userId },
-      update: patch,
-      create: { userId, ...patch },
+      update: data,
+      create: { userId, ...data },
     });
     return toDomain(s);
   }

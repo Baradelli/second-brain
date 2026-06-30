@@ -11,13 +11,21 @@ import { z } from 'zod';
 
 import {
   InvalidResourceError,
+  ResourceHasReferencesError,
+  ResourceNotArchivedError,
   ResourceNotFoundError,
 } from '../domain/errors.js';
 import type { Resource } from '../domain/resource.js';
+import { PrismaHighlightRepository } from '../repositories/prisma-highlight-repository.js';
+import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
 import { PrismaResourceRepository } from '../repositories/prisma-resource-repository.js';
+import { PrismaStudyItemRepository } from '../repositories/prisma-study-item-repository.js';
+import { ArchiveResource } from '../usecases/archive-resource.js';
 import { CreateResource } from '../usecases/create-resource.js';
+import { DeleteResource } from '../usecases/delete-resource.js';
 import { EditResource } from '../usecases/edit-resource.js';
 import { ListResources } from '../usecases/list-resources.js';
+import { UnarchiveResource } from '../usecases/unarchive-resource.js';
 
 function toResponse(r: Resource): ResourceResponse {
   return {
@@ -43,6 +51,14 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
   const createResource = new CreateResource(repo);
   const editResource = new EditResource(repo);
   const listResources = new ListResources(repo);
+  const archiveResource = new ArchiveResource(repo);
+  const unarchiveResource = new UnarchiveResource(repo);
+  const deleteResource = new DeleteResource(
+    repo,
+    new PrismaNoteRepository(options.prisma),
+    new PrismaStudyItemRepository(options.prisma),
+    new PrismaHighlightRepository(options.prisma),
+  );
 
   app.post(
     '/resources',
@@ -135,6 +151,97 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
         }
         if (error instanceof InvalidResourceError) {
           return reply.status(400).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/resources/:id/archive',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: resourceResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const resource = await archiveResource.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return toResponse(resource);
+      } catch (error) {
+        if (error instanceof ResourceNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/resources/:id/unarchive',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: resourceResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const resource = await unarchiveResource.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return toResponse(resource);
+      } catch (error) {
+        if (error instanceof ResourceNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/resources/:id/delete',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: resourceResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const resource = await deleteResource.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return toResponse(resource);
+      } catch (error) {
+        if (error instanceof ResourceNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (
+          error instanceof ResourceNotArchivedError ||
+          error instanceof ResourceHasReferencesError
+        ) {
+          return reply.status(409).send({ error: error.message });
         }
         throw error;
       }

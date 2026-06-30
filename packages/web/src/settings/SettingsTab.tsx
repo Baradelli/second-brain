@@ -8,6 +8,7 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { HighlightColorsEditor } from './HighlightColorsEditor.js';
 import {
   formValuesToPayload,
   type SettingsFormValues,
@@ -258,6 +259,8 @@ export function SettingsTab() {
           </button>
         </Field>
       </section>
+
+      <HighlightColorsEditor />
     </div>
   );
 }

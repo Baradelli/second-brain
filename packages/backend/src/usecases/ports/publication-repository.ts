@@ -12,4 +12,5 @@ export interface PublicationRepository {
   byId(id: string): Promise<Publication | null>;
   find(filter: PublicationFilter): Promise<Publication[]>;
   update(id: string, patch: Partial<Publication>): Promise<Publication>;
+  delete(id: string): Promise<void>; // hard delete — só publicações arquivadas
 }

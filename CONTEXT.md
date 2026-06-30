@@ -12,6 +12,14 @@
   estudo, nota. Escopos: dia, semana, mês, ano.
 - **Resource (Recurso)** — item da biblioteca (livro, curso, vídeo, artigo, podcast).
   Tem estágio: backlog → em progresso → concluído.
+- **Highlight (Grifo)** — uma linha manual da tabela de marca-textos de um Recurso: uma
+  **cor** (significado), a **frase grifada**, um **comentário** (texto simples) e um **local**
+  opcional (p. 42 / cap. 3 / 12:30). Desacoplado do editor TipTap (serve para livro físico).
+  O comentário *é* a nota ancorada no grifo — não existe Note separada presa a um grifo.
+- **Paleta de grifos (Highlight colors)** — lista global por-usuário das cores de marca-texto;
+  cada cor tem um **id estável** + significado editável (o Grifo referencia o id, então
+  renomear/recolorir não quebra grifos antigos). Vive no Settings. Remover uma cor **em uso**
+  é bloqueado (ver ADR 0005).
 - **Goal (Objetivo)** — compromisso com tipo explícito: hábito, alvo (com medida),
   projeto (com total), guarda-chuva (objetivo-pai).
 - **Event (Evento)** — log imutável de uma ação num objetivo (`done`/`skip`). Não se
@@ -56,6 +64,15 @@
 - **Tour / Guia** — onboarding spotlight (balões sobre a UI real) que abre no primeiro
   acesso e é reabrível pelo ícone `?` no header e pela paleta. "Visto" persiste em
   `web.tour.seen`.
+
+## Exclusão (ver ADR 0004)
+
+- **Arquivar (Archive)** — soft delete reversível: `status='ARCHIVED'` + `archivedAt`. Sai
+  das listagens ativas, mas pode ser restaurado. Vale para toda entidade criável.
+- **Restaurar (Unarchive)** — desfaz o arquivar: volta a `ACTIVE`, limpa `archivedAt`.
+- **Excluir / Excluir permanentemente (Delete)** — hard delete irreversível. Só age sobre
+  item **arquivado** e é **bloqueado se houver referência forte** (regra do `Goal`
+  generalizada). Logs imutáveis (`Event`, `Recall`) nunca são apagados — viram bloqueio.
 
 ## Camadas (DDD-lite) — termos de arquitetura
 

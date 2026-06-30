@@ -22,6 +22,8 @@ import {
 import StarterKit from '@tiptap/starter-kit';
 import {
   Bold,
+  Code,
+  Code2,
   GripVertical,
   Heading1,
   Heading2,
@@ -29,6 +31,7 @@ import {
   Italic,
   List,
   ListOrdered,
+  Minus,
   Quote,
 } from 'lucide-react';
 import { type ReactNode, useEffect, useRef } from 'react';
@@ -83,8 +86,6 @@ export function RichEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2] },
-        codeBlock: false,
-        code: false,
       }),
       Placeholder.configure({ placeholder }),
       Link.configure({ openOnClick: false }),
@@ -226,6 +227,14 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         <Italic {...iconProps} />
       </ToolBtn>
 
+      <ToolBtn
+        active={editor.isActive('code')}
+        title="Código"
+        onPress={() => editor.chain().focus().toggleCode().run()}
+      >
+        <Code {...iconProps} />
+      </ToolBtn>
+
       <Divider />
 
       <ToolBtn
@@ -268,6 +277,22 @@ function EditorToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
         onPress={() => editor.chain().focus().toggleOrderedList().run()}
       >
         <ListOrdered {...iconProps} />
+      </ToolBtn>
+
+      <ToolBtn
+        active={editor.isActive('codeBlock')}
+        title="Bloco de código"
+        onPress={() => editor.chain().focus().toggleCodeBlock().run()}
+      >
+        <Code2 {...iconProps} />
+      </ToolBtn>
+
+      <ToolBtn
+        active={false}
+        title="Divisor"
+        onPress={() => editor.chain().focus().setHorizontalRule().run()}
+      >
+        <Minus {...iconProps} />
       </ToolBtn>
 
       <Divider />

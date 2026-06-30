@@ -11,4 +11,5 @@ export interface LabelRepository {
   listByUser(userId: string, status?: 'ACTIVE' | 'ARCHIVED'): Promise<Label[]>;
   update(id: string, patch: Partial<Label>): Promise<Label>;
   usageCount(labelId: string): Promise<LabelUsage>;
+  delete(id: string): Promise<void>; // hard delete — só labels arquivadas e sem uso
 }

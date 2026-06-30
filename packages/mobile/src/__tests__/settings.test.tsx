@@ -19,6 +19,10 @@ vi.mock('@cerebro/ui', () => ({
 vi.mock('@cerebro/shared/client', () => ({
   getSettings: vi.fn(),
   updateSettings: vi.fn(),
+  listHighlightColors: vi.fn(),
+  addHighlightColor: vi.fn(),
+  editHighlightColor: vi.fn(),
+  removeHighlightColor: vi.fn(),
 }));
 
 import * as endpoints from '@cerebro/shared/client';
@@ -34,6 +38,7 @@ const SETTINGS = {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(endpoints.getSettings).mockResolvedValue(SETTINGS as never);
+  vi.mocked(endpoints.listHighlightColors).mockResolvedValue([]);
 });
 
 afterEach(async () => {

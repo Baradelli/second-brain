@@ -9,13 +9,22 @@ import type { PrismaClient } from '@prisma/client';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
-import { NoteNotFoundError } from '../domain/errors.js';
+import {
+  NoteHasReferencesError,
+  NoteNotArchivedError,
+  NoteNotFoundError,
+} from '../domain/errors.js';
 import type { Note } from '../domain/note.js';
+import { PrismaAttachmentRepository } from '../repositories/prisma-attachment-repository.js';
 import { PrismaNoteLinkRepository } from '../repositories/prisma-note-link-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
+import { PrismaPublicationRepository } from '../repositories/prisma-publication-repository.js';
+import { PrismaStudyItemRepository } from '../repositories/prisma-study-item-repository.js';
 import { ArchiveNote } from '../usecases/archive-note.js';
 import { CreateNote } from '../usecases/create-note.js';
+import { DeleteNote } from '../usecases/delete-note.js';
 import { EditNote } from '../usecases/edit-note.js';
+import { UnarchiveNote } from '../usecases/unarchive-note.js';
 
 function toResponse(note: Note): NoteResponse {
   return {
@@ -42,9 +51,20 @@ export const noteRoutes: FastifyPluginAsyncZod<{
 }> = async (app, options) => {
   const repo = new PrismaNoteRepository(options.prisma);
   const linkRepo = new PrismaNoteLinkRepository(options.prisma);
+  const attachmentRepo = new PrismaAttachmentRepository(options.prisma);
+  const studyItemRepo = new PrismaStudyItemRepository(options.prisma);
+  const publicationRepo = new PrismaPublicationRepository(options.prisma);
   const createNote = new CreateNote(repo, linkRepo);
   const editNote = new EditNote(repo, linkRepo);
   const archiveNote = new ArchiveNote(repo);
+  const unarchiveNote = new UnarchiveNote(repo);
+  const deleteNote = new DeleteNote(
+    repo,
+    linkRepo,
+    attachmentRepo,
+    studyItemRepo,
+    publicationRepo,
+  );
 
   app.post(
     '/notes',
@@ -135,6 +155,69 @@ export const noteRoutes: FastifyPluginAsyncZod<{
       } catch (err) {
         if (err instanceof NoteNotFoundError) {
           return reply.status(404).send({ error: err.message });
+        }
+        throw err;
+      }
+    },
+  );
+
+  app.post(
+    '/notes/:id/unarchive',
+    {
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: z.object({}),
+        response: {
+          200: noteResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const note = await unarchiveNote.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return reply.status(200).send(toResponse(note));
+      } catch (err) {
+        if (err instanceof NoteNotFoundError) {
+          return reply.status(404).send({ error: err.message });
+        }
+        throw err;
+      }
+    },
+  );
+
+  app.post(
+    '/notes/:id/delete',
+    {
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: z.object({}),
+        response: {
+          200: noteResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const note = await deleteNote.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return reply.status(200).send(toResponse(note));
+      } catch (err) {
+        if (err instanceof NoteNotFoundError) {
+          return reply.status(404).send({ error: err.message });
+        }
+        if (
+          err instanceof NoteNotArchivedError ||
+          err instanceof NoteHasReferencesError
+        ) {
+          return reply.status(409).send({ error: err.message });
         }
         throw err;
       }

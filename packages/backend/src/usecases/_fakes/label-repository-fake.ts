@@ -41,6 +41,11 @@ export class LabelRepositoryFake implements LabelRepository {
     return updated;
   }
 
+  async delete(id: string): Promise<void> {
+    this.store.delete(id);
+    this.itemUsage.delete(id);
+  }
+
   async usageCount(labelId: string): Promise<LabelUsage> {
     const activeChildren = Array.from(this.store.values()).filter(
       (label) => label.parentId === labelId && label.status === 'ACTIVE',

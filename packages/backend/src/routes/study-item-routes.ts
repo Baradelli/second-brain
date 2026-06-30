@@ -16,6 +16,8 @@ import {
   InvalidRecallError,
   InvalidStudyItemError,
   RecallNotFoundError,
+  StudyItemHasHistoryError,
+  StudyItemNotArchivedError,
   StudyItemNotFoundError,
 } from '../domain/errors.js';
 import type { Recall } from '../domain/recall.js';
@@ -26,11 +28,13 @@ import { PrismaSettingsReader } from '../repositories/prisma-settings-reader.js'
 import { PrismaStudyItemRepository } from '../repositories/prisma-study-item-repository.js';
 import { ArchiveStudyItem } from '../usecases/archive-study-item.js';
 import { CreateStudyItem } from '../usecases/create-study-item.js';
+import { DeleteStudyItem } from '../usecases/delete-study-item.js';
 import { EditStudyItem } from '../usecases/edit-study-item.js';
 import { ListStudyItems } from '../usecases/list-study-items.js';
 import { LogRecall } from '../usecases/log-recall.js';
 import type { RecallRepository } from '../usecases/ports/recall-repository.js';
 import type { SettingsReader } from '../usecases/ports/settings-reader.js';
+import { UnarchiveStudyItem } from '../usecases/unarchive-study-item.js';
 import { UndoRecall } from '../usecases/undo-recall.js';
 
 const DEFAULT_TIMEZONE = 'UTC';
@@ -59,6 +63,8 @@ export const studyItemRoutes: FastifyPluginAsyncZod<{
   const createStudyItem = new CreateStudyItem(itemRepo);
   const editStudyItem = new EditStudyItem(itemRepo);
   const archiveStudyItem = new ArchiveStudyItem(itemRepo);
+  const unarchiveStudyItem = new UnarchiveStudyItem(itemRepo);
+  const deleteStudyItem = new DeleteStudyItem(itemRepo, recallRepo);
   const listStudyItems = new ListStudyItems(itemRepo);
   const logRecall = new LogRecall(itemRepo, recallRepo);
   const undoRecall = new UndoRecall(recallRepo);
@@ -230,6 +236,69 @@ export const studyItemRoutes: FastifyPluginAsyncZod<{
       } catch (error) {
         if (error instanceof StudyItemNotFoundError) {
           return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/study-items/:id/unarchive',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: studyItemResponseSchema,
+          404: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const item = await unarchiveStudyItem.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return await toResponse(item, req.user.sub);
+      } catch (error) {
+        if (error instanceof StudyItemNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        throw error;
+      }
+    },
+  );
+
+  app.post(
+    '/study-items/:id/delete',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        body: z.object({}),
+        response: {
+          200: studyItemResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const item = await deleteStudyItem.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
+        return await toResponse(item, req.user.sub);
+      } catch (error) {
+        if (error instanceof StudyItemNotFoundError) {
+          return reply.status(404).send({ error: error.message });
+        }
+        if (
+          error instanceof StudyItemNotArchivedError ||
+          error instanceof StudyItemHasHistoryError
+        ) {
+          return reply.status(409).send({ error: error.message });
         }
         throw error;
       }
