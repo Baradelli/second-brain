@@ -1,13 +1,14 @@
 import type { GoalResponse } from '@cerebro/shared';
 import type { CreateGoalBody } from '@cerebro/shared/client';
-import { Button, Input } from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { LabelPicker } from './LabelPicker.js';
+import { Button } from './Button.js';
+import { Input } from './Input.js';
 
 const GOAL_TYPES = ['HABIT', 'TARGET', 'PROJECT', 'UMBRELLA'] as const;
 const PERIODS = ['day', 'week', 'month'] as const;
@@ -30,19 +31,46 @@ function weekdayNarrow(idx: number, lang: string): string {
   });
 }
 
+/** Props passadas ao seletor de labels injetado (difere por plataforma). */
+export interface GoalFormLabelPickerProps {
+  value: string[];
+  onChange: (ids: string[]) => void;
+}
+
 interface GoalFormProps {
   onSubmit: (body: CreateGoalBody) => void;
   submitting?: boolean;
   defaultTitle?: string;
   /** Quando presente, o formulário entra em modo edição (campos preenchidos, tipo travado). */
   initial?: GoalResponse;
+  /** Pré-liga o objetivo a um recurso (objetivo de leitura criado da tela do recurso). */
+  resourceId?: string | null;
+  /** Tipo inicial (ex.: PROJECT para leitura). Ignorado em modo edição. */
+  defaultType?: CreateGoalBody['type'];
+  /** Unidade inicial p/ TARGET/PROJECT (ex.: "páginas"). */
+  defaultUnit?: string;
+  /**
+   * Seletor de labels injetado: web e mobile têm implementações diferentes
+   * (o web cria label na hora). Se ausente, a seção de labels não aparece.
+   */
+  renderLabelPicker?: (props: GoalFormLabelPickerProps) => ReactNode;
 }
 
+/**
+ * Formulário compartilhado de criação/edição de Goal (web + mobile). Escolhe
+ * tipo + cadência (HABIT: dias-da-semana XOR período) ou medida (TARGET/PROJECT)
+ * ANTES de salvar — o backend rejeita um HABIT sem cadência, então criar direto
+ * não funciona. O seletor de labels é injetado via `renderLabelPicker`.
+ */
 export function GoalForm({
   onSubmit,
   submitting,
   defaultTitle,
   initial,
+  resourceId,
+  defaultType,
+  defaultUnit,
+  renderLabelPicker,
 }: GoalFormProps) {
   const { t, i18n } = useTranslation();
   const editing = initial != null;
@@ -62,12 +90,12 @@ export function GoalForm({
   } = useForm<GoalFormValues>({
     resolver: zodResolver(goalFormSchema),
     defaultValues: {
-      type: initial?.type ?? 'HABIT',
+      type: initial?.type ?? defaultType ?? 'HABIT',
       title: initial?.title ?? defaultTitle ?? '',
       period: initial?.period ?? undefined,
       timesPerPeriod: initial?.timesPerPeriod ?? undefined,
       targetValue: initial?.targetValue ?? undefined,
-      unit: initial?.unit ?? undefined,
+      unit: initial?.unit ?? defaultUnit ?? undefined,
     },
   });
 
@@ -90,6 +118,7 @@ export function GoalForm({
     }
     // Em edição, sempre envia labelIds (inclusive vazio) para permitir limpar.
     if (editing || labelIds.length) base.labelIds = labelIds;
+    if (resourceId != null) base.resourceId = resourceId;
     onSubmit(base);
   });
 
@@ -204,7 +233,7 @@ export function GoalForm({
         </div>
       )}
 
-      <LabelPicker value={labelIds} onChange={setLabelIds} />
+      {renderLabelPicker?.({ value: labelIds, onChange: setLabelIds })}
 
       <Button type="submit" disabled={submitting} className="mt-1">
         {submitting ? t('capture.submitting') : t('common.save')}
@@ -226,7 +255,7 @@ function Field({
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <label className="flex flex-1 flex-col gap-1.5">

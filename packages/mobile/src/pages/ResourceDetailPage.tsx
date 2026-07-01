@@ -6,7 +6,13 @@ import {
   getResource,
   listNotes,
 } from '@cerebro/shared/client';
-import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
+import {
+  BottomSheet,
+  Button,
+  Card,
+  EmptyState,
+  ResourceForm,
+} from '@cerebro/ui';
 import {
   ArrowLeft,
   BookOpen,
@@ -25,7 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { HighlightsSection } from '../components/HighlightsSection.js';
-import { ResourceForm } from '../components/ResourceForm.js';
+import { LabelPicker } from '../components/LabelPicker.js';
 
 const TYPE_ICON: Record<string, LucideIcon> = {
   book: BookOpen,
@@ -307,6 +313,7 @@ export function ResourceDetailPage() {
             initial={resource}
             onSubmit={handleEditSubmit}
             submitting={savingEdit}
+            renderLabelPicker={(p) => <LabelPicker {...p} />}
           />
         )}
       </BottomSheet>

@@ -1,11 +1,16 @@
 import type { StudyItemResponse } from '@cerebro/shared';
-import { createStudyItem, listStudyItems } from '@cerebro/shared/client';
-import { EmptyState } from '@cerebro/ui';
+import {
+  type CreateStudyItemInput,
+  createStudyItem,
+  listStudyItems,
+} from '@cerebro/shared/client';
+import { BottomSheet, EmptyState } from '@cerebro/ui';
 import { Brain, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ArchivedToggle } from '../shared/ArchivedToggle.js';
+import { StudyItemCreateForm } from '../study/StudyItemCreateForm.js';
 import { scheduleHint, studyItemLabel } from '../study/study-display.js';
 import { useTabs } from '../tabs/tabs-context.js';
 
@@ -22,7 +27,9 @@ export function StudySection() {
   const [items, setItems] = useState<StudyItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,16 +58,17 @@ export function StudySection() {
     });
   }
 
-  async function handleNew() {
+  async function handleCreate(body: CreateStudyItemInput) {
     if (creating) return;
     setCreating(true);
+    setCreateError(false);
     try {
-      // Default do mobile (StudyItemForm): título placeholder, sem recurso.
-      const item = await createStudyItem({ title: t('study.create.title') });
+      const item = await createStudyItem(body);
       setItems((prev) => [item, ...prev]);
+      setShowCreate(false);
       open(item);
     } catch {
-      setError(true);
+      setCreateError(true);
     } finally {
       setCreating(false);
     }
@@ -70,13 +78,32 @@ export function StudySection() {
     <div className="flex flex-col">
       <button
         type="button"
-        onClick={() => void handleNew()}
-        disabled={creating}
-        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card disabled:opacity-50"
+        onClick={() => {
+          setCreateError(false);
+          setShowCreate(true);
+        }}
+        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card"
       >
         <Plus size={15} strokeWidth={2} />
         <span className="truncate">{t('study.new')}</span>
       </button>
+
+      <BottomSheet
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        size="full"
+      >
+        {showCreate && (
+          <>
+            <StudyItemCreateForm onSubmit={handleCreate} submitting={creating} />
+            {createError && (
+              <p className="mt-2 text-xs text-error" role="alert">
+                {t('common.error')}
+              </p>
+            )}
+          </>
+        )}
+      </BottomSheet>
 
       {loading && (
         <p className="px-2 py-2 text-xs text-muted">{t('agenda.loading')}</p>

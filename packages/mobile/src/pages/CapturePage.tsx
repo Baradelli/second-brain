@@ -12,6 +12,8 @@ import {
   Button,
   Card,
   EmptyState,
+  GoalForm,
+  ResourceForm,
   SectionHeader,
 } from '@cerebro/ui';
 import { Archive, ChevronDown, Inbox } from 'lucide-react';
@@ -19,9 +21,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { GoalForm } from '../components/GoalForm.js';
+import { LabelPicker } from '../components/LabelPicker.js';
 import { QuickCaptureForm } from '../components/QuickCaptureForm.js';
-import { ResourceForm } from '../components/ResourceForm.js';
 
 const PROMOTE_TYPES: Array<{
   type: NoteType;
@@ -403,6 +404,7 @@ function PromoteSheetContent({
           onSubmit={(body: CreateResourceBody) =>
             onPromote({ destination: 'resource', ...body })
           }
+          renderLabelPicker={(p) => <LabelPicker {...p} />}
         />
       )}
 
@@ -413,6 +415,7 @@ function PromoteSheetContent({
           onSubmit={(body: CreateGoalBody) =>
             onPromote({ destination: 'goal', ...body })
           }
+          renderLabelPicker={(p) => <LabelPicker {...p} />}
         />
       )}
     </div>

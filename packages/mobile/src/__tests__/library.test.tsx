@@ -21,38 +21,46 @@ function renderLibrary() {
   );
 }
 
-vi.mock('@cerebro/ui', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
-  Button: ({
-    children,
-    ...rest
-  }: {
-    children: React.ReactNode;
-  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-    <button {...rest}>{children}</button>
-  ),
-  Input: forwardRef<
-    HTMLInputElement,
-    {
-      label?: string;
-      error?: string;
-    } & React.InputHTMLAttributes<HTMLInputElement>
-  >(({ label, error, ...props }, ref) => (
-    <label>
-      {label}
-      <input aria-label={label} ref={ref} {...props} />
-      {error ? <span>{error}</span> : null}
-    </label>
-  )),
-  BottomSheet: ({
-    open,
-    children,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-  }) => (open ? <div>{children}</div> : null),
-}));
+// Mantém o `ResourceForm` real (vindo de `@cerebro/ui`) para o fluxo de criar
+// recurso, trocando só os primitivos por stubs.
+vi.mock('@cerebro/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cerebro/ui')>();
+  return {
+    ...actual,
+    Card: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+    EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+    Button: ({
+      children,
+      ...rest
+    }: {
+      children: React.ReactNode;
+    } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+      <button {...rest}>{children}</button>
+    ),
+    Input: forwardRef<
+      HTMLInputElement,
+      {
+        label?: string;
+        error?: string;
+      } & React.InputHTMLAttributes<HTMLInputElement>
+    >(({ label, error, ...props }, ref) => (
+      <label>
+        {label}
+        <input aria-label={label} ref={ref} {...props} />
+        {error ? <span>{error}</span> : null}
+      </label>
+    )),
+    BottomSheet: ({
+      open,
+      children,
+    }: {
+      open: boolean;
+      children: React.ReactNode;
+    }) => (open ? <div>{children}</div> : null),
+  };
+});
 
 vi.mock('@cerebro/shared/client', () => ({
   listResources: vi.fn(),

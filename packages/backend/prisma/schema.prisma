@@ -193,6 +193,7 @@ model Resource {
   notes      Note[]
   studyItems StudyItem[]
   highlights Highlight[]
+  goals      Goal[] // objetivos de leitura ligados a este recurso
 }
 
 // Grifo (marca-texto) de um Recurso. Entrada manual: cor (significado) + trecho +
@@ -225,6 +226,8 @@ model Goal {
   parentId       String?
   parent         Goal?         @relation("GoalTree", fields: [parentId], references: [id])
   children       Goal[]        @relation("GoalTree")
+  resourceId     String? // objetivo de leitura: aponta para um Resource
+  resource       Resource?     @relation(fields: [resourceId], references: [id])
   targetValue    Float? // TARGET/PROJECT
   unit           String?
   period         String? // "day"|"week"|"month" (z.enum) — cadência "Nx por período"
@@ -240,6 +243,8 @@ model Goal {
   events Event[]
   labels Label[] @relation("GoalLabels")
   notes  Note[]
+
+  @@index([userId, resourceId])
 }
 
 model Event {

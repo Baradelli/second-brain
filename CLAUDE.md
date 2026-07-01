@@ -92,6 +92,10 @@ Meta: **nunca ter medo de refatorar.** Não perseguir 100% de cobertura de UI.
   conteúdo que o usuário vê.
 - **i18n no frontend (react-i18next).** Nenhum texto solto nas telas — tudo via `t('chave')`.
   Chaves **semânticas em inglês** (`agenda.todayTitle`). `pt` default, `en` segundo locale.
+- **Migrations SEMPRE via Prisma — NUNCA escreva/edite SQL de migration à mão.** Alterou o
+  `schema.prisma`? Gere a migration com `prisma migrate dev --name <nome>` (dev) e aplique em
+  produção com `prisma migrate deploy`. Nunca crie/edite arquivos em `prisma/migrations/`
+  manualmente nem invente o SQL — deixe o Prisma gerar.
 
 ## O que NÃO fazer agora (fora de escopo até o MVP indicado)
 

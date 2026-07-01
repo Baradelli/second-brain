@@ -5,7 +5,13 @@ import {
   editResource,
   listResources,
 } from '@cerebro/shared/client';
-import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
+import {
+  BottomSheet,
+  Button,
+  Card,
+  EmptyState,
+  ResourceForm,
+} from '@cerebro/ui';
 import {
   BookOpen,
   FileText,
@@ -20,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { LabelFilter } from '../components/LabelFilter.js';
-import { ResourceForm } from '../components/ResourceForm.js';
+import { LabelPicker } from '../components/LabelPicker.js';
 
 type StageFilter = 'all' | ResourceStageInput;
 type TypeFilter = 'all' | ResourceResponse['type'];
@@ -241,7 +247,11 @@ export function LibraryPage() {
       )}
 
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
-        <ResourceForm onSubmit={handleCreate} submitting={creating} />
+        <ResourceForm
+          onSubmit={handleCreate}
+          submitting={creating}
+          renderLabelPicker={(p) => <LabelPicker {...p} />}
+        />
       </BottomSheet>
     </main>
   );

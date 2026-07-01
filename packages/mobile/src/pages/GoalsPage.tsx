@@ -23,14 +23,15 @@ import {
   Card,
   Chip,
   EmptyState,
+  GoalForm,
   ProgressRing,
 } from '@cerebro/ui';
 import { Archive, Check, Plus, RotateCcw, Target, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { GoalForm } from '../components/GoalForm.js';
 import { LabelFilter } from '../components/LabelFilter.js';
+import { LabelPicker } from '../components/LabelPicker.js';
 
 export function GoalsPage() {
   const { t } = useTranslation();
@@ -275,7 +276,11 @@ export function GoalsPage() {
 
       {/* Criar */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
-        <GoalForm onSubmit={handleCreate} submitting={creating} />
+        <GoalForm
+          onSubmit={handleCreate}
+          submitting={creating}
+          renderLabelPicker={(p) => <LabelPicker {...p} />}
+        />
       </BottomSheet>
 
       {/* Editar */}
@@ -290,6 +295,7 @@ export function GoalsPage() {
               initial={editingGoal}
               onSubmit={handleEdit}
               submitting={saving}
+              renderLabelPicker={(p) => <LabelPicker {...p} />}
             />
             <button
               type="button"

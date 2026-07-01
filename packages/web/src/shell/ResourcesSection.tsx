@@ -1,6 +1,10 @@
 import type { ResourceResponse } from '@cerebro/shared';
-import { createResource, listResources } from '@cerebro/shared/client';
-import { EmptyState } from '@cerebro/ui';
+import {
+  type CreateResourceBody,
+  createResource,
+  listResources,
+} from '@cerebro/shared/client';
+import { BottomSheet, EmptyState, ResourceForm } from '@cerebro/ui';
 import {
   BookOpen,
   FileText,
@@ -15,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 import { resourceLabel } from '../resources/resource-display.js';
 import { ArchivedToggle } from '../shared/ArchivedToggle.js';
+import { LabelSelect } from '../shared/LabelSelect.js';
 import { useTabs } from '../tabs/tabs-context.js';
 
 /** Ícone por tipo de recurso — mesmo mapa do mobile (LibraryPage). */
@@ -39,7 +44,9 @@ export function ResourcesSection() {
   const [resources, setResources] = useState<ResourceResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,23 +67,21 @@ export function ResourcesSection() {
     };
   }, []);
 
-  async function handleNewResource() {
+  async function handleCreate(body: CreateResourceBody) {
     if (creating) return;
     setCreating(true);
+    setCreateError(false);
     try {
-      // Default do mobile (ResourceForm): tipo `book`, título placeholder.
-      const resource = await createResource({
-        title: t('library.create.title'),
-        type: 'book',
-      });
+      const resource = await createResource(body);
       setResources((prev) => [resource, ...prev]);
+      setShowCreate(false);
       openTab({
         kind: 'resource',
         id: resource.id,
         title: resourceLabel(resource, t('library.untitled')),
       });
     } catch {
-      setError(true);
+      setCreateError(true);
     } finally {
       setCreating(false);
     }
@@ -86,13 +91,36 @@ export function ResourcesSection() {
     <div className="flex flex-col">
       <button
         type="button"
-        onClick={() => void handleNewResource()}
-        disabled={creating}
-        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card disabled:opacity-50"
+        onClick={() => {
+          setCreateError(false);
+          setShowCreate(true);
+        }}
+        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card"
       >
         <Plus size={15} strokeWidth={2} />
         <span className="truncate">{t('library.new')}</span>
       </button>
+
+      <BottomSheet
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        size="full"
+      >
+        {showCreate && (
+          <>
+            <ResourceForm
+              onSubmit={handleCreate}
+              submitting={creating}
+              renderLabelPicker={(p) => <LabelSelect {...p} />}
+            />
+            {createError && (
+              <p className="mt-2 text-xs text-error" role="alert">
+                {t('common.error')}
+              </p>
+            )}
+          </>
+        )}
+      </BottomSheet>
 
       {loading && (
         <p className="px-2 py-2 text-xs text-muted">{t('agenda.loading')}</p>

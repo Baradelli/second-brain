@@ -2,10 +2,30 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { GoalNotFoundError, InvalidGoalError } from '../../domain/errors.js';
 import type { Goal } from '../../domain/goal.js';
+import type { Resource } from '../../domain/resource.js';
 import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
+import { ResourceRepositoryFake } from '../_fakes/resource-repository-fake.js';
 import { EditGoal } from '../edit-goal.js';
 
 const USER = 'user-1';
+
+function makeResource(overrides?: Partial<Resource>): Resource {
+  return {
+    id: 'res-1',
+    userId: USER,
+    title: 'Confissões',
+    type: 'book',
+    url: null,
+    author: null,
+    description: null,
+    stage: 'backlog',
+    status: 'ACTIVE',
+    archivedAt: null,
+    createdAt: new Date('2026-06-01T00:00:00.000Z'),
+    labelIds: [],
+    ...overrides,
+  };
+}
 
 function makeGoal(overrides?: Partial<Goal>): Goal {
   return {
@@ -33,11 +53,13 @@ function makeGoal(overrides?: Partial<Goal>): Goal {
 
 describe('EditGoal', () => {
   let repo: GoalRepositoryFake;
+  let resources: ResourceRepositoryFake;
   let useCase: EditGoal;
 
   beforeEach(() => {
     repo = new GoalRepositoryFake();
-    useCase = new EditGoal(repo);
+    resources = new ResourceRepositoryFake();
+    useCase = new EditGoal(repo, resources);
   });
 
   it('partial patch only changes present fields', async () => {
@@ -155,6 +177,53 @@ describe('EditGoal', () => {
       await repo.save(makeGoal());
       await expect(
         useCase.execute({ id: 'g-1', userId: USER, title: '   ' }),
+      ).rejects.toThrow(InvalidGoalError);
+    });
+  });
+
+  describe('resourceId — liga/desliga objetivo de leitura', () => {
+    it('links the goal to a resource the user owns', async () => {
+      await repo.save(makeGoal());
+      await resources.save(makeResource());
+
+      const result = await useCase.execute({
+        id: 'g-1',
+        userId: USER,
+        resourceId: 'res-1',
+      });
+      expect(result.resourceId).toBe('res-1');
+    });
+
+    it('unlinks with resourceId: null', async () => {
+      await repo.save(makeGoal({ resourceId: 'res-1' }));
+      await resources.save(makeResource());
+
+      const result = await useCase.execute({
+        id: 'g-1',
+        userId: USER,
+        resourceId: null,
+      });
+      expect(result.resourceId).toBeNull();
+    });
+
+    it('keeps resourceId when absent from the patch', async () => {
+      await repo.save(makeGoal({ resourceId: 'res-1' }));
+      await resources.save(makeResource());
+
+      const result = await useCase.execute({
+        id: 'g-1',
+        userId: USER,
+        title: 'x',
+      });
+      expect(result.resourceId).toBe('res-1');
+    });
+
+    it('rejects linking to a resource the user does not own', async () => {
+      await repo.save(makeGoal());
+      await resources.save(makeResource({ id: 'res-other', userId: 'other' }));
+
+      await expect(
+        useCase.execute({ id: 'g-1', userId: USER, resourceId: 'res-other' }),
       ).rejects.toThrow(InvalidGoalError);
     });
   });

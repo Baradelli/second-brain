@@ -1,15 +1,17 @@
 import type { ArchivedGoalResponse, GoalResponse } from '@cerebro/shared';
 import {
+  type CreateGoalBody,
   createGoal,
   listActiveGoals,
   listArchivedGoals,
 } from '@cerebro/shared/client';
-import { EmptyState } from '@cerebro/ui';
+import { BottomSheet, EmptyState, GoalForm } from '@cerebro/ui';
 import { Plus, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { goalLabel } from '../goals/goal-display.js';
+import { LabelSelect } from '../shared/LabelSelect.js';
 import { useTabs } from '../tabs/tabs-context.js';
 
 /**
@@ -26,7 +28,9 @@ export function GoalsSection() {
   const [goals, setGoals] = useState<GoalResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState(false);
 
   const [showArchived, setShowArchived] = useState(false);
   const [archived, setArchived] = useState<ArchivedGoalResponse[]>([]);
@@ -58,22 +62,25 @@ export function GoalsSection() {
     });
   }
 
-  async function handleNewGoal() {
+  async function handleCreate(body: CreateGoalBody) {
     if (creating) return;
     setCreating(true);
+    setCreateError(false);
     try {
-      // Default do mobile (GoalForm): tipo HABIT, título placeholder.
-      const goal = await createGoal({
-        title: t('goals.create.title'),
-        type: 'HABIT',
-      });
+      const goal = await createGoal(body);
       setGoals((prev) => [goal, ...prev]);
+      setShowCreate(false);
       open(goal);
     } catch {
-      setError(true);
+      setCreateError(true);
     } finally {
       setCreating(false);
     }
+  }
+
+  function openCreate() {
+    setCreateError(false);
+    setShowCreate(true);
   }
 
   async function toggleArchived() {
@@ -95,13 +102,33 @@ export function GoalsSection() {
     <div className="flex flex-col">
       <button
         type="button"
-        onClick={() => void handleNewGoal()}
-        disabled={creating}
-        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card disabled:opacity-50"
+        onClick={openCreate}
+        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card"
       >
         <Plus size={15} strokeWidth={2} />
         <span className="truncate">{t('goals.new')}</span>
       </button>
+
+      <BottomSheet
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        size="full"
+      >
+        {showCreate && (
+          <>
+            <GoalForm
+              onSubmit={handleCreate}
+              submitting={creating}
+              renderLabelPicker={(p) => <LabelSelect {...p} />}
+            />
+            {createError && (
+              <p className="mt-2 text-xs text-error" role="alert">
+                {t('common.error')}
+              </p>
+            )}
+          </>
+        )}
+      </BottomSheet>
 
       {loading && (
         <p className="px-2 py-2 text-xs text-muted">{t('agenda.loading')}</p>

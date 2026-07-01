@@ -406,6 +406,16 @@ export function getResource(id: string): Promise<ResourceResponse> {
   return get(`/resources/${id}`, resourceResponseSchema);
 }
 
+/** Publicações que nasceram deste recurso (diretas + de itens de estudo/notas). */
+export function listResourcePublications(
+  resourceId: string,
+): Promise<PublicationResponse[]> {
+  return get(
+    `/resources/${resourceId}/publications`,
+    z.array(publicationResponseSchema),
+  );
+}
+
 export interface CreateResourceBody {
   title: string;
   type: ResourceTypeInput;
@@ -495,11 +505,12 @@ export function deleteHighlight(id: string): Promise<HighlightResponse> {
 // ── Goals ─────────────────────────────────────────────────────────────────────
 
 export function listActiveGoals(
-  params: { type?: GoalTypeInput; parentId?: string } = {},
+  params: { type?: GoalTypeInput; parentId?: string; resourceId?: string } = {},
 ): Promise<GoalResponse[]> {
   const query = new URLSearchParams();
   if (params.type) query.set('type', params.type);
   if (params.parentId) query.set('parentId', params.parentId);
+  if (params.resourceId) query.set('resourceId', params.resourceId);
   const qs = query.toString();
   return get(`/goals${qs ? `?${qs}` : ''}`, z.array(goalResponseSchema));
 }
@@ -514,6 +525,7 @@ export interface CreateGoalBody {
   timesPerPeriod?: number | null;
   weekdays?: number[];
   parentId?: string | null;
+  resourceId?: string | null;
   labelIds?: string[];
 }
 
@@ -529,6 +541,7 @@ export interface EditGoalBody {
   period?: GoalPeriodInput | null;
   timesPerPeriod?: number | null;
   weekdays?: number[];
+  resourceId?: string | null;
   labelIds?: string[];
 }
 

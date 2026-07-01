@@ -6,38 +6,47 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { GoalsPage } from '../pages/GoalsPage.js';
 
-vi.mock('@cerebro/ui', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Chip: ({ children }: { children: React.ReactNode }) => (
-    <span>{children}</span>
-  ),
-  EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
-  ProgressRing: ({ value }: { value: number }) => <div>{value}%</div>,
-  Button: ({
-    children,
-    ...rest
-  }: {
-    children: React.ReactNode;
-  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-    <button {...rest}>{children}</button>
-  ),
-  Input: forwardRef<
-    HTMLInputElement,
-    { label?: string } & React.InputHTMLAttributes<HTMLInputElement>
-  >(({ label, ...props }, ref) => (
-    <label>
-      {label}
-      <input aria-label={label} ref={ref} {...props} />
-    </label>
-  )),
-  BottomSheet: ({
-    open,
-    children,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-  }) => (open ? <div>{children}</div> : null),
-}));
+// Mantém o `GoalForm` real (agora vindo de `@cerebro/ui`), mas troca os
+// primitivos por stubs simples. O GoalForm usa Button/Input relativos internos,
+// então segue funcionando (Título/weekday/Salvar) mesmo com os stubs abaixo.
+vi.mock('@cerebro/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cerebro/ui')>();
+  return {
+    ...actual,
+    Card: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+    Chip: ({ children }: { children: React.ReactNode }) => (
+      <span>{children}</span>
+    ),
+    EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+    ProgressRing: ({ value }: { value: number }) => <div>{value}%</div>,
+    Button: ({
+      children,
+      ...rest
+    }: {
+      children: React.ReactNode;
+    } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+      <button {...rest}>{children}</button>
+    ),
+    Input: forwardRef<
+      HTMLInputElement,
+      { label?: string } & React.InputHTMLAttributes<HTMLInputElement>
+    >(({ label, ...props }, ref) => (
+      <label>
+        {label}
+        <input aria-label={label} ref={ref} {...props} />
+      </label>
+    )),
+    BottomSheet: ({
+      open,
+      children,
+    }: {
+      open: boolean;
+      children: React.ReactNode;
+    }) => (open ? <div>{children}</div> : null),
+  };
+});
 
 vi.mock('@cerebro/shared/client', () => ({
   listActiveGoals: vi.fn(),

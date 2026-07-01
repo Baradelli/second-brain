@@ -1,15 +1,16 @@
-import type { PublicationResponse } from '@cerebro/shared';
+import type { PublicationFormatInput, PublicationResponse } from '@cerebro/shared';
 import {
   createNote,
   createPublication,
   editPublication,
   listPublications,
 } from '@cerebro/shared/client';
-import { EmptyState } from '@cerebro/ui';
+import { BottomSheet, EmptyState } from '@cerebro/ui';
 import { Megaphone, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PublicationCreateForm } from '../publications/PublicationCreateForm.js';
 import {
   formatLabelKey,
   publicationLabel,
@@ -37,7 +38,9 @@ export function PublicationsSection() {
   const [publications, setPublications] = useState<PublicationResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,29 +69,33 @@ export function PublicationsSection() {
     });
   }
 
-  async function handleNew() {
+  async function handleCreate(values: {
+    title: string;
+    format: PublicationFormatInput;
+  }) {
     if (creating) return;
     setCreating(true);
+    setCreateError(false);
     try {
-      const title = t('publish.create.title');
       // Rascunho/fonte da publicação avulsa: uma Note vazia.
       const note = await createNote({
         type: 'NOTE',
         doc: { type: 'doc', content: [] },
-        title,
+        title: values.title,
       });
       let publication = await createPublication({
         sourceType: 'note',
         sourceId: note.id,
-        format: 'linkedin',
-        title,
+        format: values.format,
+        title: values.title,
       });
       // Vincula a nota como o rascunho da publicação (modelo do mobile).
       publication = await editPublication(publication.id, { noteId: note.id });
       setPublications((prev) => [publication, ...prev]);
+      setShowCreate(false);
       open(publication);
     } catch {
-      setError(true);
+      setCreateError(true);
     } finally {
       setCreating(false);
     }
@@ -98,13 +105,35 @@ export function PublicationsSection() {
     <div className="flex flex-col">
       <button
         type="button"
-        onClick={() => void handleNew()}
-        disabled={creating}
-        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card disabled:opacity-50"
+        onClick={() => {
+          setCreateError(false);
+          setShowCreate(true);
+        }}
+        className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-accent transition-colors hover:bg-card"
       >
         <Plus size={15} strokeWidth={2} />
         <span className="truncate">{t('publish.new')}</span>
       </button>
+
+      <BottomSheet
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        size="full"
+      >
+        {showCreate && (
+          <>
+            <PublicationCreateForm
+              onSubmit={handleCreate}
+              submitting={creating}
+            />
+            {createError && (
+              <p className="mt-2 text-xs text-error" role="alert">
+                {t('common.error')}
+              </p>
+            )}
+          </>
+        )}
+      </BottomSheet>
 
       {loading && (
         <p className="px-2 py-2 text-xs text-muted">{t('agenda.loading')}</p>

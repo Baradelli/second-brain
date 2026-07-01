@@ -2,10 +2,35 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { InvalidGoalError } from '../../domain/errors.js';
 import type { Goal } from '../../domain/goal.js';
+import type { Resource } from '../../domain/resource.js';
 import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
+import { ResourceRepositoryFake } from '../_fakes/resource-repository-fake.js';
 import { CreateGoal } from '../create-goal.js';
 
 const USER = 'user-1';
+
+async function seedResource(
+  repo: ResourceRepositoryFake,
+  overrides?: Partial<Resource>,
+): Promise<Resource> {
+  const resource: Resource = {
+    id: 'res-1',
+    userId: USER,
+    title: 'Confissões',
+    type: 'book',
+    url: null,
+    author: null,
+    description: null,
+    stage: 'backlog',
+    status: 'ACTIVE',
+    archivedAt: null,
+    createdAt: new Date('2026-06-01T00:00:00.000Z'),
+    labelIds: [],
+    ...overrides,
+  };
+  await repo.save(resource);
+  return resource;
+}
 
 async function seedUmbrella(
   repo: GoalRepositoryFake,
@@ -38,11 +63,13 @@ async function seedUmbrella(
 
 describe('CreateGoal', () => {
   let repo: GoalRepositoryFake;
+  let resources: ResourceRepositoryFake;
   let useCase: CreateGoal;
 
   beforeEach(() => {
     repo = new GoalRepositoryFake();
-    useCase = new CreateGoal(repo);
+    resources = new ResourceRepositoryFake();
+    useCase = new CreateGoal(repo, resources);
   });
 
   describe('basics & defaults', () => {
@@ -288,6 +315,54 @@ describe('CreateGoal', () => {
           title: 'Sub-guarda-chuva',
           type: 'UMBRELLA',
           parentId: umbrella.id,
+        }),
+      ).rejects.toThrow(InvalidGoalError);
+    });
+  });
+
+  describe('resourceId — objetivo de leitura', () => {
+    it('links a goal to a resource the user owns', async () => {
+      const resource = await seedResource(resources);
+      const result = await useCase.execute({
+        userId: USER,
+        title: 'Ler Confissões',
+        type: 'PROJECT',
+        targetValue: 350,
+        unit: 'páginas',
+        resourceId: resource.id,
+      });
+      expect(result.resourceId).toBe(resource.id);
+    });
+
+    it('defaults resourceId to null when omitted', async () => {
+      const result = await useCase.execute({
+        userId: USER,
+        title: 'Meditar',
+        type: 'HABIT',
+        weekdays: [1],
+      });
+      expect(result.resourceId).toBeNull();
+    });
+
+    it('rejects a resourceId that does not exist', async () => {
+      await expect(
+        useCase.execute({
+          userId: USER,
+          title: 'x',
+          type: 'PROJECT',
+          resourceId: 'ghost',
+        }),
+      ).rejects.toThrow(InvalidGoalError);
+    });
+
+    it('rejects a resource owned by another user', async () => {
+      await seedResource(resources, { id: 'res-other', userId: 'other' });
+      await expect(
+        useCase.execute({
+          userId: USER,
+          title: 'x',
+          type: 'PROJECT',
+          resourceId: 'res-other',
         }),
       ).rejects.toThrow(InvalidGoalError);
     });

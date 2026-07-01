@@ -5,6 +5,7 @@ export interface ListActiveGoalsInput {
   userId: string;
   type?: GoalType;
   parentId?: string;
+  resourceId?: string;
 }
 
 export class ListActiveGoals {
@@ -16,6 +17,9 @@ export class ListActiveGoals {
       status: 'ACTIVE',
       ...(input.type ? { type: input.type } : {}),
       ...(input.parentId !== undefined ? { parentId: input.parentId } : {}),
+      ...(input.resourceId !== undefined
+        ? { resourceId: input.resourceId }
+        : {}),
     });
   }
 }

@@ -194,6 +194,9 @@ importers:
       '@cerebro/shared':
         specifier: workspace:*
         version: link:../shared
+      '@hookform/resolvers':
+        specifier: ^3.9.0
+        version: 3.10.0(react-hook-form@7.77.0(react@18.3.1))
       '@tiptap/core':
         specifier: ^2.10.0
         version: 2.27.2(@tiptap/pm@2.27.2)
@@ -263,12 +266,18 @@ importers:
       react-dom:
         specifier: ^18.3.0
         version: 18.3.1(react@18.3.1)
+      react-hook-form:
+        specifier: ^7.53.0
+        version: 7.77.0(react@18.3.1)
       react-i18next:
         specifier: ^15.0.0
         version: 15.7.4(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       tippy.js:
         specifier: ^6.3.7
         version: 6.3.7
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
     devDependencies:
       '@types/react':
         specifier: ^18.3.0

@@ -1,13 +1,15 @@
 import type { ResourceResponse } from '@cerebro/shared';
 import type { CreateResourceBody } from '@cerebro/shared/client';
-import { Button, Input } from '@cerebro/ui';
-import { zodResolver } from '@hookform/resolvers/zod';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { LabelPicker } from './LabelPicker.js';
+import { Button } from './Button.js';
+import type { GoalFormLabelPickerProps } from './GoalForm.js';
+import { Input } from './Input.js';
 
 const RESOURCE_TYPES = [
   'book',
@@ -34,13 +36,20 @@ interface ResourceFormProps {
   defaultTitle?: string;
   /** Quando presente, o form entra em modo edição (campos preenchidos). */
   initial?: ResourceResponse;
+  /** Seletor de labels injetado (difere por plataforma — ver GoalForm). */
+  renderLabelPicker?: (props: GoalFormLabelPickerProps) => ReactNode;
 }
 
+/**
+ * Formulário compartilhado de criação/edição de Resource (web + mobile). O
+ * seletor de labels é injetado via `renderLabelPicker`.
+ */
 export function ResourceForm({
   onSubmit,
   submitting,
   defaultTitle,
   initial,
+  renderLabelPicker,
 }: ResourceFormProps) {
   const { t } = useTranslation();
   const editing = initial != null;
@@ -114,7 +123,7 @@ export function ResourceForm({
       <Input label={t('resource.field.author')} {...register('author')} />
       <Input label={t('resource.field.url')} {...register('url')} />
 
-      <LabelPicker value={labelIds} onChange={setLabelIds} />
+      {renderLabelPicker?.({ value: labelIds, onChange: setLabelIds })}
 
       <Button type="submit" disabled={submitting} className="mt-1">
         {submitting ? t('capture.submitting') : t('common.save')}

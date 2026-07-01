@@ -23,6 +23,7 @@ import {
 import type { Goal } from '../domain/goal.js';
 import { PrismaEventRepository } from '../repositories/prisma-event-repository.js';
 import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
+import { PrismaResourceRepository } from '../repositories/prisma-resource-repository.js';
 import { ArchiveGoal } from '../usecases/archive-goal.js';
 import { CompleteGoal } from '../usecases/complete-goal.js';
 import { CreateGoal } from '../usecases/create-goal.js';
@@ -40,6 +41,7 @@ function toResponse(g: Goal): GoalResponse {
     description: g.description,
     type: g.type,
     parentId: g.parentId,
+    resourceId: g.resourceId ?? null,
     targetValue: g.targetValue,
     unit: g.unit,
     period: g.period,
@@ -60,8 +62,9 @@ export const goalRoutes: FastifyPluginAsyncZod<{
 }> = async (app, options) => {
   const repo = new PrismaGoalRepository(options.prisma);
   const eventRepo = new PrismaEventRepository(options.prisma);
-  const createGoal = new CreateGoal(repo);
-  const editGoal = new EditGoal(repo);
+  const resourceRepo = new PrismaResourceRepository(options.prisma);
+  const createGoal = new CreateGoal(repo, resourceRepo);
+  const editGoal = new EditGoal(repo, resourceRepo);
   const listActiveGoals = new ListActiveGoals(repo);
   const completeGoal = new CompleteGoal(repo);
   const archiveGoal = new ArchiveGoal(repo);

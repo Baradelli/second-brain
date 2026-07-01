@@ -5,6 +5,7 @@ export interface GoalFilter {
   status?: 'ACTIVE' | 'ARCHIVED';
   type?: GoalType;
   parentId?: string;
+  resourceId?: string;
 }
 
 export interface GoalRepository {

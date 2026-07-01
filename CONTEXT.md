@@ -21,7 +21,12 @@
   renomear/recolorir não quebra grifos antigos). Vive no Settings. Remover uma cor **em uso**
   é bloqueado (ver ADR 0005).
 - **Goal (Objetivo)** — compromisso com tipo explícito: hábito, alvo (com medida),
-  projeto (com total), guarda-chuva (objetivo-pai).
+  projeto (com total), guarda-chuva (objetivo-pai). Pode apontar para um Recurso
+  (ver Objetivo de leitura).
+- **Objetivo de leitura (Reading goal)** — um Goal (normalmente projeto, com total em
+  páginas + prazo opcional) cujo `resourceId` aponta para um Recurso. Não é um tipo novo:
+  é a leitura de um recurso virando compromisso rastreável. Progresso é **calculado** dos
+  Events (registrar leitura = check com valor), e aparece na tela do Recurso (ver ADR 0006).
 - **Event (Evento)** — log imutável de uma ação num objetivo (`done`/`skip`). Não se
   arquiva nem edita; desfazer = apagar de fato. Progresso é **calculado** a partir dele.
 - **Label** — etiqueta hierárquica (árvore). Pode ter perguntas-guia.

@@ -5,9 +5,11 @@ import {
   ResourceNotArchivedError,
   ResourceNotFoundError,
 } from '../../domain/errors.js';
+import type { Goal } from '../../domain/goal.js';
 import type { Note } from '../../domain/note.js';
 import type { Resource } from '../../domain/resource.js';
 import type { StudyItem } from '../../domain/study-item.js';
+import { GoalRepositoryFake } from '../_fakes/goal-repository-fake.js';
 import { HighlightRepositoryFake } from '../_fakes/highlight-repository-fake.js';
 import { NoteRepositoryFake } from '../_fakes/note-repository-fake.js';
 import { ResourceRepositoryFake } from '../_fakes/resource-repository-fake.js';
@@ -65,11 +67,36 @@ function makeStudyItem(resourceId: string): StudyItem {
   };
 }
 
+function makeGoal(resourceId: string): Goal {
+  return {
+    id: 'g1',
+    userId: USER,
+    title: 'Ler o livro',
+    description: null,
+    type: 'PROJECT',
+    parentId: null,
+    resourceId,
+    targetValue: 350,
+    unit: 'páginas',
+    period: null,
+    timesPerPeriod: null,
+    weekdays: [],
+    startAt: null,
+    dueAt: null,
+    completedAt: null,
+    status: 'ACTIVE',
+    archivedAt: null,
+    createdAt: new Date('2026-06-02T10:00:00.000Z'),
+    labelIds: [],
+  };
+}
+
 describe('DeleteResource', () => {
   let resources: ResourceRepositoryFake;
   let notes: NoteRepositoryFake;
   let studyItems: StudyItemRepositoryFake;
   let highlights: HighlightRepositoryFake;
+  let goals: GoalRepositoryFake;
   let useCase: DeleteResource;
 
   beforeEach(() => {
@@ -77,7 +104,14 @@ describe('DeleteResource', () => {
     notes = new NoteRepositoryFake();
     studyItems = new StudyItemRepositoryFake();
     highlights = new HighlightRepositoryFake();
-    useCase = new DeleteResource(resources, notes, studyItems, highlights);
+    goals = new GoalRepositoryFake();
+    useCase = new DeleteResource(
+      resources,
+      notes,
+      studyItems,
+      highlights,
+      goals,
+    );
   });
 
   it('apaga um recurso arquivado sem referências', async () => {
@@ -129,6 +163,15 @@ describe('DeleteResource', () => {
       archivedAt: null,
       createdAt: new Date('2026-06-02T10:00:00.000Z'),
     });
+
+    await expect(useCase.execute({ id: 'r1', userId: USER })).rejects.toThrow(
+      ResourceHasReferencesError,
+    );
+  });
+
+  it('recusa se há objetivos (leitura) apontando para o recurso', async () => {
+    await resources.save(makeResource());
+    await goals.save(makeGoal('r1'));
 
     await expect(useCase.execute({ id: 'r1', userId: USER })).rejects.toThrow(
       ResourceHasReferencesError,

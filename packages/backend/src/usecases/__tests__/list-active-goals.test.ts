@@ -65,4 +65,13 @@ describe('ListActiveGoals', () => {
     const result = await useCase.execute({ userId: USER, parentId: 'umb' });
     expect(result.map((g) => g.id)).toEqual(['child']);
   });
+
+  it('filters by resourceId (reading goals of a resource)', async () => {
+    await repo.save(makeGoal({ id: 'reading', resourceId: 'res-1' }));
+    await repo.save(makeGoal({ id: 'other-res', resourceId: 'res-2' }));
+    await repo.save(makeGoal({ id: 'no-res', resourceId: null }));
+
+    const result = await useCase.execute({ userId: USER, resourceId: 'res-1' });
+    expect(result.map((g) => g.id)).toEqual(['reading']);
+  });
 });

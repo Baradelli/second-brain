@@ -4,6 +4,7 @@ import {
   ResourceNotFoundError,
 } from '../domain/errors.js';
 import type { Resource } from '../domain/resource.js';
+import type { GoalRepository } from './ports/goal-repository.js';
 import type { HighlightRepository } from './ports/highlight-repository.js';
 import type { NoteRepository } from './ports/note-repository.js';
 import type { ResourceRepository } from './ports/resource-repository.js';
@@ -15,8 +16,9 @@ export interface DeleteResourceInput {
 }
 
 /**
- * Hard delete de um recurso arquivado. Bloqueado se houver notas ou itens de
- * estudo apontando para ele. Ver docs/adr/0004-politica-de-exclusao.md.
+ * Hard delete de um recurso arquivado. Bloqueado se houver notas, itens de
+ * estudo, grifos ou objetivos (leitura) apontando para ele.
+ * Ver docs/adr/0004-politica-de-exclusao.md.
  */
 export class DeleteResource {
   constructor(
@@ -24,6 +26,7 @@ export class DeleteResource {
     private notes: NoteRepository,
     private studyItems: StudyItemRepository,
     private highlights: HighlightRepository,
+    private goals: GoalRepository,
   ) {}
 
   async execute(input: DeleteResourceInput): Promise<Resource> {
@@ -58,6 +61,14 @@ export class DeleteResource {
     });
     if (highlights.length > 0) {
       throw new ResourceHasReferencesError('highlights', highlights.length);
+    }
+
+    const goals = await this.goals.find({
+      userId: input.userId,
+      resourceId: input.id,
+    });
+    if (goals.length > 0) {
+      throw new ResourceHasReferencesError('goals', goals.length);
     }
 
     await this.resources.delete(input.id);

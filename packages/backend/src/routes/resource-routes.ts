@@ -2,6 +2,8 @@ import {
   createResourceSchema,
   editResourceSchema,
   listResourcesQuerySchema,
+  type PublicationResponse,
+  publicationResponseSchema,
   type ResourceResponse,
   resourceResponseSchema,
 } from '@cerebro/shared';
@@ -15,15 +17,19 @@ import {
   ResourceNotArchivedError,
   ResourceNotFoundError,
 } from '../domain/errors.js';
+import type { Publication } from '../domain/publication.js';
 import type { Resource } from '../domain/resource.js';
+import { PrismaGoalRepository } from '../repositories/prisma-goal-repository.js';
 import { PrismaHighlightRepository } from '../repositories/prisma-highlight-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
+import { PrismaPublicationRepository } from '../repositories/prisma-publication-repository.js';
 import { PrismaResourceRepository } from '../repositories/prisma-resource-repository.js';
 import { PrismaStudyItemRepository } from '../repositories/prisma-study-item-repository.js';
 import { ArchiveResource } from '../usecases/archive-resource.js';
 import { CreateResource } from '../usecases/create-resource.js';
 import { DeleteResource } from '../usecases/delete-resource.js';
 import { EditResource } from '../usecases/edit-resource.js';
+import { ListResourcePublications } from '../usecases/list-resource-publications.js';
 import { ListResources } from '../usecases/list-resources.js';
 import { UnarchiveResource } from '../usecases/unarchive-resource.js';
 
@@ -44,6 +50,24 @@ function toResponse(r: Resource): ResourceResponse {
   };
 }
 
+function toPublicationResponse(p: Publication): PublicationResponse {
+  return {
+    id: p.id,
+    userId: p.userId,
+    sourceType: p.sourceType,
+    sourceId: p.sourceId,
+    format: p.format,
+    stage: p.stage,
+    title: p.title,
+    noteId: p.noteId,
+    publishedAt: p.publishedAt?.toISOString() ?? null,
+    status: p.status,
+    archivedAt: p.archivedAt?.toISOString() ?? null,
+    createdAt: p.createdAt.toISOString(),
+    labelIds: p.labelIds,
+  };
+}
+
 export const resourceRoutes: FastifyPluginAsyncZod<{
   prisma: PrismaClient;
 }> = async (app, options) => {
@@ -58,6 +82,12 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
     new PrismaNoteRepository(options.prisma),
     new PrismaStudyItemRepository(options.prisma),
     new PrismaHighlightRepository(options.prisma),
+    new PrismaGoalRepository(options.prisma),
+  );
+  const listResourcePublications = new ListResourcePublications(
+    new PrismaPublicationRepository(options.prisma),
+    new PrismaStudyItemRepository(options.prisma),
+    new PrismaNoteRepository(options.prisma),
   );
 
   app.post(
@@ -104,6 +134,24 @@ export const resourceRoutes: FastifyPluginAsyncZod<{
         return reply.status(404).send({ error: 'Resource not found' });
       }
       return toResponse(resource);
+    },
+  );
+
+  // Publicações que nasceram deste recurso (diretas + de itens de estudo/notas).
+  app.get(
+    '/resources/:id/publications',
+    {
+      schema: {
+        params: z.object({ id: z.string().min(1) }),
+        response: { 200: z.array(publicationResponseSchema) },
+      },
+    },
+    async (req) => {
+      const items = await listResourcePublications.execute({
+        userId: req.user.sub,
+        resourceId: req.params.id,
+      });
+      return items.map(toPublicationResponse);
     },
   );
 

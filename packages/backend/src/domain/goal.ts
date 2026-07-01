@@ -16,6 +16,7 @@ export interface Goal {
   description: string | null;
   type: GoalType;
   parentId: string | null;
+  resourceId?: string | null; // objetivo de leitura: aponta para um Resource
   targetValue: number | null; // TARGET/PROJECT
   unit: string | null;
   period: GoalPeriod | null; // cadência "Nx por período" (HABIT)

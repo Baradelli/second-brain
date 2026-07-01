@@ -26,6 +26,11 @@ export class GoalRepositoryFake implements GoalRepository {
         if (filter.type && g.type !== filter.type) return false;
         if (filter.parentId !== undefined && g.parentId !== filter.parentId)
           return false;
+        if (
+          filter.resourceId !== undefined &&
+          g.resourceId !== filter.resourceId
+        )
+          return false;
         return true;
       })
       .map((g) => ({ ...g }));

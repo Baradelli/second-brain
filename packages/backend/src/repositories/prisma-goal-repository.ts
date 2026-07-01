@@ -18,6 +18,7 @@ function toDomain(record: GoalWithLabels): Goal {
     description: record.description ?? null,
     type: record.type as Goal['type'],
     parentId: record.parentId ?? null,
+    resourceId: record.resourceId ?? null,
     targetValue: record.targetValue ?? null,
     unit: record.unit ?? null,
     period: (record.period ?? null) as Goal['period'],
@@ -45,6 +46,7 @@ export class PrismaGoalRepository implements GoalRepository {
         description: goal.description,
         type: goal.type,
         parentId: goal.parentId,
+        resourceId: goal.resourceId ?? null,
         targetValue: goal.targetValue,
         unit: goal.unit,
         period: goal.period,
@@ -80,6 +82,9 @@ export class PrismaGoalRepository implements GoalRepository {
         ...(filter.status ? { status: filter.status } : {}),
         ...(filter.type ? { type: filter.type } : {}),
         ...(filter.parentId !== undefined ? { parentId: filter.parentId } : {}),
+        ...(filter.resourceId !== undefined
+          ? { resourceId: filter.resourceId }
+          : {}),
       },
       include: INCLUDE_LABELS,
     });
@@ -103,6 +108,9 @@ export class PrismaGoalRepository implements GoalRepository {
           ? { description: rest.description }
           : {}),
         ...(rest.parentId !== undefined ? { parentId: rest.parentId } : {}),
+        ...(rest.resourceId !== undefined
+          ? { resourceId: rest.resourceId }
+          : {}),
         ...(rest.targetValue !== undefined
           ? { targetValue: rest.targetValue }
           : {}),

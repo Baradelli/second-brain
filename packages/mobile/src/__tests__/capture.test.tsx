@@ -8,56 +8,65 @@ import { CapturePage } from '../pages/CapturePage.js';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
-vi.mock('@cerebro/ui', () => ({
-  Button: ({
-    children,
-    onClick,
-    disabled,
-    variant: _v,
-    size: _s,
-    className,
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-    disabled?: boolean;
-    variant?: string;
-    size?: string;
-    className?: string;
-  }) => (
-    <button onClick={onClick} disabled={disabled} className={className}>
-      {children}
-    </button>
-  ),
-  Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SectionHeader: ({ label }: { label: string }) => <h2>{label}</h2>,
-  EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
-  Input: forwardRef<
-    HTMLInputElement,
-    { label?: string } & React.InputHTMLAttributes<HTMLInputElement>
-  >(({ label, ...props }, ref) => (
-    <label>
-      {label}
-      <input aria-label={label} ref={ref} {...props} />
-    </label>
-  )),
-  BottomSheet: ({
-    open,
-    children,
-    onClose,
-  }: {
-    open: boolean;
-    children: React.ReactNode;
-    onClose: () => void;
-  }) =>
-    open ? (
-      <div data-testid="promote-sheet">
-        <button data-testid="sheet-close" onClick={onClose}>
-          fechar
-        </button>
+// Mantém o `GoalForm` real (vindo de `@cerebro/ui`) para a promoção → objetivo,
+// trocando só os primitivos por stubs. O GoalForm usa Button/Input internos
+// relativos, então weekday/Salvar seguem funcionando com os stubs abaixo.
+vi.mock('@cerebro/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cerebro/ui')>();
+  return {
+    ...actual,
+    Button: ({
+      children,
+      onClick,
+      disabled,
+      variant: _v,
+      size: _s,
+      className,
+    }: {
+      children: React.ReactNode;
+      onClick?: () => void;
+      disabled?: boolean;
+      variant?: string;
+      size?: string;
+      className?: string;
+    }) => (
+      <button onClick={onClick} disabled={disabled} className={className}>
         {children}
-      </div>
-    ) : null,
-}));
+      </button>
+    ),
+    Card: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+    SectionHeader: ({ label }: { label: string }) => <h2>{label}</h2>,
+    EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
+    Input: forwardRef<
+      HTMLInputElement,
+      { label?: string } & React.InputHTMLAttributes<HTMLInputElement>
+    >(({ label, ...props }, ref) => (
+      <label>
+        {label}
+        <input aria-label={label} ref={ref} {...props} />
+      </label>
+    )),
+    BottomSheet: ({
+      open,
+      children,
+      onClose,
+    }: {
+      open: boolean;
+      children: React.ReactNode;
+      onClose: () => void;
+    }) =>
+      open ? (
+        <div data-testid="promote-sheet">
+          <button data-testid="sheet-close" onClick={onClose}>
+            fechar
+          </button>
+          {children}
+        </div>
+      ) : null,
+  };
+});
 
 vi.mock('@cerebro/shared/client', () => ({
   createCapture: vi.fn(),

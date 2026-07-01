@@ -9,6 +9,7 @@ import {
 } from '../domain/goal.js';
 import { validateGoalCadenceAndMeasure } from '../domain/goal-rules.js';
 import type { GoalRepository } from './ports/goal-repository.js';
+import type { ResourceRepository } from './ports/resource-repository.js';
 
 export interface CreateGoalInput {
   userId: string;
@@ -23,11 +24,17 @@ export interface CreateGoalInput {
   startAt?: Date | null;
   dueAt?: Date | null;
   parentId?: string | null;
+  resourceId?: string | null; // objetivo de leitura ligado a um Resource
   labelIds?: string[];
 }
 
 export class CreateGoal {
-  constructor(private repo: GoalRepository) {}
+  // `resources` é opcional: só é preciso para validar `resourceId` (objetivo de
+  // leitura). Callers que nunca criam goal ligado a recurso podem omiti-lo.
+  constructor(
+    private repo: GoalRepository,
+    private resources?: ResourceRepository,
+  ) {}
 
   async execute(input: CreateGoalInput): Promise<Goal> {
     if (!GOAL_TYPES.includes(input.type)) {
@@ -51,6 +58,7 @@ export class CreateGoal {
     });
 
     await this.validateParent(input);
+    await this.validateResource(input);
 
     const goal: Goal = {
       id: randomUUID(),
@@ -59,6 +67,7 @@ export class CreateGoal {
       description: input.description ?? null,
       type: input.type,
       parentId: input.parentId ?? null,
+      resourceId: input.resourceId ?? null,
       targetValue: input.targetValue ?? null,
       unit: input.unit ?? null,
       period: input.period ?? null,
@@ -90,6 +99,14 @@ export class CreateGoal {
       parent.type !== 'UMBRELLA'
     ) {
       throw new InvalidGoalError('parent must be an existing UMBRELLA you own');
+    }
+  }
+
+  private async validateResource(input: CreateGoalInput): Promise<void> {
+    if (input.resourceId == null || !this.resources) return;
+    const resource = await this.resources.byId(input.resourceId);
+    if (!resource || resource.userId !== input.userId) {
+      throw new InvalidGoalError('resource must be an existing resource you own');
     }
   }
 }

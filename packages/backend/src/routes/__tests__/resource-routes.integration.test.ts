@@ -133,6 +133,100 @@ describe('GET /resources', () => {
   });
 });
 
+describe('GET /resources/:id/publications (transitivo)', () => {
+  it('retorna posts diretos do recurso e de notas dele; ignora outro recurso', async () => {
+    // Isola: limpa notas/publicações do usuário antes.
+    await prisma.publication.deleteMany({ where: { userId: USER_ID } });
+    await prisma.note.deleteMany({ where: { userId: USER_ID } });
+
+    const resource = (
+      await injectAuth({ method: 'POST', url: '/resources', payload: baseBody })
+    ).json();
+
+    // Nota vinculada ao recurso + publicação a partir dela.
+    const note = (
+      await injectAuth({
+        method: 'POST',
+        url: '/notes',
+        payload: {
+          type: 'NOTE',
+          doc: {},
+          date: '2026-06-10T00:00:00.000Z',
+          resourceId: resource.id,
+        },
+      })
+    ).json();
+    const pFromNote = (
+      await injectAuth({
+        method: 'POST',
+        url: '/publications',
+        payload: {
+          sourceType: 'note',
+          sourceId: note.id,
+          format: 'linkedin',
+          title: 'Do fichamento',
+        },
+      })
+    ).json();
+
+    // Publicação direta do recurso.
+    const pDirect = (
+      await injectAuth({
+        method: 'POST',
+        url: '/publications',
+        payload: {
+          sourceType: 'resource',
+          sourceId: resource.id,
+          format: 'blog',
+          title: 'Do recurso',
+        },
+      })
+    ).json();
+
+    // Recurso + nota + publicação de OUTRO recurso — não deve aparecer.
+    const other = (
+      await injectAuth({
+        method: 'POST',
+        url: '/resources',
+        payload: { userId: USER_ID, title: 'Outro', type: 'book' },
+      })
+    ).json();
+    const otherNote = (
+      await injectAuth({
+        method: 'POST',
+        url: '/notes',
+        payload: {
+          type: 'NOTE',
+          doc: {},
+          date: '2026-06-10T00:00:00.000Z',
+          resourceId: other.id,
+        },
+      })
+    ).json();
+    await injectAuth({
+      method: 'POST',
+      url: '/publications',
+      payload: {
+        sourceType: 'note',
+        sourceId: otherNote.id,
+        format: 'linkedin',
+        title: 'De outro recurso',
+      },
+    });
+
+    const res = await injectAuth({
+      method: 'GET',
+      url: `/resources/${resource.id}/publications`,
+    });
+
+    expect(res.statusCode).toBe(200);
+    const ids = res.json().map((p: { id: string }) => p.id);
+    expect(ids).toHaveLength(2);
+    expect(ids).toContain(pFromNote.id);
+    expect(ids).toContain(pDirect.id);
+  });
+});
+
 describe('PATCH /resources/:id', () => {
   it('edita stage e title → 200', async () => {
     const created = await injectAuth({

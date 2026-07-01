@@ -22,6 +22,7 @@ export const createGoalSchema = z.object({
   startAt: z.coerce.date().nullish(),
   dueAt: z.coerce.date().nullish(),
   parentId: z.string().nullish(),
+  resourceId: z.string().nullish(),
   labelIds: z.array(z.string()).optional(),
 });
 export type CreateGoalBody = z.infer<typeof createGoalSchema>;
@@ -38,6 +39,7 @@ export const editGoalSchema = z.object({
   weekdays: z.array(weekday).optional(),
   startAt: z.coerce.date().nullish(),
   dueAt: z.coerce.date().nullish(),
+  resourceId: z.string().nullish(),
   labelIds: z.array(z.string()).optional(),
 });
 export type EditGoalBody = z.infer<typeof editGoalSchema>;
@@ -58,6 +60,7 @@ export const listGoalsQuerySchema = z.object({
   userId: z.string().min(1),
   type: goalType.optional(),
   parentId: z.string().optional(),
+  resourceId: z.string().optional(),
 });
 export type ListGoalsQuery = z.infer<typeof listGoalsQuerySchema>;
 
@@ -104,6 +107,7 @@ export const goalResponseSchema = z.object({
   description: z.string().nullable(),
   type: goalType,
   parentId: z.string().nullable(),
+  resourceId: z.string().nullable(),
   targetValue: z.number().nullable(),
   unit: z.string().nullable(),
   period: goalPeriod.nullable(),

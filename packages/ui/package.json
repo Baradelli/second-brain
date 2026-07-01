@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@cerebro/shared": "workspace:*",
+    "@hookform/resolvers": "^3.9.0",
     "@tiptap/core": "^2.10.0",
     "@tiptap/extension-color": "^2.10.0",
     "@tiptap/extension-details": "^2.10.0",
@@ -37,8 +38,10 @@
     "@tiptap/suggestion": "^2.10.0",
     "i18next": "^23.15.0",
     "lucide-react": "^1.17.0",
+    "react-hook-form": "^7.53.0",
     "react-i18next": "^15.0.0",
-    "tippy.js": "^6.3.7"
+    "tippy.js": "^6.3.7",
+    "zod": "^3.23.0"
   },
   "peerDependencies": {
     "react": "^18.3.0",

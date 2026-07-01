@@ -2,6 +2,7 @@ import { GoalNotFoundError, InvalidGoalError } from '../domain/errors.js';
 import type { Goal, GoalPeriod } from '../domain/goal.js';
 import { validateGoalCadenceAndMeasure } from '../domain/goal-rules.js';
 import type { GoalRepository } from './ports/goal-repository.js';
+import type { ResourceRepository } from './ports/resource-repository.js';
 
 export interface EditGoalInput {
   id: string;
@@ -15,6 +16,7 @@ export interface EditGoalInput {
   weekdays?: number[];
   startAt?: Date | null;
   dueAt?: Date | null;
+  resourceId?: string | null; // liga/desliga o objetivo de um Resource
   labelIds?: string[]; // se presente, SUBSTITUI o conjunto
 }
 
@@ -22,7 +24,10 @@ export interface EditGoalInput {
 // trocar tipo/pai = recriar; arquivar/completar são UseCases próprios (Tarefa 31).
 
 export class EditGoal {
-  constructor(private repo: GoalRepository) {}
+  constructor(
+    private repo: GoalRepository,
+    private resources?: ResourceRepository,
+  ) {}
 
   async execute(input: EditGoalInput): Promise<Goal> {
     const existing = await this.repo.byId(input.id);
@@ -64,6 +69,17 @@ export class EditGoal {
     if (input.weekdays !== undefined) patch.weekdays = input.weekdays;
     if (input.startAt !== undefined) patch.startAt = input.startAt;
     if (input.dueAt !== undefined) patch.dueAt = input.dueAt;
+    if (input.resourceId !== undefined) {
+      if (input.resourceId !== null && this.resources) {
+        const resource = await this.resources.byId(input.resourceId);
+        if (!resource || resource.userId !== existing.userId) {
+          throw new InvalidGoalError(
+            'resource must be an existing resource you own',
+          );
+        }
+      }
+      patch.resourceId = input.resourceId;
+    }
     if (input.labelIds !== undefined) patch.labelIds = input.labelIds;
 
     return this.repo.update(input.id, patch);
