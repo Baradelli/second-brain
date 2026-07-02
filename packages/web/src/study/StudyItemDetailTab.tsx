@@ -8,14 +8,27 @@ import {
   createNote,
   deleteStudyItem,
   editStudyItem,
+  getNoteById,
   getStudyItem,
   logRecall,
+  textToDoc,
   unarchiveStudyItem,
   undoRecall,
 } from '@cerebro/shared/client';
-import { Button, Input } from '@cerebro/ui';
+import {
+  Button,
+  Input,
+  type PromptRequest,
+  PromptSheet,
+} from '@cerebro/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { BookOpen, Brain, FileText, RotateCcw } from 'lucide-react';
+import {
+  BookOpen,
+  Brain,
+  FileText,
+  RotateCcw,
+  Sparkles,
+} from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -64,6 +77,70 @@ type StudyFormValues = z.infer<typeof studyFormSchema>;
 export function StudyItemDetailTab({ studyItemId }: { studyItemId: string }) {
   const { t } = useTranslation();
   const { openTab, renameTab, closeTab, tabs } = useTabs();
+
+  // Assistente (IA) inline — Tarefa 83. Mesmos fluxos do mobile: toda saída é
+  // candidato; o resultado confirmado vira uma Note aberta em aba (§9).
+  const [promptReq, setPromptReq] = useState<PromptRequest | null>(null);
+
+  function saveAiNote(suffix: string) {
+    return async (text: string) => {
+      if (!item) return;
+      const note = await createNote({
+        type: 'NOTE',
+        doc: textToDoc(text),
+        title: `${item.title} — ${suffix}`,
+      });
+      openTab({ kind: 'note', id: note.id, title: `${item.title} — ${suffix}` });
+    };
+  }
+
+  function openQuestionsPrompt() {
+    if (!item) return;
+    setPromptReq({
+      skill: 'study.questions',
+      context: {
+        title: item.title,
+        ...(item.reference ? { reference: item.reference } : {}),
+      },
+      apply: saveAiNote(t('ai.skill.study.questions')),
+    });
+  }
+
+  function openQuizPrompt() {
+    if (!item) return;
+    const topics = item.questions
+      ? [...item.questions.before, ...item.questions.after]
+      : [];
+    setPromptReq({
+      skill: 'study.quiz',
+      context: {
+        title: item.title,
+        ...(topics.length > 0 ? { topics } : {}),
+      },
+      apply: saveAiNote(t('ai.skill.study.quiz')),
+    });
+  }
+
+  async function openFeedbackPrompt() {
+    if (!item?.fichamentoNoteId) return;
+    const note = await getNoteById(item.fichamentoNoteId);
+    setPromptReq({
+      skill: 'study.fichamento_feedback',
+      context: { title: item.title, fichamentoText: note.plainText },
+      apply: saveAiNote(t('ai.skill.study.fichamento_feedback')),
+    });
+  }
+
+  async function openSocraticPrompt() {
+    if (!item?.fichamentoNoteId) return;
+    const note = await getNoteById(item.fichamentoNoteId);
+    setPromptReq({
+      skill: 'study.socratic',
+      context: { title: item.title, fichamentoText: note.plainText },
+      apply: saveAiNote(t('ai.skill.study.socratic')),
+    });
+  }
+
   const { set, clear } = useActiveStudy();
   const [confirm, setConfirm] = useState<'archive' | 'delete' | null>(null);
 
@@ -323,6 +400,57 @@ export function StudyItemDetailTab({ studyItemId }: { studyItemId: string }) {
           </Button>
         )}
       </section>
+
+      {/* Assistente (IA) inline — Tarefa 83 */}
+      <section className="mt-8">
+        <h2 className="mb-2 text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">
+          {t('nav.assistant')}
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={openQuestionsPrompt}
+            data-testid="prompt-questions"
+          >
+            <Sparkles size={15} strokeWidth={1.85} />
+            {t('ai.skill.study.questions')}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={openQuizPrompt}
+            data-testid="prompt-quiz"
+          >
+            <Sparkles size={15} strokeWidth={1.85} />
+            {t('ai.skill.study.quiz')}
+          </Button>
+          {item.fichamentoNoteId && (
+            <>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => void openFeedbackPrompt()}
+                data-testid="prompt-fichamento-feedback"
+              >
+                <Sparkles size={15} strokeWidth={1.85} />
+                {t('ai.skill.study.fichamento_feedback')}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => void openSocraticPrompt()}
+                data-testid="prompt-socratic"
+              >
+                <Sparkles size={15} strokeWidth={1.85} />
+                {t('ai.skill.study.socratic')}
+              </Button>
+            </>
+          )}
+        </div>
+      </section>
+
+      <PromptSheet request={promptReq} onClose={() => setPromptReq(null)} />
 
       {/* Recuperação ativa (Práticas 3/7) — o ritual de revisão */}
       {!archived && (

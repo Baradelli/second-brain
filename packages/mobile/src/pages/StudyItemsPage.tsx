@@ -9,13 +9,16 @@ import {
   logRecall,
   textToDoc,
 } from '@cerebro/shared/client';
-import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
+import { BottomSheet, Button, Card, EmptyState,
+  PromptSheet,
+  type PromptRequest,
+} from '@cerebro/ui';
 import { BookOpen, Brain, FileText, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { type PromptRequest, PromptSheet } from '../components/PromptSheet.js';
+
 import { PublishTrigger } from '../components/PublishTrigger.js';
 import { StudyItemForm } from '../components/StudyItemForm.js';
 

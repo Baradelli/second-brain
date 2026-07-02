@@ -249,8 +249,12 @@ obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo
 
 ### Bloco S — Paridade de superfícies de IA
 
-- [ ] **82** — Hub Assistente real no mobile (mata o placeholder; reusa descritores da 80).
-- [ ] **83** — `PromptSheet` → `packages/ui` + IA inline nas telas web de estudo/publicação.
+- [x] **82** — Hub Assistente real no mobile: 7 skills via descritores do shared +
+      PromptSheet; entrada no menu lateral (resolve a rota órfã /assistant).
+- [x] **83** — `PromptSheet` movido para `packages/ui`; web `StudyItemDetailTab` ganhou
+      IA inline (perguntas/quiz/feedback/socrático). `publish.draft` inline no web
+      segue pelo hub (registrado como melhoria futura).
+      → `tasks/82-83-paridade-superficies-ia.md` (mobile 125 · web 140 · shared 50)
 
 ### Bloco T — "Perguntar ao meu segundo cérebro" (MVP 4)
 

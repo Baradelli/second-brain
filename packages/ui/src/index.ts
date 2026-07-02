@@ -9,6 +9,7 @@ export type { GoalFormLabelPickerProps } from './components/GoalForm.js';
 export { GoalForm } from './components/GoalForm.js';
 export { Input } from './components/Input.js';
 export type { NoteFormValues } from './components/NoteForm.js';
+export { type PromptRequest, PromptSheet } from './components/PromptSheet.js';
 export { NoteForm } from './components/NoteForm.js';
 export { ResourceForm } from './components/ResourceForm.js';
 export { ProgressRing } from './components/ProgressRing.js';

@@ -20,6 +20,7 @@ import {
   Plus,
   Search,
   Settings,
+  Sparkles,
   Tags,
   Target,
 } from 'lucide-react';
@@ -91,6 +92,11 @@ function AppShell() {
       to: '/publications',
       icon: <Megaphone size={18} strokeWidth={1.75} />,
       label: t('nav.publications'),
+    },
+    {
+      to: '/assistant',
+      icon: <Sparkles size={18} strokeWidth={1.75} />,
+      label: t('nav.assistant'),
     },
     {
       to: '/notes',

@@ -8,13 +8,16 @@ import {
   listHighlights,
   textToDoc,
 } from '@cerebro/shared/client';
-import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
+import { BottomSheet, Button, Card, EmptyState,
+  PromptSheet,
+  type PromptRequest,
+} from '@cerebro/ui';
 import { Archive, Pencil, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { type PromptRequest, PromptSheet } from './PromptSheet.js';
+
 
 type EditorState =
   | { mode: 'new' }
