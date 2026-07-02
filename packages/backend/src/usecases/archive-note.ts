@@ -4,6 +4,7 @@ import type { NoteRepository } from './ports/note-repository.js';
 
 export interface ArchiveNoteInput {
   id: string;
+  userId: string;
   archivedAt?: Date; // default: now
 }
 
@@ -13,7 +14,9 @@ export class ArchiveNote {
 
   async execute(input: ArchiveNoteInput): Promise<Note> {
     const existing = await this.repo.byId(input.id);
-    if (!existing) throw new NoteNotFoundError(input.id);
+    // Dono errado = NotFound (não vaza a existência). Tarefa 77.
+    if (!existing || existing.userId !== input.userId)
+      throw new NoteNotFoundError(input.id);
 
     return this.repo.update(input.id, {
       status: 'ARCHIVED',

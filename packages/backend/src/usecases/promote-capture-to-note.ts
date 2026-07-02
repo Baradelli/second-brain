@@ -10,6 +10,7 @@ import { loadPendingCapture, markPromoted } from './promote-capture-shared.js';
 
 export interface PromoteCaptureToNoteInput {
   captureId: string;
+  userId: string;
   type: NoteType;
   scope?: NoteScope;
   reference: Date;
@@ -26,7 +27,11 @@ export class PromoteCaptureToNote {
   async execute(
     input: PromoteCaptureToNoteInput,
   ): Promise<{ note: Note; capture: Capture }> {
-    const capture = await loadPendingCapture(this.captureRepo, input.captureId);
+    const capture = await loadPendingCapture(
+      this.captureRepo,
+      input.captureId,
+      input.userId,
+    );
 
     const date = DateTime.fromJSDate(input.reference, { zone: input.timezone })
       .startOf('day')

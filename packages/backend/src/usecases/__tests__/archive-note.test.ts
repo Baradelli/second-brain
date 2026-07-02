@@ -32,7 +32,7 @@ describe('ArchiveNote', () => {
   it('arquiva a nota (status ARCHIVED + archivedAt)', async () => {
     await repo.save(makeNote({ id: 'n1', status: 'ACTIVE' }));
 
-    const result = await useCase.execute({ id: 'n1' });
+    const result = await useCase.execute({ id: 'n1', userId: 'user-1' });
 
     expect(result.status).toBe('ARCHIVED');
     expect(result.archivedAt).toBeInstanceOf(Date);
@@ -43,7 +43,7 @@ describe('ArchiveNote', () => {
   });
 
   it('throws NoteNotFoundError para id inexistente', async () => {
-    await expect(useCase.execute({ id: 'ghost' })).rejects.toThrow(
+    await expect(useCase.execute({ id: 'ghost', userId: 'user-1' })).rejects.toThrow(
       NoteNotFoundError,
     );
   });

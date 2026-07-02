@@ -69,6 +69,7 @@ export class UpsertJournalNote {
     if (mode === 'create-or-update') {
       const note = await this.editNote.execute({
         id: existing.id,
+        userId: input.userId,
         title: input.title,
         doc: input.doc,
       });

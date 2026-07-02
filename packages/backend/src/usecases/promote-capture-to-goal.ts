@@ -6,6 +6,7 @@ import { loadPendingCapture, markPromoted } from './promote-capture-shared.js';
 
 export interface PromoteCaptureToGoalInput {
   captureId: string;
+  userId: string;
   title?: string; // default: capture.text (trim)
   type: GoalType;
   description?: string | null;
@@ -28,7 +29,11 @@ export class PromoteCaptureToGoal {
   async execute(
     input: PromoteCaptureToGoalInput,
   ): Promise<{ goal: Goal; capture: Capture }> {
-    const capture = await loadPendingCapture(this.captureRepo, input.captureId);
+    const capture = await loadPendingCapture(
+      this.captureRepo,
+      input.captureId,
+      input.userId,
+    );
 
     const goal = await this.createGoal.execute({
       userId: capture.userId,

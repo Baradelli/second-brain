@@ -112,7 +112,7 @@ describe('ArchiveLabel', () => {
     const repo = new LabelRepositoryFake();
     await repo.save(makeLabel({ id: 'unused' }));
 
-    const result = await new ArchiveLabel(repo).execute({ id: 'unused' }, NOW);
+    const result = await new ArchiveLabel(repo).execute({ id: 'unused', userId: 'user-1' }, NOW);
 
     expect(result.status).toBe('ARCHIVED');
     expect(result.archivedAt).toBe(NOW);
@@ -124,7 +124,7 @@ describe('ArchiveLabel', () => {
     repo.setItemUsage('used', 1);
 
     await expect(
-      new ArchiveLabel(repo).execute({ id: 'used' }, NOW),
+      new ArchiveLabel(repo).execute({ id: 'used', userId: 'user-1' }, NOW),
     ).rejects.toMatchObject({
       name: 'LabelInUseError',
       reason: 'items',
@@ -138,7 +138,7 @@ describe('ArchiveLabel', () => {
     await repo.save(makeLabel({ id: 'child', parentId: 'parent' }));
 
     await expect(
-      new ArchiveLabel(repo).execute({ id: 'parent' }, NOW),
+      new ArchiveLabel(repo).execute({ id: 'parent', userId: 'user-1' }, NOW),
     ).rejects.toThrow(LabelInUseError);
   });
 });

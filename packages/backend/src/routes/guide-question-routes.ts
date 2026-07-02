@@ -82,6 +82,7 @@ export const guideQuestionRoutes: FastifyPluginAsyncZod<{
       try {
         const question = await toggleGuideQuestion.execute({
           id: req.params.id,
+          userId: req.user.sub,
           active: req.body.active,
         });
         return toResponse(question);

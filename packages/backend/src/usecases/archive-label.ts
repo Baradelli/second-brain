@@ -5,9 +5,14 @@ import type { LabelRepository } from './ports/label-repository.js';
 export class ArchiveLabel {
   constructor(private repo: LabelRepository) {}
 
-  async execute(input: { id: string }, now: Date = new Date()): Promise<Label> {
+  async execute(
+    input: { id: string; userId: string },
+    now: Date = new Date(),
+  ): Promise<Label> {
     const label = await this.repo.byId(input.id);
-    if (!label) throw new LabelNotFoundError(input.id);
+    // Dono errado = NotFound (não vaza a existência). Tarefa 77.
+    if (!label || label.userId !== input.userId)
+      throw new LabelNotFoundError(input.id);
 
     const usage = await this.repo.usageCount(input.id);
     if (usage.items > 0) {

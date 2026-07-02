@@ -6,6 +6,7 @@ import { loadPendingCapture, markPromoted } from './promote-capture-shared.js';
 
 export interface PromoteCaptureToResourceInput {
   captureId: string;
+  userId: string;
   title?: string; // default: capture.text (trim)
   type: ResourceType;
   url?: string | null;
@@ -22,7 +23,11 @@ export class PromoteCaptureToResource {
   async execute(
     input: PromoteCaptureToResourceInput,
   ): Promise<{ resource: Resource; capture: Capture }> {
-    const capture = await loadPendingCapture(this.captureRepo, input.captureId);
+    const capture = await loadPendingCapture(
+      this.captureRepo,
+      input.captureId,
+      input.userId,
+    );
 
     const resource = await this.createResource.execute({
       userId: capture.userId,

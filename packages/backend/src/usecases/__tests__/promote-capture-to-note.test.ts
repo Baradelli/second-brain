@@ -29,6 +29,7 @@ const BASE_CAPTURE = {
 
 const INPUT_BASE = {
   captureId: 'cap-1',
+  userId: 'user-1',
   type: 'NOTE' as const,
   reference: new Date('2026-06-03T14:00:00.000Z'),
   timezone: 'America/Sao_Paulo',

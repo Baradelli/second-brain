@@ -155,7 +155,10 @@ export const labelRoutes: FastifyPluginAsyncZod<{
     },
     async (req, reply) => {
       try {
-        const label = await archiveLabel.execute({ id: req.params.id });
+        const label = await archiveLabel.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
         return toResponse(label);
       } catch (error) {
         if (error instanceof LabelNotFoundError) {

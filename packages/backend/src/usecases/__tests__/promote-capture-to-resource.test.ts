@@ -48,6 +48,7 @@ describe('PromoteCaptureToResource', () => {
     await captures.save(makeCapture());
 
     const { resource, capture } = await useCase.execute({
+      userId: USER,
       captureId: 'cap-1',
       type: 'book',
     });
@@ -65,6 +66,7 @@ describe('PromoteCaptureToResource', () => {
   it('uses provided title over capture text', async () => {
     await captures.save(makeCapture());
     const { resource } = await useCase.execute({
+      userId: USER,
       captureId: 'cap-1',
       type: 'course',
       title: 'Curso de DDD',
@@ -74,14 +76,14 @@ describe('PromoteCaptureToResource', () => {
 
   it('throws for unknown capture', async () => {
     await expect(
-      useCase.execute({ captureId: 'ghost', type: 'book' }),
+      useCase.execute({ userId: USER, captureId: 'ghost', type: 'book' }),
     ).rejects.toThrow(CaptureNotFoundError);
   });
 
   it('throws when capture is not PENDING', async () => {
     await captures.save(makeCapture({ status: 'PROCESSED' }));
     await expect(
-      useCase.execute({ captureId: 'cap-1', type: 'book' }),
+      useCase.execute({ userId: USER, captureId: 'cap-1', type: 'book' }),
     ).rejects.toThrow(CaptureAlreadyProcessedError);
   });
 });

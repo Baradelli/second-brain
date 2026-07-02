@@ -125,7 +125,11 @@ export const noteRoutes: FastifyPluginAsyncZod<{
     },
     async (req, reply) => {
       try {
-        const note = await editNote.execute({ id: req.params.id, ...req.body });
+        const note = await editNote.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+          ...req.body,
+        });
         return reply.status(200).send(toResponse(note));
       } catch (err) {
         if (err instanceof NoteNotFoundError) {
@@ -150,7 +154,10 @@ export const noteRoutes: FastifyPluginAsyncZod<{
     },
     async (req, reply) => {
       try {
-        const note = await archiveNote.execute({ id: req.params.id });
+        const note = await archiveNote.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+        });
         return reply.status(200).send(toResponse(note));
       } catch (err) {
         if (err instanceof NoteNotFoundError) {

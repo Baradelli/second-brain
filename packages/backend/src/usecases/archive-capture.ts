@@ -4,6 +4,7 @@ import type { CaptureRepository } from './ports/capture-repository.js';
 
 export interface ArchiveCaptureInput {
   id: string;
+  userId: string;
   reason?: string;
 }
 
@@ -12,7 +13,9 @@ export class ArchiveCapture {
 
   async execute(input: ArchiveCaptureInput): Promise<Capture> {
     const capture = await this.repo.byId(input.id);
-    if (!capture) throw new CaptureNotFoundError(input.id);
+    // Dono errado = NotFound (não vaza a existência do recurso). Tarefa 77.
+    if (!capture || capture.userId !== input.userId)
+      throw new CaptureNotFoundError(input.id);
 
     return this.repo.update(input.id, {
       status: 'ARCHIVED',

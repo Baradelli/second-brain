@@ -47,7 +47,7 @@ describe('EditNote', () => {
   it('editing title preserves all other fields unchanged', async () => {
     await repo.save(makeNote());
 
-    const result = await useCase.execute({ id: 'note-1', title: 'New Title' });
+    const result = await useCase.execute({ id: 'note-1', userId: 'user-1', title: 'New Title' });
 
     expect(result.title).toBe('New Title');
     expect(result.plainText).toBe('original');
@@ -71,14 +71,14 @@ describe('EditNote', () => {
       ],
     };
 
-    const result = await useCase.execute({ id: 'note-1', doc: newDoc });
+    const result = await useCase.execute({ id: 'note-1', userId: 'user-1', doc: newDoc });
 
     expect(result.plainText).toBe('Updated text');
     expect(result.doc).toEqual(newDoc);
   });
 
   it('throws NoteNotFoundError for unknown id', async () => {
-    await expect(useCase.execute({ id: 'ghost' })).rejects.toThrow(
+    await expect(useCase.execute({ id: 'ghost', userId: 'user-1' })).rejects.toThrow(
       NoteNotFoundError,
     );
   });
@@ -86,7 +86,7 @@ describe('EditNote', () => {
   it('recomputes outgoing links when the doc gains mentions', async () => {
     await repo.save(makeNote());
 
-    await useCase.execute({ id: 'note-1', doc: docMentioning('a', 'b') });
+    await useCase.execute({ id: 'note-1', userId: 'user-1', doc: docMentioning('a', 'b') });
 
     const edges = await linkRepo.listGraphEdges('user-1');
     expect(edges.map((e) => e.toNoteId).sort()).toEqual(['a', 'b']);
@@ -95,9 +95,9 @@ describe('EditNote', () => {
 
   it('recomputes (removes) outgoing links when mentions are removed', async () => {
     await repo.save(makeNote());
-    await useCase.execute({ id: 'note-1', doc: docMentioning('a', 'b') });
+    await useCase.execute({ id: 'note-1', userId: 'user-1', doc: docMentioning('a', 'b') });
 
-    await useCase.execute({ id: 'note-1', doc: docMentioning('a') });
+    await useCase.execute({ id: 'note-1', userId: 'user-1', doc: docMentioning('a') });
 
     expect(await linkRepo.listGraphEdges('user-1')).toEqual([
       { fromNoteId: 'note-1', toNoteId: 'a' },
@@ -106,10 +106,11 @@ describe('EditNote', () => {
 
   it('clears outgoing links when the doc edited to have no mentions', async () => {
     await repo.save(makeNote());
-    await useCase.execute({ id: 'note-1', doc: docMentioning('a') });
+    await useCase.execute({ id: 'note-1', userId: 'user-1', doc: docMentioning('a') });
 
     await useCase.execute({
       id: 'note-1',
+      userId: 'user-1',
       doc: { type: 'doc', content: [] },
     });
 
@@ -119,7 +120,7 @@ describe('EditNote', () => {
   it('drops a self-mention (a note does not link to itself)', async () => {
     await repo.save(makeNote());
 
-    await useCase.execute({ id: 'note-1', doc: docMentioning('note-1', 'a') });
+    await useCase.execute({ id: 'note-1', userId: 'user-1', doc: docMentioning('note-1', 'a') });
 
     expect(await linkRepo.listGraphEdges('user-1')).toEqual([
       { fromNoteId: 'note-1', toNoteId: 'a' },
@@ -128,9 +129,9 @@ describe('EditNote', () => {
 
   it('does not touch links when the doc is not part of the edit', async () => {
     await repo.save(makeNote());
-    await useCase.execute({ id: 'note-1', doc: docMentioning('a') });
+    await useCase.execute({ id: 'note-1', userId: 'user-1', doc: docMentioning('a') });
 
-    await useCase.execute({ id: 'note-1', title: 'Only title' });
+    await useCase.execute({ id: 'note-1', userId: 'user-1', title: 'Only title' });
 
     expect(await linkRepo.listGraphEdges('user-1')).toEqual([
       { fromNoteId: 'note-1', toNoteId: 'a' },

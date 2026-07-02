@@ -7,13 +7,18 @@ import type { CaptureRepository } from './ports/capture-repository.js';
 
 export type PromoteDestination = 'note' | 'resource' | 'goal';
 
-/** Carrega a captura e garante que ainda está PENDING (senão lança). */
+/**
+ * Carrega a captura do DONO e garante que ainda está PENDING (senão lança).
+ * Dono errado = NotFound (não vaza a existência). Tarefa 77.
+ */
 export async function loadPendingCapture(
   repo: CaptureRepository,
   captureId: string,
+  userId: string,
 ): Promise<Capture> {
   const capture = await repo.byId(captureId);
-  if (!capture) throw new CaptureNotFoundError(captureId);
+  if (!capture || capture.userId !== userId)
+    throw new CaptureNotFoundError(captureId);
   if (capture.status !== 'PENDING')
     throw new CaptureAlreadyProcessedError(captureId);
   return capture;

@@ -46,6 +46,7 @@ describe('PromoteCaptureToGoal', () => {
     await captures.save(makeCapture());
 
     const { goal, capture } = await useCase.execute({
+      userId: USER,
       captureId: 'cap-1',
       type: 'HABIT',
       weekdays: [1, 3, 5],
@@ -64,7 +65,7 @@ describe('PromoteCaptureToGoal', () => {
   it('propagates CreateGoal validation errors (HABIT without cadence)', async () => {
     await captures.save(makeCapture());
     await expect(
-      useCase.execute({ captureId: 'cap-1', type: 'HABIT' }),
+      useCase.execute({ userId: USER, captureId: 'cap-1', type: 'HABIT' }),
     ).rejects.toThrow(InvalidGoalError);
 
     // capture stays PENDING (not consumed) since creation failed
@@ -74,12 +75,12 @@ describe('PromoteCaptureToGoal', () => {
 
   it('throws for unknown capture / already processed', async () => {
     await expect(
-      useCase.execute({ captureId: 'ghost', type: 'TARGET', targetValue: 1 }),
+      useCase.execute({ userId: USER, captureId: 'ghost', type: 'TARGET', targetValue: 1 }),
     ).rejects.toThrow(CaptureNotFoundError);
 
     await captures.save(makeCapture({ status: 'PROCESSED' }));
     await expect(
-      useCase.execute({ captureId: 'cap-1', type: 'TARGET', targetValue: 1 }),
+      useCase.execute({ userId: USER, captureId: 'cap-1', type: 'TARGET', targetValue: 1 }),
     ).rejects.toThrow(CaptureAlreadyProcessedError);
   });
 });

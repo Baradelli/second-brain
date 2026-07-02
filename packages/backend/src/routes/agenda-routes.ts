@@ -248,6 +248,7 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
     async (req, reply) => {
       const capture = await archiveCapture.execute({
         id: req.params.id,
+        userId: req.user.sub,
         reason: req.body.reason,
       });
       return reply.status(200).send(captureToResponse(capture));
@@ -333,6 +334,7 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
       if (body.destination === 'resource') {
         const { resource, capture } = await promoteCaptureToResource.execute({
           captureId,
+          userId: req.user.sub,
           title: body.title,
           type: body.type,
           url: body.url,
@@ -348,6 +350,7 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
       if (body.destination === 'goal') {
         const { goal, capture } = await promoteCaptureToGoal.execute({
           captureId,
+          userId: req.user.sub,
           title: body.title,
           type: body.type,
           description: body.description,
@@ -366,15 +369,14 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
         });
       }
 
-      // destination === 'note' — timezone do dono da captura, com o fallback
-      // único do app (Tarefa 75).
-      const existing = await captureRepo.byId(captureId);
-      const timezone = existing
-        ? ((await settingsReader.getByUserId(existing.userId))?.timezone ??
-          DEFAULT_TIMEZONE)
-        : DEFAULT_TIMEZONE;
+      // destination === 'note' — o dono é sempre quem está autenticado (Tarefa
+      // 77); timezone com o fallback único do app (Tarefa 75).
+      const timezone =
+        (await settingsReader.getByUserId(req.user.sub))?.timezone ??
+        DEFAULT_TIMEZONE;
       const { note, capture } = await promoteCaptureToNote.execute({
         captureId,
+        userId: req.user.sub,
         type: body.type,
         scope: body.scope,
         title: body.title,

@@ -30,7 +30,7 @@ describe('ArchiveCapture', () => {
   });
 
   it('arquiva uma captura PENDING: status ARCHIVED e archivedAt setado', async () => {
-    const result = await usecase.execute({ id: 'cap-1' });
+    const result = await usecase.execute({ id: 'cap-1', userId: 'user-1' });
 
     expect(result.status).toBe('ARCHIVED');
     expect(result.archivedAt).toBeInstanceOf(Date);
@@ -40,6 +40,7 @@ describe('ArchiveCapture', () => {
   it('grava archiveReason quando enviado', async () => {
     const result = await usecase.execute({
       id: 'cap-1',
+      userId: 'user-1',
       reason: 'já fiz isso',
     });
 
@@ -48,13 +49,13 @@ describe('ArchiveCapture', () => {
   });
 
   it('lança CaptureNotFoundError para id inexistente', async () => {
-    await expect(usecase.execute({ id: 'nao-existe' })).rejects.toThrow(
+    await expect(usecase.execute({ id: 'nao-existe', userId: 'user-1' })).rejects.toThrow(
       CaptureNotFoundError,
     );
   });
 
   it('não aparece em listPendingCaptures após arquivar; aparece em listArchived', async () => {
-    await usecase.execute({ id: 'cap-1' });
+    await usecase.execute({ id: 'cap-1', userId: 'user-1' });
 
     const pending = await repo.find({ userId: 'user-1', status: 'PENDING' });
     const archived = await repo.find({ userId: 'user-1', status: 'ARCHIVED' });

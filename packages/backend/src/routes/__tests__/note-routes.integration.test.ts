@@ -174,3 +174,33 @@ describe('GET /notes', () => {
     expect(res.statusCode).toBe(404);
   });
 });
+
+describe('ownership (Tarefa 77) — intruso com token valido', () => {
+  it('PATCH e archive de nota de outro dono → 404', async () => {
+    const created = await injectAuth({
+      method: 'POST',
+      url: '/notes',
+      payload: baseBody,
+    });
+    const id = created.json().id;
+    const intruderAuth = {
+      authorization: `Bearer ${app.jwt.sign({ sub: 'intruder' })}`,
+    };
+
+    const edited = await app.inject({
+      method: 'PATCH',
+      url: `/notes/${id}`,
+      payload: { title: 'hack' },
+      headers: intruderAuth,
+    });
+    expect(edited.statusCode).toBe(404);
+
+    const archived = await app.inject({
+      method: 'POST',
+      url: `/notes/${id}/archive`,
+      payload: {},
+      headers: intruderAuth,
+    });
+    expect(archived.statusCode).toBe(404);
+  });
+});

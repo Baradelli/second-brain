@@ -7,6 +7,7 @@ import type { NoteRepository } from './ports/note-repository.js';
 
 export interface EditNoteInput {
   id: string;
+  userId: string;
   title?: string;
   doc?: unknown;
   labelIds?: string[];
@@ -20,7 +21,9 @@ export class EditNote {
 
   async execute(input: EditNoteInput): Promise<Note> {
     const existing = await this.repo.byId(input.id);
-    if (!existing) throw new NoteNotFoundError(input.id);
+    // Dono errado = NotFound (não vaza a existência). Tarefa 77.
+    if (!existing || existing.userId !== input.userId)
+      throw new NoteNotFoundError(input.id);
 
     const patch: Partial<Note> = {};
 

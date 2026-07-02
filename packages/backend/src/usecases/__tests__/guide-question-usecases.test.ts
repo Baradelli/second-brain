@@ -67,6 +67,7 @@ describe('ToggleGuideQuestion', () => {
 
     const toggled = await new ToggleGuideQuestion(repo).execute({
       id: 'q-1',
+      userId: 'user-1',
       active: false,
     });
     const suggestions = await new SuggestedQuestionsForNote(repo).execute({
@@ -82,7 +83,11 @@ describe('ToggleGuideQuestion', () => {
     const repo = repoWithLabels();
 
     await expect(
-      new ToggleGuideQuestion(repo).execute({ id: 'missing', active: false }),
+      new ToggleGuideQuestion(repo).execute({
+        id: 'missing',
+        userId: 'user-1',
+        active: false,
+      }),
     ).rejects.toThrow(GuideQuestionNotFoundError);
   });
 });
