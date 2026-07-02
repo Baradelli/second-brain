@@ -24,6 +24,7 @@ import {
 import type { Goal } from '../domain/goal.js';
 import type { Note } from '../domain/note.js';
 import type { Resource } from '../domain/resource.js';
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import { PrismaAttachmentRepository } from '../repositories/prisma-attachment-repository.js';
 import { PrismaCaptureRepository } from '../repositories/prisma-capture-repository.js';
 import { PrismaEventRepository } from '../repositories/prisma-event-repository.js';
@@ -144,6 +145,7 @@ function goalToResponse(g: Goal): GoalResponse {
     description: g.description,
     type: g.type,
     parentId: g.parentId,
+    resourceId: g.resourceId,
     targetValue: g.targetValue,
     unit: g.unit,
     period: g.period,
@@ -364,12 +366,13 @@ export const agendaRoutes: FastifyPluginAsyncZod<{
         });
       }
 
-      // destination === 'note' — timezone do dono da captura (não mais hardcoded).
+      // destination === 'note' — timezone do dono da captura, com o fallback
+      // único do app (Tarefa 75).
       const existing = await captureRepo.byId(captureId);
       const timezone = existing
         ? ((await settingsReader.getByUserId(existing.userId))?.timezone ??
-          'UTC')
-        : 'UTC';
+          DEFAULT_TIMEZONE)
+        : DEFAULT_TIMEZONE;
       const { note, capture } = await promoteCaptureToNote.execute({
         captureId,
         type: body.type,
