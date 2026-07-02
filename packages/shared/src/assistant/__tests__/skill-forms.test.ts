@@ -8,14 +8,17 @@ import {
   candidateNoteTitle,
   requiredFieldsFilled,
   skillDescriptor,
-} from '../assistant-skills.js';
+} from '../skill-forms.js';
 
 describe('ASSISTANT_SKILLS', () => {
-  it('cobre exatamente as 4 skills', () => {
+  it('cobre exatamente as 7 skills, na ordem do hub', () => {
     expect(ASSISTANT_SKILLS.map((s) => s.skill)).toEqual([
       'study.questions',
       'study.fichamento_feedback',
       'study.quiz',
+      'study.explain',
+      'study.socratic',
+      'study.difference_map',
       'publish.draft',
     ]);
   });
@@ -141,5 +144,47 @@ describe('candidateNoteTitle', () => {
 
   it('usa só o rótulo quando não há assunto', () => {
     expect(candidateNoteTitle({}, 'Rascunhar com IA')).toBe('Rascunhar com IA');
+  });
+});
+
+// ── Skills novas (Tarefa 79/80) ──────────────────────────────────────────────
+
+describe('skills novas no hub', () => {
+  it('study.explain exige excerpt e monta o contexto', () => {
+    expect(requiredFieldsFilled('study.explain', {})).toBe(false);
+    expect(requiredFieldsFilled('study.explain', { excerpt: 'x' })).toBe(true);
+    expect(
+      buildContext('study.explain', { excerpt: ' t ', resourceTitle: 'R' }),
+    ).toEqual({ excerpt: 't', resourceTitle: 'R' });
+  });
+
+  it('study.socratic exige title + fichamentoText', () => {
+    expect(
+      requiredFieldsFilled('study.socratic', { title: 'T' }),
+    ).toBe(false);
+    expect(
+      buildContext('study.socratic', { title: 'T', fichamentoText: 'f' }),
+    ).toEqual({ title: 'T', fichamentoText: 'f' });
+  });
+
+  it('study.difference_map monta DUAS fontes a partir dos campos A/B', () => {
+    const values = {
+      topic: 'ressurreicao',
+      sourceATitle: 'A',
+      sourceAAuthor: 'Wright',
+      sourceAText: 'a',
+      sourceBTitle: 'B',
+      sourceBText: 'b',
+    };
+    expect(requiredFieldsFilled('study.difference_map', values)).toBe(true);
+    expect(buildContext('study.difference_map', values)).toEqual({
+      topic: 'ressurreicao',
+      sources: [
+        { resourceTitle: 'A', author: 'Wright', fichamentoText: 'a' },
+        { resourceTitle: 'B', fichamentoText: 'b' },
+      ],
+    });
+    const body = aiRunBody('study.difference_map', values, 'pt');
+    expect(body.skill).toBe('study.difference_map');
   });
 });

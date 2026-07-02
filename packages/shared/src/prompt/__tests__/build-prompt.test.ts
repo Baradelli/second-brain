@@ -123,6 +123,15 @@ describe('buildPrompt — §9 boundary in system', () => {
         'study.questions': { title: 'X' },
         'study.fichamento_feedback': { title: 'X', fichamentoText: 'y' },
         'study.quiz': { title: 'X' },
+        'study.explain': { excerpt: 'x' },
+        'study.socratic': { title: 'X', fichamentoText: 'y' },
+        'study.difference_map': {
+          topic: 'X',
+          sources: [
+            { resourceTitle: 'A', fichamentoText: 'a' },
+            { resourceTitle: 'B', fichamentoText: 'b' },
+          ],
+        },
         'publish.draft': { format: 'blog', sourceText: 'y' },
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -157,5 +166,95 @@ describe('buildPrompt — determinism', () => {
     expect(buildPrompt('study.questions', ctx)).toEqual(
       buildPrompt('study.questions', ctx),
     );
+  });
+});
+
+// ── Skills de compreensão de leitura (Tarefa 79) ─────────────────────────────
+
+describe('buildPrompt — study.explain', () => {
+  it('ancora a explicação no trecho colado (nunca resume o material inteiro)', () => {
+    const p = buildPrompt('study.explain', {
+      excerpt: 'A justificação pela fé é forense.',
+      resourceTitle: 'Paulo e o Dom',
+    });
+    expect(p.skill).toBe('study.explain');
+    expect(p.user).toContain('A justificação pela fé é forense.');
+    expect(p.user).toContain('Paulo e o Dom');
+    expect(p.system).toContain('CANDIDATO');
+  });
+
+  it('modo eli5 pede linguagem simples; sem level não pede', () => {
+    const eli5 = buildPrompt('study.explain', {
+      excerpt: 'trecho',
+      level: 'eli5',
+    });
+    const plain = buildPrompt('study.explain', { excerpt: 'trecho' });
+    expect(eli5.user).toContain('linguagem simples');
+    expect(plain.user).not.toContain('linguagem simples');
+  });
+});
+
+describe('buildPrompt — study.socratic', () => {
+  it('só pergunta: leva o fichamento e proíbe entregar respostas', () => {
+    const p = buildPrompt('study.socratic', {
+      title: 'Ressurreição em Paulo',
+      fichamentoText: 'Paulo argumenta que...',
+    });
+    expect(p.user).toContain('Paulo argumenta que...');
+    expect(p.user).toContain('Ressurreição em Paulo');
+    // O tutor socrático não entrega a resposta — só perguntas.
+    expect(p.user.toLowerCase()).toContain('apenas perguntas');
+  });
+});
+
+describe('buildPrompt — study.difference_map', () => {
+  it('monta os autores em blocos e pede os 4 eixos das Práticas 5/9', () => {
+    const p = buildPrompt('study.difference_map', {
+      topic: 'ressurreição',
+      sources: [
+        {
+          resourceTitle: 'A Ressurreição do Filho de Deus',
+          author: 'N. T. Wright',
+          fichamentoText: 'Corpo transformado...',
+        },
+        {
+          resourceTitle: 'Teologia Sistemática',
+          author: 'Pannenberg',
+          fichamentoText: 'Prolepse do fim...',
+        },
+      ],
+    });
+    expect(p.user).toContain('N. T. Wright');
+    expect(p.user).toContain('Pannenberg');
+    expect(p.user).toContain('Corpo transformado...');
+    expect(p.user).toContain('Prolepse do fim...');
+    expect(p.user).toContain('tese distintiva');
+    expect(p.user).toContain('ponto fraco');
+    expect(p.user.toLowerCase()).toContain('vocabul');
+  });
+
+  it('existe também em inglês', () => {
+    const p = buildPrompt(
+      'study.difference_map',
+      {
+        topic: 'resurrection',
+        sources: [
+          { resourceTitle: 'A', fichamentoText: 'x' },
+          { resourceTitle: 'B', fichamentoText: 'y' },
+        ],
+      },
+      'en',
+    );
+    expect(p.user).toContain('resurrection');
+    expect(p.system.length).toBeGreaterThan(0);
+  });
+});
+
+describe('AI_SKILL_KEYS — inclui as skills novas', () => {
+  it('cobre as 7 skills', () => {
+    expect(AI_SKILL_KEYS).toContain('study.explain');
+    expect(AI_SKILL_KEYS).toContain('study.socratic');
+    expect(AI_SKILL_KEYS).toContain('study.difference_map');
+    expect(AI_SKILL_KEYS).toHaveLength(7);
   });
 });

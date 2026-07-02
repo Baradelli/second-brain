@@ -29,6 +29,31 @@ const publishDraftContext = z.object({
   angle: z.string().optional(),
 });
 
+// Skills de compreensão de leitura (Tarefa 79).
+const explainContext = z.object({
+  excerpt: z.string().min(1),
+  resourceTitle: z.string().optional(),
+  level: z.enum(['eli5', 'technical']).optional(),
+});
+
+const socraticContext = z.object({
+  title: z.string().min(1),
+  fichamentoText: z.string().min(1),
+});
+
+const differenceMapContext = z.object({
+  topic: z.string().min(1),
+  sources: z
+    .array(
+      z.object({
+        resourceTitle: z.string().min(1),
+        author: z.string().optional(),
+        fichamentoText: z.string().min(1),
+      }),
+    )
+    .min(2), // comparar exige pelo menos dois autores
+});
+
 export const aiRunRequestSchema = z.discriminatedUnion('skill', [
   z.object({
     skill: z.literal('study.questions'),
@@ -43,6 +68,21 @@ export const aiRunRequestSchema = z.discriminatedUnion('skill', [
   z.object({
     skill: z.literal('study.quiz'),
     context: quizContext,
+    locale: promptLocale.optional(),
+  }),
+  z.object({
+    skill: z.literal('study.explain'),
+    context: explainContext,
+    locale: promptLocale.optional(),
+  }),
+  z.object({
+    skill: z.literal('study.socratic'),
+    context: socraticContext,
+    locale: promptLocale.optional(),
+  }),
+  z.object({
+    skill: z.literal('study.difference_map'),
+    context: differenceMapContext,
     locale: promptLocale.optional(),
   }),
   z.object({

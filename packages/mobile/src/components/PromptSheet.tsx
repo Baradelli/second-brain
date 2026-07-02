@@ -2,11 +2,14 @@ import {
   type AiRunRequest,
   type AiSkillKey,
   buildPrompt,
+  type DifferenceMapContext,
+  type ExplainContext,
   type FichamentoFeedbackContext,
   type PromptContext,
   type PromptLocale,
   type PublishDraftContext,
   type QuizContext,
+  type SocraticContext,
   type StudyQuestionsContext,
 } from '@cerebro/shared';
 import { getSettings, runAi } from '@cerebro/shared/client';
@@ -42,6 +45,24 @@ function build(req: PromptRequest, locale: PromptLocale) {
       );
     case 'study.quiz':
       return buildPrompt('study.quiz', req.context as QuizContext, locale);
+    case 'study.explain':
+      return buildPrompt(
+        'study.explain',
+        req.context as ExplainContext,
+        locale,
+      );
+    case 'study.socratic':
+      return buildPrompt(
+        'study.socratic',
+        req.context as SocraticContext,
+        locale,
+      );
+    case 'study.difference_map':
+      return buildPrompt(
+        'study.difference_map',
+        req.context as DifferenceMapContext,
+        locale,
+      );
     case 'publish.draft':
       return buildPrompt(
         'publish.draft',

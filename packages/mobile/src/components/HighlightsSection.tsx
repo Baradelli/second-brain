@@ -2,14 +2,19 @@ import type { HighlightColorInput, HighlightResponse } from '@cerebro/shared';
 import {
   archiveHighlight,
   createHighlight,
+  createNote,
   editHighlight,
   listHighlightColors,
   listHighlights,
+  textToDoc,
 } from '@cerebro/shared/client';
 import { BottomSheet, Button, Card, EmptyState } from '@cerebro/ui';
-import { Archive, Pencil, Plus } from 'lucide-react';
+import { Archive, Pencil, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
+import { type PromptRequest, PromptSheet } from './PromptSheet.js';
 
 type EditorState =
   | { mode: 'new' }
@@ -30,6 +35,28 @@ const FIELD_STYLE = {
  * num BottomSheet. Arquivar remove da lista (mesmo padrão dos fichamentos aqui).
  */
 export function HighlightsSection({ resourceId }: { resourceId: string }) {
+  const navigate = useNavigate();
+  // Explicar trecho (Tarefa 81): o grifo vira o excerpt da skill study.explain.
+  const [promptReq, setPromptReq] = useState<PromptRequest | null>(null);
+
+  function openExplainPrompt(quote: string, comment: string | null) {
+    const excerpt = comment ? `${quote}
+
+(nota do leitor: ${comment})` : quote;
+    setPromptReq({
+      skill: 'study.explain',
+      context: { excerpt },
+      apply: async (text) => {
+        const note = await createNote({
+          type: 'NOTE',
+          doc: textToDoc(text),
+          title: `${quote.slice(0, 60)} — explicado`,
+        });
+        navigate(`/editor/${note.id}`);
+      },
+    });
+  }
+
   const { t } = useTranslation();
   const [palette, setPalette] = useState<HighlightColorInput[]>([]);
   const [highlights, setHighlights] = useState<HighlightResponse[]>([]);
@@ -157,6 +184,16 @@ export function HighlightsSection({ resourceId }: { resourceId: string }) {
                   <div className="flex shrink-0 flex-col gap-1">
                     <button
                       type="button"
+                      aria-label={t('ai.skill.study.explain')}
+                      data-testid={`explain-highlight-${h.id}`}
+                      onClick={() => openExplainPrompt(h.quote, h.comment)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full"
+                      style={{ color: 'var(--cerebro-muted)' }}
+                    >
+                      <Sparkles size={15} strokeWidth={1.85} />
+                    </button>
+                    <button
+                      type="button"
                       aria-label={t('common.save')}
                       onClick={() => setEditor({ mode: 'edit', highlight: h })}
                       className="flex h-8 w-8 items-center justify-center rounded-full"
@@ -185,6 +222,8 @@ export function HighlightsSection({ resourceId }: { resourceId: string }) {
           })}
         </div>
       )}
+
+      <PromptSheet request={promptReq} onClose={() => setPromptReq(null)} />
 
       <BottomSheet open={editor !== null} onClose={() => setEditor(null)}>
         {editor && (

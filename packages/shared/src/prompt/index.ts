@@ -3,12 +3,15 @@ import { templatesPt } from './templates.pt.js';
 import {
   type AiSkillKey,
   type BuiltPrompt,
+  type DifferenceMapContext,
+  type ExplainContext,
   type FichamentoFeedbackContext,
   type PromptContext,
   type PromptLocale,
   type PromptTemplates,
   type PublishDraftContext,
   type QuizContext,
+  type SocraticContext,
   type StudyQuestionsContext,
   UnknownAiSkillError,
 } from './types.js';
@@ -35,6 +38,21 @@ export function buildPrompt(
 export function buildPrompt(
   skill: 'study.quiz',
   context: QuizContext,
+  locale?: PromptLocale,
+): BuiltPrompt;
+export function buildPrompt(
+  skill: 'study.explain',
+  context: ExplainContext,
+  locale?: PromptLocale,
+): BuiltPrompt;
+export function buildPrompt(
+  skill: 'study.socratic',
+  context: SocraticContext,
+  locale?: PromptLocale,
+): BuiltPrompt;
+export function buildPrompt(
+  skill: 'study.difference_map',
+  context: DifferenceMapContext,
   locale?: PromptLocale,
 ): BuiltPrompt;
 export function buildPrompt(

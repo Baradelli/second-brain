@@ -1,22 +1,24 @@
+import type { AiRunRequest } from '../ai.js';
 import type {
-  AiRunRequest,
   AiSkillKey,
+  DifferenceMapContext,
+  ExplainContext,
   FichamentoFeedbackContext,
   PromptContext,
   PromptLocale,
   PublishDraftContext,
   QuizContext,
+  SocraticContext,
   StudyQuestionsContext,
-} from '@cerebro/shared';
-import type { PublicationFormatInput } from '@cerebro/shared';
+} from '../prompt/types.js';
+import type { PublicationFormatInput } from '../publication.js';
 
 /**
- * Lógica pura do Assistente (IA) no desktop. Sem React aqui — só funções
- * testáveis com Vitest. NÃO reescreve prompts: a construção dos prompts vive no
- * shared (`buildPrompt`). Aqui só decidimos QUAIS campos cada skill coleta, se
- * estão preenchidos, e como mapear os campos brutos do formulário para o
- * `PromptContext`/corpo do `AiRunRequest`. Espelha o que o mobile coleta por
- * skill (StudyItemsPage / PublicationsPage / PromptSheet).
+ * Lógica pura dos formulários de skill do Assistente (IA) — COMPARTILHADA entre
+ * web (AssistantTab) e mobile (AssistantPage, Tarefas 80/82). Sem React aqui —
+ * só funções testáveis. NÃO reescreve prompts: a construção vive em `buildPrompt`.
+ * Aqui só decidimos QUAIS campos cada skill coleta, se estão preenchidos, e como
+ * mapear os campos brutos do formulário para o `PromptContext`/`AiRunRequest`.
  *
  * Regra de produto (§9): tudo que a IA devolve é CANDIDATO. Este módulo só
  * prepara a entrada; a confirmação/gravação é responsabilidade da tela, sempre
@@ -35,6 +37,18 @@ export interface AssistantFormValues {
   format?: PublicationFormatInput;
   sourceText?: string;
   angle?: string;
+  // study.explain (Tarefa 79)
+  excerpt?: string;
+  level?: 'eli5' | 'technical';
+  // study.difference_map — o hub compara DUAS fontes (v1); a tela de estudo
+  // (Tarefa 90) alimenta a skill com N fontes reais sem passar por aqui.
+  topic?: string;
+  sourceATitle?: string;
+  sourceAAuthor?: string;
+  sourceAText?: string;
+  sourceBTitle?: string;
+  sourceBAuthor?: string;
+  sourceBText?: string;
 }
 
 /** Um campo do formulário e se é obrigatório para a skill. */
@@ -56,8 +70,8 @@ export interface SkillDescriptor {
 }
 
 /**
- * As 4 skills e os campos que cada uma coleta — espelha exatamente os contextos
- * de `prompt/types.ts` e o que o mobile junta antes de abrir o PromptSheet.
+ * As 7 skills e os campos que cada uma coleta — espelha exatamente os contextos
+ * de `prompt/types.ts`.
  */
 export const ASSISTANT_SKILLS: readonly SkillDescriptor[] = [
   {
@@ -82,6 +96,32 @@ export const ASSISTANT_SKILLS: readonly SkillDescriptor[] = [
     fields: [
       { name: 'title', required: true },
       { name: 'topics', required: false, multiline: true },
+    ],
+  },
+  {
+    skill: 'study.explain',
+    fields: [
+      { name: 'excerpt', required: true, multiline: true },
+      { name: 'resourceTitle', required: false },
+    ],
+  },
+  {
+    skill: 'study.socratic',
+    fields: [
+      { name: 'title', required: true },
+      { name: 'fichamentoText', required: true, multiline: true },
+    ],
+  },
+  {
+    skill: 'study.difference_map',
+    fields: [
+      { name: 'topic', required: true },
+      { name: 'sourceATitle', required: true },
+      { name: 'sourceAAuthor', required: false },
+      { name: 'sourceAText', required: true, multiline: true },
+      { name: 'sourceBTitle', required: true },
+      { name: 'sourceBAuthor', required: false },
+      { name: 'sourceBText', required: true, multiline: true },
     ],
   },
   {
@@ -169,6 +209,41 @@ export function buildContext(
       if (topics.length > 0) ctx.topics = topics;
       return ctx;
     }
+    case 'study.explain': {
+      const ctx: ExplainContext = { excerpt: clean(values.excerpt) };
+      const resourceTitle = clean(values.resourceTitle);
+      if (resourceTitle) ctx.resourceTitle = resourceTitle;
+      if (values.level) ctx.level = values.level;
+      return ctx;
+    }
+    case 'study.socratic': {
+      const ctx: SocraticContext = {
+        title: clean(values.title),
+        fichamentoText: clean(values.fichamentoText),
+      };
+      return ctx;
+    }
+    case 'study.difference_map': {
+      const sourceA = {
+        resourceTitle: clean(values.sourceATitle),
+        fichamentoText: clean(values.sourceAText),
+        ...(clean(values.sourceAAuthor)
+          ? { author: clean(values.sourceAAuthor) }
+          : {}),
+      };
+      const sourceB = {
+        resourceTitle: clean(values.sourceBTitle),
+        fichamentoText: clean(values.sourceBText),
+        ...(clean(values.sourceBAuthor)
+          ? { author: clean(values.sourceBAuthor) }
+          : {}),
+      };
+      const ctx: DifferenceMapContext = {
+        topic: clean(values.topic),
+        sources: [sourceA, sourceB],
+      };
+      return ctx;
+    }
     case 'publish.draft': {
       // O formato é obrigatório; requiredFieldsFilled já garantiu que veio.
       const ctx: PublishDraftContext = {
@@ -213,6 +288,12 @@ export function aiRunBody(
       };
     case 'study.quiz':
       return { skill, context: context as QuizContext, locale };
+    case 'study.explain':
+      return { skill, context: context as ExplainContext, locale };
+    case 'study.socratic':
+      return { skill, context: context as SocraticContext, locale };
+    case 'study.difference_map':
+      return { skill, context: context as DifferenceMapContext, locale };
     case 'publish.draft':
       return {
         skill,
@@ -234,6 +315,6 @@ export function candidateNoteTitle(
   values: AssistantFormValues,
   skillLabel: string,
 ): string {
-  const subject = clean(values.title);
+  const subject = clean(values.title) || clean(values.topic);
   return subject ? `${subject} — ${skillLabel}` : skillLabel;
 }

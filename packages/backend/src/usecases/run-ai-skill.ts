@@ -1,9 +1,12 @@
 import {
   buildPrompt,
+  type DifferenceMapContext,
+  type ExplainContext,
   type FichamentoFeedbackContext,
   type PromptLocale,
   type PublishDraftContext,
   type QuizContext,
+  type SocraticContext,
   type StudyQuestionsContext,
 } from '@cerebro/shared';
 
@@ -31,6 +34,24 @@ export type RunAiSkillInput =
     }
   | {
       userId: string;
+      skill: 'study.explain';
+      context: ExplainContext;
+      locale?: PromptLocale;
+    }
+  | {
+      userId: string;
+      skill: 'study.socratic';
+      context: SocraticContext;
+      locale?: PromptLocale;
+    }
+  | {
+      userId: string;
+      skill: 'study.difference_map';
+      context: DifferenceMapContext;
+      locale?: PromptLocale;
+    }
+  | {
+      userId: string;
       skill: 'publish.draft';
       context: PublishDraftContext;
       locale?: PromptLocale;
@@ -50,6 +71,12 @@ export class RunAiSkill {
         case 'study.fichamento_feedback':
           return buildPrompt(input.skill, input.context, locale);
         case 'study.quiz':
+          return buildPrompt(input.skill, input.context, locale);
+        case 'study.explain':
+          return buildPrompt(input.skill, input.context, locale);
+        case 'study.socratic':
+          return buildPrompt(input.skill, input.context, locale);
+        case 'study.difference_map':
           return buildPrompt(input.skill, input.context, locale);
         case 'publish.draft':
           return buildPrompt(input.skill, input.context, locale);

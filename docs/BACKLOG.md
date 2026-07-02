@@ -235,14 +235,17 @@ obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo
 
 ### Bloco R — IA de compreensão expandida
 
-- [ ] **79** — Skills novas no `PromptBuilder` (puro, TDD, pt/en, §9): `study.explain`
-      (termos + ELI5 ancorado no trecho), `study.socratic` (só pergunta),
-      `study.difference_map` (2+ autores). + `ANTHROPIC_MODEL` via env.
-- [ ] **80** — Mover descritores de skill (`assistant-skills.ts` do web) para `shared/`,
-      cobrindo as 7 skills.
-- [ ] **81** — Superfícies das 3 skills novas no mobile (PromptSheet) e no web
-      (AssistantTab), dois modos. + corrigir rótulo `settings.ai.mode.connected`
-      ("Conectado (em breve)" → "Conectado"; o modo já funciona).
+- [x] **79** — Skills novas no `PromptBuilder` (puro, TDD, pt/en, §9): `study.explain`
+      (termos + ELI5 ancorado no trecho, anti-achatamento), `study.socratic` (só
+      perguntas, profundidade crescente), `study.difference_map` (2+ autores, mín. 2
+      na borda). Uniões de `ai.ts`/`RunAiSkill` ampliadas; `ANTHROPIC_MODEL` via env.
+- [x] **80** — Descritores de skill movidos para `shared/src/assistant/skill-forms.ts`
+      (7 skills; difference_map com 2 fontes A/B no hub); web importa do shared;
+      testes movidos e ampliados.
+- [x] **81** — Superfícies: web AssistantTab ganha as 7 skills (via descritores);
+      mobile ganha socrático no StudyItemsPage e explicar-trecho em cada grifo
+      (HighlightsSection → Note candidata). Rótulo "Conectado (em breve)" → "Conectado".
+      → `tasks/79-skills-compreensao.md` (shared 50 · backend 507 · web 140 · mobile 125)
 
 ### Bloco S — Paridade de superfícies de IA
 

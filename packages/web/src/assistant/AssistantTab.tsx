@@ -2,11 +2,14 @@ import {
   AI_SKILL_KEYS,
   type AiSkillKey,
   buildPrompt,
+  type DifferenceMapContext,
+  type ExplainContext,
   type FichamentoFeedbackContext,
   type PromptLocale,
   type PublicationFormatInput,
   type PublishDraftContext,
   type QuizContext,
+  type SocraticContext,
   type StudyQuestionsContext,
 } from '@cerebro/shared';
 import {
@@ -20,7 +23,6 @@ import { Check, ClipboardCopy, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useTabs } from '../tabs/tabs-context.js';
 import {
   aiRunBody,
   type AssistantFormValues,
@@ -28,7 +30,9 @@ import {
   candidateNoteTitle,
   requiredFieldsFilled,
   skillDescriptor,
-} from './assistant-skills.js';
+} from '@cerebro/shared';
+
+import { useTabs } from '../tabs/tabs-context.js';
 
 const PUBLICATION_FORMATS: PublicationFormatInput[] = [
   'linkedin',
@@ -364,6 +368,12 @@ function buildPromptFor(
       return buildPrompt(skill, context as FichamentoFeedbackContext, locale);
     case 'study.quiz':
       return buildPrompt(skill, context as QuizContext, locale);
+    case 'study.explain':
+      return buildPrompt(skill, context as ExplainContext, locale);
+    case 'study.socratic':
+      return buildPrompt(skill, context as SocraticContext, locale);
+    case 'study.difference_map':
+      return buildPrompt(skill, context as DifferenceMapContext, locale);
     case 'publish.draft':
       return buildPrompt(skill, context as PublishDraftContext, locale);
     default:

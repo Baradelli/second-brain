@@ -56,6 +56,37 @@ describe('RunAiSkill', () => {
     expect(runner.lastPrompt?.user).toContain('meu material de estudo');
   });
 
+  it('builds the new comprehension skills (Tarefa 79)', async () => {
+    await useCase.execute({
+      userId: 'user-1',
+      skill: 'study.explain',
+      context: { excerpt: 'trecho difícil', level: 'eli5' },
+    });
+    expect(runner.lastPrompt?.skill).toBe('study.explain');
+    expect(runner.lastPrompt?.user).toContain('trecho difícil');
+
+    await useCase.execute({
+      userId: 'user-1',
+      skill: 'study.socratic',
+      context: { title: 'T', fichamentoText: 'meu fichamento' },
+    });
+    expect(runner.lastPrompt?.user).toContain('meu fichamento');
+
+    await useCase.execute({
+      userId: 'user-1',
+      skill: 'study.difference_map',
+      context: {
+        topic: 'ressurreição',
+        sources: [
+          { resourceTitle: 'A', author: 'Wright', fichamentoText: 'a' },
+          { resourceTitle: 'B', fichamentoText: 'b' },
+        ],
+      },
+    });
+    expect(runner.lastPrompt?.user).toContain('Wright');
+    expect(runner.lastPrompt?.user).toContain('tese distintiva');
+  });
+
   it('propagates a runner error (e.g. provider failure) to the caller', async () => {
     runner.error = new Error('provider down');
     await expect(

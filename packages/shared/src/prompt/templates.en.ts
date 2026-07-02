@@ -76,6 +76,63 @@ export const templatesEn: PromptTemplates = {
     ]),
   }),
 
+  'study.explain': (ctx) => ({
+    system: withRole(
+      'Current task: explain a SPECIFIC excerpt and define its difficult terms — anchored to the excerpt, never summarizing the whole material (the user reads the source; you only unblock comprehension).',
+    ),
+    user: joinLines([
+      ctx.resourceTitle && `Source: ${ctx.resourceTitle}`,
+      'Excerpt to explain:',
+      '---',
+      ctx.excerpt,
+      '---',
+      'Explain what this excerpt is saying: (1) define technical or unusual terms; (2) restate the core idea in other words; (3) point out what the author is assuming or responding to.',
+      ctx.level === 'eli5' &&
+        'Use simple language, as if for a smart 12-year-old — no jargon.',
+      'Do not summarize the whole material or go beyond the excerpt: the goal is to unblock the reading, not replace it.',
+    ]),
+  }),
+
+  'study.socratic': (ctx) => ({
+    system: withRole(
+      'Current task: act as a Socratic tutor over a from-memory summary — ask ONLY questions that deepen understanding, never give answers.',
+    ),
+    user: joinLines([
+      `Topic studied: "${ctx.title}"`,
+      '',
+      "User's from-memory summary:",
+      '---',
+      ctx.fichamentoText,
+      '---',
+      'Reply with QUESTIONS ONLY — no statements, answers or corrections.',
+      '5 to 8 questions, in increasing depth: start by checking basic understanding, move to implications, and end with questions that expose tensions or gaps in the summary itself.',
+      'Questions specific to THIS summary — nothing generic.',
+    ]),
+  }),
+
+  'study.difference_map': (ctx) => ({
+    system: withRole(
+      'Current task: build a DIFFERENCE map between authors on the same topic — discriminate where they truly agree, where it is only vocabulary, and where the divergence is real (retentive-reading practices 4/5/9).',
+    ),
+    user: joinLines([
+      `Topic: "${ctx.topic}"`,
+      '',
+      'What the user studied from each author:',
+      ...ctx.sources.flatMap((s) => [
+        `### ${s.resourceTitle}${s.author ? ` — ${s.author}` : ''}`,
+        '---',
+        s.fichamentoText,
+        '---',
+      ]),
+      'Build the difference map:',
+      '1. Where the authors TRULY AGREE;',
+      '2. Where the divergence is VOCABULARY ONLY (same idea, different terms);',
+      '3. Where there is REAL divergence of thesis — and what exactly the disagreement is;',
+      '4. For each author: the distinctive thesis, the key passage supporting it, the weakest point of the argument, and what sets them apart.',
+      'Use ONLY what is in the summaries above; where evidence is missing, say what the user would need to reread to decide.',
+    ]),
+  }),
+
   'publish.draft': (ctx) => ({
     system: withRole(
       'Current task: turn a study artifact into a publication draft in the requested format.',

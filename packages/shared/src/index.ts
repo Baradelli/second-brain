@@ -1,4 +1,5 @@
 export * from './ai.js';
+export * from './assistant/skill-forms.js';
 export * from './attachment.js';
 export * from './auth.js';
 export * from './calendar.js';

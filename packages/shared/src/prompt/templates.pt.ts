@@ -78,6 +78,63 @@ export const templatesPt: PromptTemplates = {
     ]),
   }),
 
+  'study.explain': (ctx) => ({
+    system: withRole(
+      'Tarefa atual: explicar um TRECHO específico e definir os termos difíceis dele — ancorado no trecho, sem resumir o material inteiro (o usuário lê a fonte; você só destrava a compreensão).',
+    ),
+    user: joinLines([
+      ctx.resourceTitle && `Fonte: ${ctx.resourceTitle}`,
+      'Trecho a explicar:',
+      '---',
+      ctx.excerpt,
+      '---',
+      'Explique o que este trecho está dizendo: (1) defina os termos técnicos ou incomuns; (2) reformule a ideia central com outras palavras; (3) aponte o que o autor está assumindo ou respondendo.',
+      ctx.level === 'eli5' &&
+        'Use linguagem simples, como para alguém inteligente de 12 anos — sem jargão.',
+      'Não resuma o material inteiro nem vá além do trecho: o objetivo é destravar a leitura, não substituí-la.',
+    ]),
+  }),
+
+  'study.socratic': (ctx) => ({
+    system: withRole(
+      'Tarefa atual: agir como tutor socrático sobre um fichamento — fazer APENAS perguntas que aprofundem, sem entregar respostas.',
+    ),
+    user: joinLines([
+      `Tópico estudado: "${ctx.title}"`,
+      '',
+      'Fichamento do usuário (escrito de memória):',
+      '---',
+      ctx.fichamentoText,
+      '---',
+      'Responda com APENAS PERGUNTAS — nenhuma afirmação, resposta ou correção.',
+      'De 5 a 8 perguntas, em ordem crescente de profundidade: comece checando o entendimento básico, avance para implicações e termine com perguntas que exponham tensões ou lacunas do próprio fichamento.',
+      'Perguntas específicas a ESTE fichamento — nada genérico.',
+    ]),
+  }),
+
+  'study.difference_map': (ctx) => ({
+    system: withRole(
+      'Tarefa atual: montar um mapa de DIFERENÇA entre autores sobre um mesmo tema — discriminar onde concordam, onde é só vocabulário e onde a divergência é real (Práticas 4/5/9 da leitura retentiva).',
+    ),
+    user: joinLines([
+      `Tema: "${ctx.topic}"`,
+      '',
+      'O que o usuário estudou de cada autor:',
+      ...ctx.sources.flatMap((s) => [
+        `### ${s.resourceTitle}${s.author ? ` — ${s.author}` : ''}`,
+        '---',
+        s.fichamentoText,
+        '---',
+      ]),
+      'Monte o mapa de diferença:',
+      '1. Onde os autores CONCORDAM de verdade;',
+      '2. Onde a divergência é SÓ DE VOCABULÁRIO (mesma ideia, termos diferentes);',
+      '3. Onde há DIVERGÊNCIA REAL de tese — e qual é exatamente o desacordo;',
+      '4. Para cada autor: a tese distintiva, o texto-chave que a sustenta, o ponto fraco do argumento e o que o separa dos demais.',
+      'Baseie-se APENAS no que está nos fichamentos acima; onde faltar base, diga o que o usuário precisaria reler para decidir.',
+    ]),
+  }),
+
   'publish.draft': (ctx) => ({
     system: withRole(
       'Tarefa atual: transformar um material de estudo em um rascunho de publicação no formato pedido.',

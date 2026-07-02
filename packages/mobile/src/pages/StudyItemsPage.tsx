@@ -310,6 +310,18 @@ function RecallSheet({
     });
   }
 
+  // Tutor socrático usa o MESMO fichamento — mas devolve só perguntas (Tarefa 81).
+  async function openSocraticPrompt() {
+    if (!item?.fichamentoNoteId) return;
+    const note = await getNoteById(item.fichamentoNoteId);
+    const title = item.title;
+    setPromptReq({
+      skill: 'study.socratic',
+      context: { title, fichamentoText: note.plainText },
+      apply: (text) => saveAsNote(title, t('ai.skill.study.socratic'), text),
+    });
+  }
+
   const contextPrompts = [
     t('review.context.where'),
     t('review.context.against'),
@@ -443,14 +455,24 @@ function RecallSheet({
                 {t('ai.skill.study.quiz')}
               </Button>
               {item.fichamentoNoteId && (
-                <Button
-                  variant="secondary"
-                  onClick={() => void openFeedbackPrompt()}
-                  data-testid="prompt-fichamento-feedback"
-                >
-                  <Sparkles size={16} strokeWidth={1.85} />
-                  {t('ai.skill.study.fichamento_feedback')}
-                </Button>
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={() => void openFeedbackPrompt()}
+                    data-testid="prompt-fichamento-feedback"
+                  >
+                    <Sparkles size={16} strokeWidth={1.85} />
+                    {t('ai.skill.study.fichamento_feedback')}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => void openSocraticPrompt()}
+                    data-testid="prompt-socratic"
+                  >
+                    <Sparkles size={16} strokeWidth={1.85} />
+                    {t('ai.skill.study.socratic')}
+                  </Button>
+                </>
               )}
             </div>
 

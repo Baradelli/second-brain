@@ -3,8 +3,9 @@ import type { BuiltPrompt } from '@cerebro/shared';
 
 import type { AiRunner } from '../usecases/ports/ai-runner.js';
 
-// Modelo mais recente da família 4.x (ver skill claude-api). Sem streaming no MVP.
-const MODEL = 'claude-opus-4-8';
+// Modelo configurável por env (Tarefa 79); default = Opus mais recente.
+// Sem streaming no MVP (decisão registrada em ANALISE-E-PLANO-MELHORIA §6).
+const MODEL = process.env['ANTHROPIC_MODEL'] ?? 'claude-opus-4-8';
 const MAX_TOKENS = 16000;
 
 // Modo conectado: roda o prompt via Anthropic SDK e devolve o texto. A chave vem de

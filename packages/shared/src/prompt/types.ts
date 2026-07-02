@@ -4,12 +4,18 @@ export type AiSkillKey =
   | 'study.questions' // perguntas antes/durante/depois (Prática 2)
   | 'study.fichamento_feedback' // comparar fichamento × material, apontar lacunas (1/6)
   | 'study.quiz' // quiz de recuperação ativa (3/7)
+  | 'study.explain' // definir termos / explicar um trecho, ancorado no trecho (Tarefa 79)
+  | 'study.socratic' // tutor que SÓ pergunta sobre o fichamento (Tarefa 79)
+  | 'study.difference_map' // divergência real × vocabulário entre autores (Práticas 4/5/9)
   | 'publish.draft'; // rascunho de post/artigo/roteiro por formato (Bloco O)
 
 export const AI_SKILL_KEYS: readonly AiSkillKey[] = [
   'study.questions',
   'study.fichamento_feedback',
   'study.quiz',
+  'study.explain',
+  'study.socratic',
+  'study.difference_map',
   'publish.draft',
 ];
 
@@ -47,6 +53,32 @@ export interface QuizContext {
   topics?: string[];
 }
 
+// Explicar/definir um trecho colado ou grifado — NUNCA resumir o material
+// inteiro (resumo pronto "achata" a retenção; ver ANALISE-E-PLANO-MELHORIA §2.2).
+export interface ExplainContext {
+  excerpt: string;
+  resourceTitle?: string;
+  level?: 'eli5' | 'technical'; // eli5 = linguagem simples; default: explicação normal
+}
+
+// Tutor socrático: recebe o fichamento e devolve APENAS perguntas, escalando.
+export interface SocraticContext {
+  title: string;
+  fichamentoText: string;
+}
+
+// Mapa de diferença entre 2+ autores sobre um tema (Práticas 4/5/9).
+export interface DifferenceMapSource {
+  resourceTitle: string;
+  author?: string;
+  fichamentoText: string;
+}
+
+export interface DifferenceMapContext {
+  topic: string;
+  sources: DifferenceMapSource[]; // mínimo 2 (validado na borda)
+}
+
 export interface PublishDraftContext {
   format: PublicationFormatInput;
   sourceText: string;
@@ -58,12 +90,18 @@ export type PromptContext =
   | StudyQuestionsContext
   | FichamentoFeedbackContext
   | QuizContext
+  | ExplainContext
+  | SocraticContext
+  | DifferenceMapContext
   | PublishDraftContext;
 
 export interface PromptTemplates {
   'study.questions': (ctx: StudyQuestionsContext) => PromptBody;
   'study.fichamento_feedback': (ctx: FichamentoFeedbackContext) => PromptBody;
   'study.quiz': (ctx: QuizContext) => PromptBody;
+  'study.explain': (ctx: ExplainContext) => PromptBody;
+  'study.socratic': (ctx: SocraticContext) => PromptBody;
+  'study.difference_map': (ctx: DifferenceMapContext) => PromptBody;
   'publish.draft': (ctx: PublishDraftContext) => PromptBody;
 }
 
