@@ -216,7 +216,10 @@ obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo
       `reviewWeekday`); `JWT_SECRET`/`ANTHROPIC_API_KEY` no `.env.example`.
       → `tasks/75-fuso-unificado.md` (shared 25 · backend 494 · web 153 · mobile 123
       testes verdes)
-- [ ] **76** — JWT com `expiresIn` + `POST /auth/refresh` (sliding) + renovação no front.
+- [x] **76** — JWT expira em 15d (`expiresIn`) + `POST /auth/refresh` (troca token
+      válido por um novo; 401 limpo sem/expirado) + `refreshSession`/`renewSessionOnBoot`
+      no `shared/client` chamados no boot do web e do mobile.
+      → `tasks/76-jwt-expiracao-refresh.md` (4 testes de integração novos; 682 verdes)
 - [ ] **77** — Ownership nas rotas `:id`: corrigir gaps (`archive-capture/note/label` +
       auditar irmãos) + teste "intruder".
 - [ ] **78** — Capturas editáveis (hoje não há UPDATE de Capture) + paridade do mobile

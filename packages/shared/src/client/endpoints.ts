@@ -72,12 +72,30 @@ import {
   type UpdateSettingsBody,
   uploadResponseSchema,
 } from '../index.js';
+import { isAuthenticated, setToken } from './auth.js';
 import { del, get, patch, post, postFile } from './client.js';
 
 // ── Auth ────────────────────────────────────────────────────────────────────
 
 export function login(email: string, password: string): Promise<LoginResponse> {
   return post('/auth/login', { email, password }, loginResponseSchema);
+}
+
+/** Troca um token ainda válido por um novo de 15 dias (Tarefa 76). */
+export function refreshSession(): Promise<LoginResponse> {
+  return post('/auth/refresh', {}, loginResponseSchema);
+}
+
+/**
+ * Renovação deslizante no boot do app: se há token salvo, troca por um novo.
+ * O 401 (token vencido) já desloga pelo client; erro de rede fica quieto —
+ * o token atual continua valendo até a próxima abertura.
+ */
+export function renewSessionOnBoot(): void {
+  if (!isAuthenticated()) return;
+  refreshSession()
+    .then((r) => setToken(r.token))
+    .catch(() => {});
 }
 
 // ── Agenda ────────────────────────────────────────────────────────────────────

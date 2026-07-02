@@ -2,7 +2,7 @@ import './index.css';
 // Importar @cerebro/ui inicializa o i18next como efeito colateral.
 import '@cerebro/ui';
 
-import { isAuthenticated } from '@cerebro/shared/client';
+import { isAuthenticated, renewSessionOnBoot } from '@cerebro/shared/client';
 import { ThemeProvider } from '@cerebro/ui';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -15,6 +15,9 @@ import {
 import { LoginPage } from './auth/LoginPage.js';
 import { RequireAuth } from './auth/RequireAuth.js';
 import { Shell } from './shell/Shell.js';
+
+// Renovação deslizante do JWT (Tarefa 76): cada abertura troca o token por um novo.
+renewSessionOnBoot();
 
 // Fase 0.4 — /login público; / protegido pela guarda de rota (RequireAuth).
 // Já autenticado visitando /login é redirecionado para a home.

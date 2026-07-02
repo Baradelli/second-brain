@@ -58,4 +58,70 @@ describe('POST /auth/login', () => {
     });
     expect(res.statusCode).toBe(400);
   });
+
+  it('issues a token that EXPIRES (~15 days)', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: { email: EMAIL, password: 'correct-horse' },
+    });
+
+    const { exp, iat } = decodeJwtPayload(res.json().token);
+    expect(typeof exp).toBe('number');
+    expect(typeof iat).toBe('number');
+    // 15 dias, com 1 minuto de folga para o relógio do teste.
+    const fifteenDays = 15 * 24 * 60 * 60;
+    expect((exp as number) - (iat as number)).toBeGreaterThan(fifteenDays - 60);
+    expect((exp as number) - (iat as number)).toBeLessThanOrEqual(fifteenDays);
+  });
 });
+
+describe('POST /auth/refresh', () => {
+  async function login(): Promise<string> {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: { email: EMAIL, password: 'correct-horse' },
+    });
+    return res.json<{ token: string }>().token;
+  }
+
+  it('trades a valid token for a fresh one (sliding window)', async () => {
+    const token = await login();
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/refresh',
+      headers: { authorization: `Bearer ${token}` },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const fresh = res.json<{ token: string }>().token;
+    expect(typeof fresh).toBe('string');
+    const payload = decodeJwtPayload(fresh);
+    expect(typeof payload['exp']).toBe('number');
+    expect(payload['sub']).toBe(decodeJwtPayload(token)['sub']);
+  });
+
+  it('returns 401 without a token', async () => {
+    const res = await app.inject({ method: 'POST', url: '/auth/refresh' });
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('returns 401 for a garbage token', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/refresh',
+      headers: { authorization: 'Bearer not-a-jwt' },
+    });
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+/** Decodifica o payload de um JWT (sem validar assinatura — só para asserts). */
+function decodeJwtPayload(token: string): Record<string, unknown> {
+  const part = token.split('.')[1] as string;
+  return JSON.parse(Buffer.from(part, 'base64url').toString('utf8')) as Record<
+    string,
+    unknown
+  >;
+}
