@@ -142,7 +142,11 @@ Repository**, com implementação Prisma em produção e um **fake em memória**
 
 ## Documentação
 
+- **`docs/GUIA-DE-USO.md`** — **o guia de utilização** (rituais, estudo de um livro do
+  início ao fim, IA nos dois modos, FAQ).
 - **`docs/plano-segundo-cerebro.md`** — o plano completo de produto e arquitetura.
+- **`docs/ANALISE-E-PLANO-MELHORIA.md`** — análise geral + plano de melhoria (jul/2026,
+  Blocos Q–X).
 - **`docs/BACKLOG.md`** — o roadmap fatiado em tarefas, com o progresso por MVP.
 - **`docs/tasks/`** — uma spec por tarefa (objetivo, contrato, testes, definição de pronto).
 - **`docs/LEITURA-RETENTIVA.md`** — o design do recurso de estudo + publicação + agente IA.

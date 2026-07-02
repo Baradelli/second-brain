@@ -187,3 +187,109 @@ obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo
       repo. Web (seção Grifos no detalhe + editor de paleta no Settings) e mobile (cards +
       BottomSheet). Verbetes no `CONTEXT.md`. → `tasks/74-grifos-highlights.md`
       (659 testes backend verdes; web 157; mobile 123)
+
+---
+
+# Plano de Melhoria Geral (jul/2026)
+
+> Origem: pedido do dono (IA de compreensão nos dois modos web+mobile · "perguntar ao meu
+> segundo cérebro" · rumo Notion/Obsidian focado em estudo · guia de uso). **Análise e
+> racional em `docs/ANALISE-E-PLANO-MELHORIA.md`** (leia antes). Mesma ordem do projeto:
+> domínio (TDD) → repo/rota → telas; specs detalhadas uma por vez, quando a task chegar.
+
+## Decisões fechadas (não reabrir sem o dono)
+
+- **Chave API só no `.env` do servidor** (sem campo no Settings) — Anthropic e, no Bloco T,
+  `OPENAI_API_KEY` opcional para embeddings (`EMBEDDING_PROVIDER=openai|ollama|none`).
+- **Toda skill nova nasce nos DOIS modos** (cheap e conectado), mesmos templates pt/en.
+- **Cortes registrados:** streaming no conectado, grafo no mobile, transclusão, FSRS —
+  ver §6 do doc de análise.
+
+### Bloco Q — Fundação de confiança
+
+- [ ] **75** — Fuso unificado: helper `todayISO(tz)` em `shared/`; **calendário**
+      (web `calendar-grid.ts` / mobile `CalendarPage`) passa a usar `Settings.timezone`
+      em vez do fuso do dispositivo; um só fallback no backend (`build-today-agenda`
+      usa `UTC`, os demais `America/Sao_Paulo`); um só início de semana;
+      `ANTHROPIC_API_KEY`/`JWT_SECRET` no `.env.example`.
+- [ ] **76** — JWT com `expiresIn` + `POST /auth/refresh` (sliding) + renovação no front.
+- [ ] **77** — Ownership nas rotas `:id`: corrigir gaps (`archive-capture/note/label` +
+      auditar irmãos) + teste "intruder".
+- [ ] **78** — Capturas editáveis (hoje não há UPDATE de Capture) + paridade do mobile
+      com o ADR 0004: arquivar Resource e restaurar as demais entidades pela UI mobile
+      (web/backend já cobrem tudo; no mobile só Goal tem restaurar).
+
+### Bloco R — IA de compreensão expandida
+
+- [ ] **79** — Skills novas no `PromptBuilder` (puro, TDD, pt/en, §9): `study.explain`
+      (termos + ELI5 ancorado no trecho), `study.socratic` (só pergunta),
+      `study.difference_map` (2+ autores). + `ANTHROPIC_MODEL` via env.
+- [ ] **80** — Mover descritores de skill (`assistant-skills.ts` do web) para `shared/`,
+      cobrindo as 7 skills.
+- [ ] **81** — Superfícies das 3 skills novas no mobile (PromptSheet) e no web
+      (AssistantTab), dois modos. + corrigir rótulo `settings.ai.mode.connected`
+      ("Conectado (em breve)" → "Conectado"; o modo já funciona).
+
+### Bloco S — Paridade de superfícies de IA
+
+- [ ] **82** — Hub Assistente real no mobile (mata o placeholder; reusa descritores da 80).
+- [ ] **83** — `PromptSheet` → `packages/ui` + IA inline nas telas web de estudo/publicação.
+
+### Bloco T — "Perguntar ao meu segundo cérebro" (MVP 4)
+
+- [ ] **84** — Migração `SearchChunk` (tsvector via índice GIN; `vector(1536)` NULLABLE) +
+      porta `EmbeddingProvider` + ADRs (provider de embeddings; exceção pgvector na regra
+      de migrations; `docker-compose` → `pgvector/pgvector:pg16`).
+- [ ] **85** — Pipeline de indexação: `chunkTiptapDoc` puro em `shared/` + Contextual
+      Retrieval (prefixo determinístico) + reindex incremental por `contentHash` +
+      "Reindexar tudo" no Settings.
+- [ ] **86** — Busca híbrida BM25+vetor com RRF no usecase (TDD com fake); **v1 só
+      lexical, sem chave**; substitui o `SearchAll` substring na mesma tela.
+- [ ] **87** — Skill `brain.ask`: prompt recheado com top-k chunks + citações `[n]`;
+      cheap devolve o prompt p/ copiar (diferencial); conectado devolve resposta com
+      citações; `POST /ai/ask`; nada persiste sem confirmação.
+- [ ] **88** — Tela "Perguntar ao cérebro" web+mobile com citações clicáveis.
+
+### Bloco U — Práticas 4/5/9/10 do PDF
+
+- [ ] **89** — Domínio `DifferenceMap` (por autor: tese distintiva, texto-chave, ponto
+      fraco, diferença; N recursos por tema). Migração + UseCases + rota.
+- [ ] **90** — Telas do mapa de diferença (web+mobile) + `study.difference_map` alimentada
+      pelo dado real.
+- [ ] **91** — Dica de intercalação na agenda (2+ recursos ativos do mesmo label → convite
+      a alternar; nunca cobrança).
+- [ ] **92** — Sono: material "decisivo" + nudge leve (dá função ao
+      `devotionalTime`/`reflectionTime`).
+
+### Bloco V — PKM de estudo
+
+- [ ] **93** — Wikilink `[[` com autocomplete (reusa Mention/`NoteSearch`; extrator do
+      `NoteLink` aceita `mention|wikilink`).
+- [ ] **94** — Templates de nota por tipo no menu de criação.
+- [ ] **95** — Painel de backlinks/conexões no mobile (grafo mobile: cortado).
+- [ ] **96** — Atalho "nota do dia" na Agenda (sem daily note paralela; transclusão:
+      cortada).
+
+### Bloco W — MVP 3: métricas anti-culpa
+
+- [ ] **97** — Agregadores calculados (puros, TDD pesado): constância, aderência,
+      recalls feitos×devidos, distribuição A/B/C — sem streak punitivo.
+- [ ] **98** — Tela "Evolução" web+mobile.
+- [ ] **99** — Skill `recap.auto` (candidato de recap montado dos dados do período).
+
+### Bloco X — Guia + onboarding
+
+- [x] **100** — `docs/GUIA-DE-USO.md` (rituais + telas + IA nos dois modos + FAQ).
+      Entregue em jul/2026 junto com este plano.
+- [ ] **101** — Tour de onboarding no mobile (o app principal não tem nenhum).
+- [ ] **102** — Empty states ensinantes (+ registrar: "?" contextual, Ajuda in-app,
+      checklist de 1ª semana).
+
+## Definição de "Plano de Melhoria pronto"
+
+Eu pergunto qualquer assunto ao app e recebo **o que eu já estudei sobre ele, com
+citações** — de graça (copiar prompt recheado) ou automático (conectado). Toda skill de
+IA existe **nas duas plataformas**, inline e no hub. As 10 práticas do PDF têm apoio no
+produto (as 4 que faltavam: mapa de diferença, intercalação, interferência, sono). A
+agenda calcula "hoje" no MEU fuso; o login expira; capturas se editam. Vejo minha
+evolução sem culpa. E qualquer pessoa entende o app em minutos com o guia e o tour.
