@@ -169,3 +169,45 @@ describe('POST /captures/:id/promote', () => {
     expect(body.capture.promotedToType).toBe('goal');
   });
 });
+
+describe('PATCH /captures/:id (Tarefa 78)', () => {
+  it('edita o texto de uma captura pendente → 200', async () => {
+    const created = await injectAuth({
+      method: 'POST',
+      url: '/captures',
+      payload: { userId: USER_ID, text: 'texo com erro' },
+    });
+    const { id } = created.json<{ id: string }>();
+
+    const res = await injectAuth({
+      method: 'PATCH',
+      url: `/captures/${id}`,
+      payload: { text: 'texto corrigido' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json().text).toBe('texto corrigido');
+  });
+
+  it('captura ja promovida não se edita → 409', async () => {
+    const created = await injectAuth({
+      method: 'POST',
+      url: '/captures',
+      payload: { userId: USER_ID, text: 'vira nota' },
+    });
+    const { id } = created.json<{ id: string }>();
+    await injectAuth({
+      method: 'POST',
+      url: `/captures/${id}/promote`,
+      payload: { destination: 'note', type: 'NOTE' },
+    });
+
+    const res = await injectAuth({
+      method: 'PATCH',
+      url: `/captures/${id}`,
+      payload: { text: 'tarde demais' },
+    });
+
+    expect(res.statusCode).toBe(409);
+  });
+});

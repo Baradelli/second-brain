@@ -22,6 +22,7 @@ vi.mock('@cerebro/ui', async (importOriginal) => {
       variant: _v,
       size: _s,
       className,
+      ...rest
     }: {
       children: React.ReactNode;
       onClick?: () => void;
@@ -29,8 +30,8 @@ vi.mock('@cerebro/ui', async (importOriginal) => {
       variant?: string;
       size?: string;
       className?: string;
-    }) => (
-      <button onClick={onClick} disabled={disabled} className={className}>
+    } & Record<string, unknown>) => (
+      <button onClick={onClick} disabled={disabled} className={className} {...rest}>
         {children}
       </button>
     ),
@@ -72,9 +73,11 @@ vi.mock('@cerebro/shared/client', () => ({
   createCapture: vi.fn(),
   createNote: vi.fn(),
   editNote: vi.fn(),
+  editCapture: vi.fn(),
   listCaptures: vi.fn(),
   archiveCapture: vi.fn(),
   promoteCapture: vi.fn(),
+  unarchiveCapture: vi.fn(),
 }));
 
 import * as endpoints from '@cerebro/shared/client';
@@ -373,5 +376,64 @@ describe('CapturePage — arquivados', () => {
 
     await waitFor(() => screen.getByText('Arquivada há tempos'));
     expect(endpoints.listCaptures).toHaveBeenCalledWith('ARCHIVED');
+  });
+});
+
+// ── Editar e restaurar (Tarefa 78) ───────────────────────────────────────────
+
+describe('CapturePage — editar e restaurar', () => {
+  it('edita o texto de uma captura pendente', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    vi.mocked(endpoints.listCaptures).mockImplementation(async (status) => {
+      if (status === 'PENDING') return [STUB_CAPTURE({ text: 'Texo errado' })];
+      return [];
+    });
+    vi.mocked(endpoints.editCapture).mockResolvedValue(
+      STUB_CAPTURE({ text: 'Texto certo' }) as never,
+    );
+
+    renderCapturePage();
+    await waitFor(() => screen.getByText('Texo errado'));
+
+    await user.click(screen.getByTestId('edit-capture-cap-1'));
+    const input = await screen.findByTestId('edit-capture-text');
+    await user.clear(input);
+    await user.type(input, 'Texto certo');
+    await user.click(screen.getByTestId('edit-capture-save'));
+
+    await waitFor(() =>
+      expect(endpoints.editCapture).toHaveBeenCalledWith('cap-1', {
+        text: 'Texto certo',
+      }),
+    );
+    await waitFor(() => screen.getByText('Texto certo'));
+  });
+
+  it('restaura uma captura arquivada (sai da lista)', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    vi.mocked(endpoints.listCaptures).mockImplementation(async (status) => {
+      if (status === 'ARCHIVED')
+        return [
+          STUB_CAPTURE({ id: 'cap-9', text: 'Voltei', status: 'ARCHIVED' }),
+        ];
+      return [];
+    });
+    vi.mocked(endpoints.unarchiveCapture).mockResolvedValue(
+      STUB_CAPTURE({ id: 'cap-9', text: 'Voltei' }) as never,
+    );
+
+    renderCapturePage();
+    await waitFor(() => screen.getByRole('button', { name: /ver arquivados/i }));
+    await user.click(screen.getByRole('button', { name: /ver arquivados/i }));
+    await waitFor(() => screen.getByText('Voltei'));
+
+    await user.click(screen.getByTestId('restore-capture-cap-9'));
+
+    await waitFor(() =>
+      expect(endpoints.unarchiveCapture).toHaveBeenCalledWith('cap-9'),
+    );
+    await waitFor(() =>
+      expect(screen.queryByTestId('restore-capture-cap-9')).toBeNull(),
+    );
   });
 });

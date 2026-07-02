@@ -40,6 +40,16 @@ export const captureResponseSchema = z.object({
 
 export type CaptureResponse = z.infer<typeof captureResponseSchema>;
 
+// Edição de captura PENDENTE (Tarefa 78): corrigir texto/url/labels antes de
+// promover/arquivar. Capturas processadas/arquivadas não se editam.
+export const editCaptureBodySchema = z.object({
+  text: z.string().min(1).optional(),
+  url: z.string().url().nullish(),
+  labelIds: z.array(z.string()).optional(),
+});
+
+export type EditCaptureBody = z.infer<typeof editCaptureBodySchema>;
+
 export const archiveCaptureSchema = z.object({
   reason: z.string().optional(),
 });

@@ -17,6 +17,7 @@ import {
   type CaptureResponse,
   captureResponseSchema,
   type CreateStudyItemBody,
+  type EditCaptureBody,
   type DayClosingResponse,
   dayClosingResponseSchema,
   type EditStudyItemBody,
@@ -258,6 +259,13 @@ export function archiveCapture(
 }
 
 /** Restaura uma captura arquivada (volta para a fila de revisão). */
+export function editCapture(
+  id: string,
+  body: EditCaptureBody,
+): Promise<CaptureResponse> {
+  return patch(`/captures/${id}`, body, captureResponseSchema);
+}
+
 export function unarchiveCapture(id: string): Promise<CaptureResponse> {
   return post(`/captures/${id}/unarchive`, {}, captureResponseSchema);
 }

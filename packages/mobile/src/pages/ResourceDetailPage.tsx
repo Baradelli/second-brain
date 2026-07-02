@@ -2,6 +2,7 @@ import type { NoteResponse, NoteType, ResourceResponse } from '@cerebro/shared';
 import {
   archiveNote,
   type CreateResourceBody,
+  archiveResource,
   editResource,
   getResource,
   listNotes,
@@ -72,6 +73,16 @@ export function ResourceDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+
+  async function handleArchiveResource() {
+    setSavingEdit(true);
+    try {
+      await archiveResource(id);
+      navigate('/library');
+    } finally {
+      setSavingEdit(false);
+    }
+  }
 
   async function handleEditSubmit(body: CreateResourceBody) {
     setSavingEdit(true);
@@ -308,13 +319,28 @@ export function ResourceDetailPage() {
       {/* Editar recurso */}
       <BottomSheet open={editOpen} onClose={() => setEditOpen(false)}>
         {resource && (
-          <ResourceForm
-            key={resource.id}
-            initial={resource}
-            onSubmit={handleEditSubmit}
-            submitting={savingEdit}
-            renderLabelPicker={(p) => <LabelPicker {...p} />}
-          />
+          <div className="flex flex-col gap-3">
+            <ResourceForm
+              key={resource.id}
+              initial={resource}
+              onSubmit={handleEditSubmit}
+              submitting={savingEdit}
+              renderLabelPicker={(p) => <LabelPicker {...p} />}
+            />
+            <button
+              type="button"
+              onClick={() => void handleArchiveResource()}
+              disabled={savingEdit}
+              data-testid="archive-resource"
+              className="flex items-center justify-center gap-2 rounded-[var(--radius-card)] py-2.5 text-sm font-medium"
+              style={{
+                color: 'var(--cerebro-muted)',
+                border: '1px solid var(--cerebro-border)',
+              }}
+            >
+              {t('resources.archive')}
+            </button>
+          </div>
         )}
       </BottomSheet>
     </main>

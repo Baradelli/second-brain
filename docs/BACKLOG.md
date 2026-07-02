@@ -225,9 +225,13 @@ obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo
       promotes, `toggle-guide-question` via label). Dono errado = NotFound (não vaza
       existência); rotas passam `req.user.sub`. → `tasks/77-ownership-rotas-id.md`
       (6 testes de intruso unit + 1 integração; 689 verdes)
-- [ ] **78** — Capturas editáveis (hoje não há UPDATE de Capture) + paridade do mobile
-      com o ADR 0004: arquivar Resource e restaurar as demais entidades pela UI mobile
-      (web/backend já cobrem tudo; no mobile só Goal tem restaurar).
+- [x] **78** — Capturas editáveis: `EditCapture` (só PENDING; 409 se processada) +
+      `PATCH /captures/:id` + `editCapture` no client + sheet de edição no mobile.
+      Paridade mobile: restaurar captura arquivada; Biblioteca com "Ver arquivados"
+      (restaurar/excluir, 409 se bloqueado); arquivar Resource no sheet de edição do
+      detalhe. Pendência registrada: visões de arquivados de Note/StudyItem/Publication
+      no mobile ficam para fatia própria. → `tasks/78-capturas-editaveis-paridade-mobile.md`
+      (backend 697 · mobile 125 verdes)
 
 ### Bloco R — IA de compreensão expandida
 

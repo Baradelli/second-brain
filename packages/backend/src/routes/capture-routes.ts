@@ -2,6 +2,7 @@ import {
   type CaptureResponse,
   captureResponseSchema,
   createCaptureSchema,
+  editCaptureBodySchema,
   listCapturesQuerySchema,
 } from '@cerebro/shared';
 import type { PrismaClient } from '@prisma/client';
@@ -9,10 +10,15 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 import type { Capture } from '../domain/capture.js';
+import {
+  CaptureAlreadyProcessedError,
+  CaptureNotFoundError,
+} from '../domain/errors.js';
 import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import { PrismaCaptureRepository } from '../repositories/prisma-capture-repository.js';
 import { PrismaSettingsReader } from '../repositories/prisma-settings-reader.js';
 import { CreateCapture } from '../usecases/create-capture.js';
+import { EditCapture } from '../usecases/edit-capture.js';
 import { ListArchived } from '../usecases/list-archived.js';
 import { ListPendingCaptures } from '../usecases/list-pending-captures.js';
 
@@ -40,6 +46,7 @@ export const captureRoutes: FastifyPluginAsyncZod<{
   const repo = new PrismaCaptureRepository(options.prisma);
   const settingsReader = new PrismaSettingsReader(options.prisma);
   const createCapture = new CreateCapture(repo, settingsReader);
+  const editCapture = new EditCapture(repo);
   const listPending = new ListPendingCaptures(repo);
   const listArchived = new ListArchived(repo);
 
@@ -57,6 +64,39 @@ export const captureRoutes: FastifyPluginAsyncZod<{
         userId: req.user.sub,
       });
       return reply.status(201).send(toResponse(capture));
+    },
+  );
+
+  app.patch(
+    '/captures/:id',
+    {
+      schema: {
+        params: z.object({ id: z.string() }),
+        body: editCaptureBodySchema,
+        response: {
+          200: captureResponseSchema,
+          404: z.object({ error: z.string() }),
+          409: z.object({ error: z.string() }),
+        },
+      },
+    },
+    async (req, reply) => {
+      try {
+        const capture = await editCapture.execute({
+          id: req.params.id,
+          userId: req.user.sub,
+          ...req.body,
+        });
+        return reply.status(200).send(toResponse(capture));
+      } catch (err) {
+        if (err instanceof CaptureNotFoundError) {
+          return reply.status(404).send({ error: err.message });
+        }
+        if (err instanceof CaptureAlreadyProcessedError) {
+          return reply.status(409).send({ error: err.message });
+        }
+        throw err;
+      }
     },
   );
 

@@ -3,9 +3,11 @@ import {
   archiveCapture,
   type CreateGoalBody,
   type CreateResourceBody,
+  editCapture,
   listCaptures,
   promoteCapture,
   type PromoteCaptureBody,
+  unarchiveCapture,
 } from '@cerebro/shared/client';
 import {
   BottomSheet,
@@ -15,8 +17,9 @@ import {
   GoalForm,
   ResourceForm,
   SectionHeader,
+  Textarea,
 } from '@cerebro/ui';
-import { Archive, ChevronDown, Inbox } from 'lucide-react';
+import { Archive, ChevronDown, Inbox, Pencil, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -73,6 +76,11 @@ export function CapturePage() {
   const [promoting, setPromoting] = useState(false);
   const [promoteError, setPromoteError] = useState(false);
 
+  // Edição de captura pendente (Tarefa 78): corrigir o texto antes de triar.
+  const [editTarget, setEditTarget] = useState<CaptureResponse | null>(null);
+  const [editText, setEditText] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+
   const loadPending = useCallback(async () => {
     setLoadingPending(true);
     try {
@@ -90,6 +98,33 @@ export function CapturePage() {
   async function handleArchive(id: string) {
     await archiveCapture(id);
     setPending((prev) => prev.filter((c) => c.id !== id));
+  }
+
+  async function handleRestore(id: string) {
+    await unarchiveCapture(id);
+    setArchived((prev) => prev.filter((c) => c.id !== id));
+    await loadPending();
+  }
+
+  function openEdit(capture: CaptureResponse) {
+    setEditTarget(capture);
+    setEditText(capture.text);
+  }
+
+  async function handleEditSave() {
+    if (!editTarget || editText.trim().length === 0) return;
+    setSavingEdit(true);
+    try {
+      const updated = await editCapture(editTarget.id, {
+        text: editText.trim(),
+      });
+      setPending((prev) =>
+        prev.map((c) => (c.id === updated.id ? updated : c)),
+      );
+      setEditTarget(null);
+    } finally {
+      setSavingEdit(false);
+    }
   }
 
   async function handlePromote(body: PromoteCaptureBody) {
@@ -170,6 +205,7 @@ export function CapturePage() {
                 capture={capture}
                 onArchive={() => handleArchive(capture.id)}
                 onPromote={() => setPromoteTarget(capture)}
+                onEdit={() => openEdit(capture)}
               />
             ))}
           </div>
@@ -205,12 +241,43 @@ export function CapturePage() {
               <EmptyState title={t('capture.archived.empty')} />
             ) : (
               archived.map((capture) => (
-                <CaptureCard key={capture.id} capture={capture} archived />
+                <CaptureCard
+                  key={capture.id}
+                  capture={capture}
+                  archived
+                  onRestore={() => void handleRestore(capture.id)}
+                />
               ))
             )}
           </div>
         )}
       </section>
+
+      {/* ── Edit bottom sheet (Tarefa 78) ─────────────────────────────── */}
+      <BottomSheet open={editTarget !== null} onClose={() => setEditTarget(null)}>
+        <div className="flex flex-col gap-3">
+          <h2
+            className="font-display text-lg font-semibold"
+            style={{ color: 'var(--cerebro-fg)' }}
+          >
+            {t('capture.edit')}
+          </h2>
+          <Textarea
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            rows={4}
+            aria-label={t('capture.edit')}
+            data-testid="edit-capture-text"
+          />
+          <Button
+            onClick={() => void handleEditSave()}
+            disabled={savingEdit || editText.trim().length === 0}
+            data-testid="edit-capture-save"
+          >
+            {t('common.save')}
+          </Button>
+        </div>
+      </BottomSheet>
 
       {/* ── Promote bottom sheet ───────────────────────────────────────── */}
       <BottomSheet
@@ -234,11 +301,15 @@ function CaptureCard({
   capture,
   onArchive,
   onPromote,
+  onEdit,
+  onRestore,
   archived = false,
 }: {
   capture: CaptureResponse;
   onArchive?: () => Promise<void>;
   onPromote?: () => void;
+  onEdit?: () => void;
+  onRestore?: () => void;
   archived?: boolean;
 }) {
   const { t } = useTranslation();
@@ -274,6 +345,15 @@ function CaptureCard({
           <Button
             variant="ghost"
             size="sm"
+            onClick={onEdit}
+            aria-label={t('capture.edit')}
+            data-testid={`edit-capture-${capture.id}`}
+          >
+            <Pencil size={14} strokeWidth={2} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => void handleArchive()}
             disabled={archiving}
           >
@@ -298,6 +378,20 @@ function CaptureCard({
         >
           {capture.archiveReason}
         </p>
+      )}
+
+      {archived && onRestore && (
+        <div className="mt-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRestore}
+            data-testid={`restore-capture-${capture.id}`}
+          >
+            <RotateCcw size={14} strokeWidth={2} />
+            {t('common.restore')}
+          </Button>
+        </div>
       )}
     </Card>
   );
