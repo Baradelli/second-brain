@@ -59,7 +59,8 @@ describe('ComputeGoalProgress', () => {
     goals = new GoalRepositoryFake();
     events = new EventRepositoryFake();
     settings = new SettingsReaderFake();
-    settings.set(USER, { timezone: TZ, reviewWeekday: 1 });
+    // recapWeekday 1 (segunda) preserva as janelas seg–dom destes cenários.
+    settings.set(USER, { timezone: TZ, reviewWeekday: 1, recapWeekday: 1 });
     useCase = new ComputeGoalProgress(goals, events, settings);
   });
 
@@ -251,6 +252,23 @@ describe('ComputeGoalProgress', () => {
     });
     expect(p.done).toBe(1);
     expect(p.target).toBe(1);
+  });
+
+  it('janela semanal começa no recapWeekday do Settings (0 = domingo)', async () => {
+    settings.set(USER, { timezone: TZ, reviewWeekday: 1, recapWeekday: 0 });
+    await goals.save(makeGoal({ id: 'hs', type: 'HABIT', weekdays: [0, 3] }));
+    // Domingo 2026-05-31 12:00 local: DENTRO da semana dom–sáb (31/05–06/06),
+    // mas FORA de uma semana seg–dom — garante que a noção fixa "segunda" morreu.
+    await events.save(doneEvent('hs', '2026-05-31T15:00:00.000Z'));
+
+    const p = await useCase.execute({
+      goalId: 'hs',
+      userId: USER,
+      reference: REFERENCE,
+    });
+
+    expect(p.done).toBe(1);
+    expect(p.target).toBe(2);
   });
 
   it('throws GoalNotFoundError for unknown goal or wrong owner', async () => {

@@ -10,7 +10,7 @@ export interface FindNoteOfTheDayInput {
   scope?: NoteScope;
   reference: Date;
   timezone: string;
-  weekStartsOn?: number; // 0=Sun, 1=Mon (default), ..., 6=Sat
+  weekStartsOn?: number; // 0=Sun..6=Sat — recapWeekday do usuário (default: domínio)
 }
 
 export class FindNoteOfTheDay {
@@ -22,7 +22,7 @@ export class FindNoteOfTheDay {
       input.reference,
       input.timezone,
       scope,
-      input.weekStartsOn ?? 1,
+      input.weekStartsOn, // undefined → default único do domínio (day-range)
     );
 
     const notes = await this.repo.find({

@@ -141,8 +141,7 @@ describe('BuildTodayAgenda', () => {
     expect(agenda.journal.devotional.noteId).toBe('note-hoje');
   });
 
-  it('usuário sem Settings usa UTC como fuso padrão (sem lançar erro)', async () => {
-    settingsReader.set(USER_ID, null as unknown as never);
+  it('usuário sem Settings cai para America/Sao_Paulo (fallback único do app)', async () => {
     const noSettingsReader = new SettingsReaderFake(); // sem configuração para USER_ID
     const agendaUsecase = new BuildTodayAgenda(
       noSettingsReader,
@@ -152,13 +151,14 @@ describe('BuildTodayAgenda', () => {
       new SelectDueRecalls(studyItemRepo, recallRepo),
     );
 
+    // 01:00 UTC ainda é o dia ANTERIOR em São Paulo (UTC-3); em UTC seria 06-03.
     const agenda = await agendaUsecase.execute({
       userId: USER_ID,
-      reference: REFERENCE,
+      reference: new Date('2026-06-03T01:00:00.000Z'),
     });
 
     expect(agenda.journal.devotional.done).toBe(false);
-    expect(agenda.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(agenda.date).toBe('2026-06-02');
   });
 
   it('inclui os objetivos do dia (HABIT agendado hoje) com resolvedToday', async () => {

@@ -22,6 +22,7 @@ import {
 } from '../domain/errors.js';
 import type { Recall } from '../domain/recall.js';
 import { computeRecallSchedule } from '../domain/recall-schedule.js';
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import type { StudyItem } from '../domain/study-item.js';
 import { PrismaRecallRepository } from '../repositories/prisma-recall-repository.js';
 import { PrismaSettingsReader } from '../repositories/prisma-settings-reader.js';
@@ -36,8 +37,6 @@ import type { RecallRepository } from '../usecases/ports/recall-repository.js';
 import type { SettingsReader } from '../usecases/ports/settings-reader.js';
 import { UnarchiveStudyItem } from '../usecases/unarchive-study-item.js';
 import { UndoRecall } from '../usecases/undo-recall.js';
-
-const DEFAULT_TIMEZONE = 'UTC';
 
 function recallToResponse(r: Recall): RecallResponse {
   return {

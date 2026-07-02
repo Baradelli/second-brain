@@ -18,7 +18,7 @@ export interface UpsertJournalNoteInput {
   title?: string;
   doc: unknown;
   mode?: 'create-or-get' | 'create-or-update';
-  weekStartsOn?: number; // 0=Sun, 1=Mon (default), ..., 6=Sat
+  weekStartsOn?: number; // 0=Sun..6=Sat — recapWeekday do usuário (default: domínio)
 }
 
 export class UpsertJournalNote {
@@ -37,7 +37,7 @@ export class UpsertJournalNote {
 
     const scope = input.scope ?? 'DAY';
     const mode = input.mode ?? 'create-or-get';
-    const weekStartsOn = input.weekStartsOn ?? 1;
+    const weekStartsOn = input.weekStartsOn; // undefined → default do domínio
 
     const existing = await this.findNoteOfTheDay.execute({
       userId: input.userId,

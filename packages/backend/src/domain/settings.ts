@@ -1,4 +1,21 @@
+import { FALLBACK_TIMEZONE } from '@cerebro/shared';
+
 export type AiMode = 'cheap' | 'connected';
+
+/**
+ * Fallback ÚNICO de timezone do app (Tarefa 75). A constante mora no `shared`
+ * (front usa o mesmo valor); aqui só re-exportamos com o nome do domínio.
+ * Nenhum usecase/rota deve declarar o próprio fallback.
+ */
+export const DEFAULT_TIMEZONE = FALLBACK_TIMEZONE;
+
+/**
+ * Início de semana padrão do app (0=domingo — o mesmo default de
+ * `Settings.recapWeekday`). É a ÚNICA noção de "início de semana": recap
+ * semanal, janela de hábitos e convites de período usam o `recapWeekday` do
+ * usuário, caindo aqui quando não configurado (Tarefa 75).
+ */
+export const DEFAULT_WEEK_STARTS_ON = 0;
 
 /**
  * Uma cor de marca-texto (grifo) na paleta global do usuário. O `id` é estável:
@@ -50,8 +67,8 @@ export function effectiveHighlightColors(
 
 export const DEFAULT_SETTINGS: Omit<Settings, 'userId'> = {
   reviewWeekday: 0,
-  recapWeekday: 0,
-  timezone: 'America/Sao_Paulo',
+  recapWeekday: DEFAULT_WEEK_STARTS_ON,
+  timezone: DEFAULT_TIMEZONE,
   devotionalTime: '07:00',
   reflectionTime: '21:00',
   aiMode: 'cheap',

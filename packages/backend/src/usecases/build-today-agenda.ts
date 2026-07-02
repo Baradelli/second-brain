@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 
 import type { Capture } from '../domain/capture.js';
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import { FindNoteOfTheDay } from './find-note-of-the-day.js';
 import { ListPendingCaptures } from './list-pending-captures.js';
 import type { SettingsReader } from './ports/settings-reader.js';
@@ -31,10 +32,6 @@ export interface TodayAgenda {
   recallsDue: DueRecallItem[];
 }
 
-// When the user has no Settings configured, fall back to UTC so the UseCase
-// never throws — the UI can prompt the user to configure their timezone later.
-const DEFAULT_TIMEZONE = 'UTC';
-
 export class BuildTodayAgenda {
   constructor(
     private settings: SettingsReader,
@@ -46,6 +43,7 @@ export class BuildTodayAgenda {
 
   async execute(input: BuildTodayAgendaInput): Promise<TodayAgenda> {
     const userSettings = await this.settings.getByUserId(input.userId);
+    // Fallback único do app (Tarefa 75) — nunca UTC.
     const timezone = userSettings?.timezone ?? DEFAULT_TIMEZONE;
 
     const date = DateTime.fromJSDate(input.reference, {
@@ -56,6 +54,7 @@ export class BuildTodayAgenda {
       userId: input.userId,
       reference: input.reference,
       timezone,
+      weekStartsOn: userSettings?.recapWeekday,
     };
 
     const [

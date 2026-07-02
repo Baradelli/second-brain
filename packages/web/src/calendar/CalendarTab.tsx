@@ -1,11 +1,15 @@
-import type {
-  CalendarDayDetailResponse,
-  CalendarDayGoalResponse,
-  CalendarDayNoteResponse,
-  CalendarMonthResponse,
-  NoteType,
+import {
+  type CalendarDayDetailResponse,
+  type CalendarDayGoalResponse,
+  type CalendarDayNoteResponse,
+  type CalendarMonthResponse,
+  currentMonthISO,
+  FALLBACK_TIMEZONE,
+  type NoteType,
+  shiftMonth,
+  todayISO,
 } from '@cerebro/shared';
-import { getCalendar, getDayDetail } from '@cerebro/shared/client';
+import { getCalendar, getDayDetail, getSettings } from '@cerebro/shared/client';
 import { Button, Card, EmptyState } from '@cerebro/ui';
 import {
   Check,
@@ -23,14 +27,11 @@ import { useTranslation } from 'react-i18next';
 import { useTabs } from '../tabs/tabs-context.js';
 import {
   buildMonthGrid,
-  currentMonthKey,
   dayHasGoals,
   dayHasJournal,
   dayNumber,
   longDateLabel,
   monthTitle,
-  shiftMonth,
-  todayKey,
   weekdayNarrowNames,
 } from './calendar-grid.js';
 import { DayClosingPanel } from './DayClosingPanel.js';
@@ -48,22 +49,44 @@ const NOTE_TYPE_KEY: Record<NoteType, string> = {
  * num dia, abre o detalhe daquele dia num painel ao lado da grade — reusando os
  * endpoints `getCalendar`/`getDayDetail` do shared (mesma semântica do mobile,
  * sem duplicar lógica). A matemática de mês/grade é pura/testada (Luxon, nunca
- * `new Date`). O dia local já vem resolvido do backend (timezone do Settings).
- * O ritual "Fechar o dia" fica acessível por uma ação no topo da aba.
+ * `new Date`). O dia local já vem resolvido do backend (timezone do Settings);
+ * "que mês/dia é hoje" também usa o timezone do Settings, nunca o do
+ * dispositivo (Tarefa 75). O ritual "Fechar o dia" fica no topo da aba.
  */
 export function CalendarTab() {
   const { t, i18n } = useTranslation();
   const { openTab } = useTabs();
   const locale = i18n.language;
 
-  const [month, setMonth] = useState<string>(() => currentMonthKey());
+  const [timezone, setTimezone] = useState<string | null>(null);
+  const [month, setMonth] = useState<string | null>(null);
   const [data, setData] = useState<CalendarMonthResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [closing, setClosing] = useState(false);
 
+  // O fuso vem do Settings; sem ele (erro de rede) usa o fallback único do app.
+  useEffect(() => {
+    let cancelled = false;
+    getSettings()
+      .then((s) => {
+        if (cancelled) return;
+        setTimezone(s.timezone);
+        setMonth((m) => m ?? currentMonthISO(s.timezone));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setTimezone(FALLBACK_TIMEZONE);
+        setMonth((m) => m ?? currentMonthISO(FALLBACK_TIMEZONE));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const loadMonth = useCallback(() => {
+    if (!month) return;
     let cancelled = false;
     setLoading(true);
     setError(false);
@@ -84,8 +107,8 @@ export function CalendarTab() {
 
   useEffect(() => loadMonth(), [loadMonth]);
 
-  const today = todayKey();
-  const grid = data ? buildMonthGrid(month, data.days) : [];
+  const today = timezone ? todayISO(timezone) : '';
+  const grid = data && month ? buildMonthGrid(month, data.days) : [];
   const weekdays = weekdayNarrowNames(locale);
 
   return (
@@ -109,8 +132,9 @@ export function CalendarTab() {
             variant="ghost"
             size="sm"
             onClick={() => {
-              setMonth(currentMonthKey());
-              setSelectedDate(today);
+              if (!timezone) return;
+              setMonth(currentMonthISO(timezone));
+              setSelectedDate(todayISO(timezone));
             }}
             data-testid="calendar-today"
           >
@@ -137,7 +161,7 @@ export function CalendarTab() {
           <div className="mb-3 flex items-center justify-between">
             <button
               type="button"
-              onClick={() => setMonth(shiftMonth(month, -1))}
+              onClick={() => month && setMonth(shiftMonth(month, -1))}
               aria-label={t('calendar.prevMonth')}
               data-testid="calendar-prev"
               className="flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-card"
@@ -148,11 +172,11 @@ export function CalendarTab() {
               className="font-display text-base font-semibold capitalize text-fg"
               data-testid="calendar-month-title"
             >
-              {monthTitle(month, locale)}
+              {month ? monthTitle(month, locale) : ''}
             </span>
             <button
               type="button"
-              onClick={() => setMonth(shiftMonth(month, 1))}
+              onClick={() => month && setMonth(shiftMonth(month, 1))}
               aria-label={t('calendar.nextMonth')}
               data-testid="calendar-next"
               className="flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-card"

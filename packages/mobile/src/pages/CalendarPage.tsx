@@ -1,35 +1,21 @@
-import type {
-  CalendarDayResponse,
-  CalendarMonthResponse,
+import {
+  type CalendarDayResponse,
+  type CalendarMonthResponse,
+  currentMonthISO,
+  FALLBACK_TIMEZONE,
+  shiftMonth,
+  todayISO,
 } from '@cerebro/shared';
-import { getCalendar } from '@cerebro/shared/client';
+import { getCalendar, getSettings } from '@cerebro/shared/client';
 import { Card } from '@cerebro/ui';
 import { CalendarRange, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-function pad(n: number): string {
-  return String(n).padStart(2, '0');
-}
-
-/** Mês corrente local ('YYYY-MM') — bom o bastante para abrir a tela. */
-function currentMonthKey(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
-}
-
-function todayKey(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-}
-
-function shiftMonth(month: string, delta: number): string {
-  const [y, m] = month.split('-').map(Number);
-  const d = new Date(y as number, (m as number) - 1 + delta, 1);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
-}
-
+// "Que mês/dia é hoje" usa o timezone do Settings via helpers do shared
+// (Tarefa 75) — nunca o relógio do dispositivo. Aqui fica só a matemática de
+// grade sobre datas civis (ano/mês), que independe de fuso.
 function monthParts(month: string): { year: number; monthIndex: number } {
   const [y, m] = month.split('-').map(Number);
   return { year: y as number, monthIndex: (m as number) - 1 };
@@ -40,12 +26,33 @@ export function CalendarPage() {
   const locale = i18n.language;
   const navigate = useNavigate();
 
-  const [month, setMonth] = useState<string>(currentMonthKey);
+  const [timezone, setTimezone] = useState<string | null>(null);
+  const [month, setMonth] = useState<string | null>(null);
   const [data, setData] = useState<CalendarMonthResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // O fuso vem do Settings; sem ele (erro de rede) usa o fallback único do app.
   useEffect(() => {
+    let cancelled = false;
+    getSettings()
+      .then((s) => {
+        if (cancelled) return;
+        setTimezone(s.timezone);
+        setMonth((m) => m ?? currentMonthISO(s.timezone));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setTimezone(FALLBACK_TIMEZONE);
+        setMonth((m) => m ?? currentMonthISO(FALLBACK_TIMEZONE));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!month) return;
     let cancelled = false;
     setLoading(true);
     setError(false);
@@ -64,17 +71,19 @@ export function CalendarPage() {
     };
   }, [month]);
 
-  const { year, monthIndex } = monthParts(month);
-  const monthTitle = new Date(year, monthIndex, 1).toLocaleDateString(locale, {
-    month: 'long',
-    year: 'numeric',
-  });
+  const { year, monthIndex } = monthParts(month ?? '1970-01');
+  const monthTitle = month
+    ? new Date(year, monthIndex, 1).toLocaleDateString(locale, {
+        month: 'long',
+        year: 'numeric',
+      })
+    : '';
   // Cabeçalho de dias da semana (domingo→sábado). 2024-06-02 é um domingo.
   const weekdayNames = Array.from({ length: 7 }, (_, i) =>
     new Date(2024, 5, 2 + i).toLocaleDateString(locale, { weekday: 'narrow' }),
   );
   const leadingBlanks = new Date(year, monthIndex, 1).getDay(); // 0=Dom..6=Sáb
-  const today = todayKey();
+  const today = timezone ? todayISO(timezone) : '';
 
   return (
     <main className="mx-auto min-h-dvh max-w-lg px-5 pt-8 pb-24">
@@ -98,7 +107,7 @@ export function CalendarPage() {
           </button>
           <button
             type="button"
-            onClick={() => setMonth(currentMonthKey())}
+            onClick={() => timezone && setMonth(currentMonthISO(timezone))}
             className="rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--cerebro-accent-soft)]"
             style={{ color: 'var(--cerebro-accent)' }}
             data-testid="calendar-today"
@@ -111,7 +120,7 @@ export function CalendarPage() {
       <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
-          onClick={() => setMonth(shiftMonth(month, -1))}
+          onClick={() => month && setMonth(shiftMonth(month, -1))}
           aria-label={t('calendar.prevMonth')}
           data-testid="calendar-prev"
           className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"
@@ -128,7 +137,7 @@ export function CalendarPage() {
         </span>
         <button
           type="button"
-          onClick={() => setMonth(shiftMonth(month, 1))}
+          onClick={() => month && setMonth(shiftMonth(month, 1))}
           aria-label={t('calendar.nextMonth')}
           data-testid="calendar-next"
           className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[var(--cerebro-accent-soft)]"

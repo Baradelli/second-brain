@@ -4,12 +4,11 @@ import { localDayKey, monthDayKeys } from '../domain/calendar-month.js';
 import { dayRange } from '../domain/day-range.js';
 import type { Goal } from '../domain/goal.js';
 import { localWeekday } from '../domain/local-weekday.js';
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import type { EventRepository } from './ports/event-repository.js';
 import type { GoalRepository } from './ports/goal-repository.js';
 import type { NoteRepository } from './ports/note-repository.js';
 import type { SettingsReader } from './ports/settings-reader.js';
-
-const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
 
 export interface BuildMonthCalendarInput {
   userId: string;

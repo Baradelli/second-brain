@@ -26,7 +26,8 @@ export interface TodaysGoalItem {
 export interface SelectTodaysGoalsInput {
   userId: string;
   reference: Date;
-  timezone: string; // já resolvido pelo chamador (cada um tem seu fallback)
+  timezone: string; // já resolvido pelo chamador (fallback único do domínio)
+  weekStartsOn?: number; // recapWeekday do usuário (default: domínio)
 }
 
 /**
@@ -70,6 +71,7 @@ export class SelectTodaysGoals {
         input.timezone,
         todayWeekday,
         resolvedToday,
+        input.weekStartsOn,
       );
       if (item) items.push(item);
     }
@@ -82,6 +84,7 @@ export class SelectTodaysGoals {
     timezone: string,
     todayWeekday: number,
     resolvedToday: boolean,
+    weekStartsOn: number | undefined,
   ): Promise<TodaysGoalItem | null> {
     if (goal.weekdays.length > 0) {
       if (!goal.weekdays.includes(todayWeekday)) return null;
@@ -94,7 +97,12 @@ export class SelectTodaysGoals {
     }
 
     if (goal.period == null || goal.timesPerPeriod == null) return null;
-    const period = dayRange(reference, timezone, PERIOD_TO_SCOPE[goal.period]);
+    const period = dayRange(
+      reference,
+      timezone,
+      PERIOD_TO_SCOPE[goal.period],
+      weekStartsOn,
+    );
     const periodDone = (
       await this.events.find({
         userId: goal.userId,

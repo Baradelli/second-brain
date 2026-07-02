@@ -1,16 +1,16 @@
 import type { CalendarDayResponse } from '@cerebro/shared';
-import { DateTime } from 'luxon';
 import { describe, expect, it } from 'vitest';
 
 import {
   buildMonthGrid,
-  currentMonthKey,
   dayHasGoals,
   dayHasJournal,
   dayNumber,
   leadingBlanks,
-  shiftMonth,
 } from '../calendar-grid.js';
+
+// currentMonthISO/todayISO/shiftMonth agora moram no shared (local-day.ts) e
+// são testados lá — aqui fica só a matemática de grade (Tarefa 75).
 
 function day(date: string, over: Partial<CalendarDayResponse> = {}): CalendarDayResponse {
   return {
@@ -21,25 +21,6 @@ function day(date: string, over: Partial<CalendarDayResponse> = {}): CalendarDay
     ...over,
   };
 }
-
-describe('currentMonthKey', () => {
-  it('formata o mês como YYYY-MM', () => {
-    expect(currentMonthKey(DateTime.fromISO('2026-06-15T10:00'))).toBe('2026-06');
-  });
-});
-
-describe('shiftMonth', () => {
-  it('avança um mês', () => {
-    expect(shiftMonth('2026-06', 1)).toBe('2026-07');
-  });
-  it('volta um mês', () => {
-    expect(shiftMonth('2026-06', -1)).toBe('2026-05');
-  });
-  it('cruza a virada de ano', () => {
-    expect(shiftMonth('2026-12', 1)).toBe('2027-01');
-    expect(shiftMonth('2026-01', -1)).toBe('2025-12');
-  });
-});
 
 describe('leadingBlanks', () => {
   // Domingo=0..Sábado=6. 2026-06-01 é uma segunda → 1 blank antes do dia 1.

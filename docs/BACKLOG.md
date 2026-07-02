@@ -207,11 +207,15 @@ obrigatória. O agente (Bloco P) entra como assistente opcional, começando pelo
 
 ### Bloco Q — Fundação de confiança
 
-- [ ] **75** — Fuso unificado: helper `todayISO(tz)` em `shared/`; **calendário**
-      (web `calendar-grid.ts` / mobile `CalendarPage`) passa a usar `Settings.timezone`
-      em vez do fuso do dispositivo; um só fallback no backend (`build-today-agenda`
-      usa `UTC`, os demais `America/Sao_Paulo`); um só início de semana;
-      `ANTHROPIC_API_KEY`/`JWT_SECRET` no `.env.example`.
+- [x] **75** — Fuso unificado: helper `todayISO`/`currentMonthISO`/`shiftMonth` em
+      `shared/local-day.ts` (puro, via Intl, sem dependência); calendário web+mobile
+      usa `Settings.timezone` (via `getSettings`); fallback único
+      (`FALLBACK_TIMEZONE` no shared → `DEFAULT_TIMEZONE` no domínio) nos 8 pontos;
+      semana única = `recapWeekday` (`DEFAULT_WEEK_STARTS_ON`, porta `SettingsReader`
+      expõe `recapWeekday`; corrigido bug do `recap-routes` que usava
+      `reviewWeekday`); `JWT_SECRET`/`ANTHROPIC_API_KEY` no `.env.example`.
+      → `tasks/75-fuso-unificado.md` (shared 25 · backend 494 · web 153 · mobile 123
+      testes verdes)
 - [ ] **76** — JWT com `expiresIn` + `POST /auth/refresh` (sliding) + renovação no front.
 - [ ] **77** — Ownership nas rotas `:id`: corrigir gaps (`archive-capture/note/label` +
       auditar irmãos) + teste "intruder".

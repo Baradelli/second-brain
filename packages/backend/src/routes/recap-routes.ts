@@ -4,6 +4,10 @@ import type { PrismaClient } from '@prisma/client';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 
 import type { Note } from '../domain/note.js';
+import {
+  DEFAULT_TIMEZONE,
+  DEFAULT_WEEK_STARTS_ON,
+} from '../domain/settings.js';
 import { PrismaNoteLinkRepository } from '../repositories/prisma-note-link-repository.js';
 import { PrismaNoteRepository } from '../repositories/prisma-note-repository.js';
 import { PrismaSettingsReader } from '../repositories/prisma-settings-reader.js';
@@ -13,7 +17,6 @@ import { FindNoteOfTheDay } from '../usecases/find-note-of-the-day.js';
 import { UpsertJournalNote } from '../usecases/upsert-journal-note.js';
 import { UpsertRecap } from '../usecases/upsert-recap.js';
 
-const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
 const EMPTY_DOC = { type: 'doc', content: [] };
 
 function toResponse(n: Note): NoteResponse {
@@ -64,7 +67,8 @@ export const recapRoutes: FastifyPluginAsyncZod<{
         scope: req.body.scope,
         reference: new Date(),
         timezone: userSettings?.timezone ?? DEFAULT_TIMEZONE,
-        recapWeekday: userSettings?.reviewWeekday ?? 1,
+        // recapWeekday (não reviewWeekday!) é o início da semana do usuário.
+        recapWeekday: userSettings?.recapWeekday ?? DEFAULT_WEEK_STARTS_ON,
         doc: EMPTY_DOC,
         mode: 'create-or-get',
       });

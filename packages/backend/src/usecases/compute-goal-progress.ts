@@ -5,11 +5,10 @@ import { countDistinctDays } from '../domain/distinct-days.js';
 import { GoalNotFoundError } from '../domain/errors.js';
 import type { Event } from '../domain/event.js';
 import type { Goal, GoalPeriod, GoalType } from '../domain/goal.js';
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import type { EventRepository } from './ports/event-repository.js';
 import type { GoalRepository } from './ports/goal-repository.js';
 import type { SettingsReader } from './ports/settings-reader.js';
-
-const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
 
 const PERIOD_TO_SCOPE: Record<GoalPeriod, NoteScope> = {
   day: 'DAY',
@@ -73,21 +72,23 @@ export class ComputeGoalProgress {
 
     const userSettings = await this.settings.getByUserId(input.userId);
     const timezone = userSettings?.timezone ?? DEFAULT_TIMEZONE;
+    const weekStartsOn = userSettings?.recapWeekday; // undefined → default do domínio
     const reference = input.reference ?? new Date();
 
-    return this.computeFor(goal, timezone, reference);
+    return this.computeFor(goal, timezone, reference, weekStartsOn);
   }
 
   private async computeFor(
     goal: Goal,
     timezone: string,
     reference: Date,
+    weekStartsOn: number | undefined,
   ): Promise<GoalProgress> {
     if (goal.type === 'UMBRELLA') {
-      return this.computeUmbrella(goal, timezone, reference);
+      return this.computeUmbrella(goal, timezone, reference, weekStartsOn);
     }
     if (goal.type === 'HABIT') {
-      return this.computeHabit(goal, timezone, reference);
+      return this.computeHabit(goal, timezone, reference, weekStartsOn);
     }
     return this.computeMeasurable(goal, timezone, reference); // TARGET / PROJECT
   }
@@ -96,12 +97,13 @@ export class ComputeGoalProgress {
     goal: Goal,
     timezone: string,
     reference: Date,
+    weekStartsOn: number | undefined,
   ): Promise<GoalProgress> {
     const usesWeekdays = goal.weekdays.length > 0;
     const scope: NoteScope = usesWeekdays
       ? 'WEEK'
       : PERIOD_TO_SCOPE[goal.period ?? 'day'];
-    const period = dayRange(reference, timezone, scope);
+    const period = dayRange(reference, timezone, scope, weekStartsOn);
 
     const events = await this.events.find({
       userId: goal.userId,
@@ -164,6 +166,7 @@ export class ComputeGoalProgress {
     goal: Goal,
     timezone: string,
     reference: Date,
+    weekStartsOn: number | undefined,
   ): Promise<GoalProgress> {
     const children = await this.goals.find({
       userId: goal.userId,
@@ -171,7 +174,9 @@ export class ComputeGoalProgress {
       status: 'ACTIVE',
     });
     const childProgresses = await Promise.all(
-      children.map((child) => this.computeFor(child, timezone, reference)),
+      children.map((child) =>
+        this.computeFor(child, timezone, reference, weekStartsOn),
+      ),
     );
 
     const target = childProgresses.length;

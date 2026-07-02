@@ -1,6 +1,8 @@
 import type { NoteScope } from '@cerebro/shared';
 import { DateTime } from 'luxon';
 
+import { DEFAULT_WEEK_STARTS_ON } from './settings.js';
+
 export interface DateRange {
   from: Date;
   to: Date;
@@ -10,14 +12,15 @@ export interface DateRange {
  * Calculates the UTC [from, to] range (both inclusive) for a given scope
  * centered on `reference`, using the user's IANA `timezone`.
  *
- * `weekStartsOn`: 0=Sun, 1=Mon (ISO default), ..., 6=Sat — mirrors Settings.recapWeekday.
- * All calendar arithmetic uses Luxon; `new Date` only for trivial instants.
+ * `weekStartsOn`: 0=Sun, ..., 6=Sat — SEMPRE o `Settings.recapWeekday` do
+ * usuário (a única noção de semana do app, Tarefa 75); o default é o mesmo
+ * do Settings (domingo). All calendar arithmetic uses Luxon.
  */
 export function dayRange(
   reference: Date,
   timezone: string,
   scope: NoteScope = 'DAY',
-  weekStartsOn = 1,
+  weekStartsOn: number = DEFAULT_WEEK_STARTS_ON,
 ): DateRange {
   const dt = DateTime.fromJSDate(reference, { zone: timezone });
 

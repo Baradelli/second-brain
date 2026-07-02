@@ -9,6 +9,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 import type { Capture } from '../domain/capture.js';
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import { PrismaCaptureRepository } from '../repositories/prisma-capture-repository.js';
 import { PrismaSettingsReader } from '../repositories/prisma-settings-reader.js';
 import { CreateCapture } from '../usecases/create-capture.js';
@@ -77,7 +78,7 @@ export const captureRoutes: FastifyPluginAsyncZod<{
       }
 
       const userSettings = await settingsReader.getByUserId(userId);
-      const timezone = userSettings?.timezone ?? 'America/Sao_Paulo';
+      const timezone = userSettings?.timezone ?? DEFAULT_TIMEZONE;
 
       const captures = await listPending.execute({
         userId,

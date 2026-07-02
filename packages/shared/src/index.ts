@@ -11,6 +11,7 @@ export * from './graph.js';
 export * from './guide-question.js';
 export * from './highlight.js';
 export * from './label.js';
+export * from './local-day.js';
 export * from './note.js';
 export * from './prompt/index.js';
 export * from './publication.js';

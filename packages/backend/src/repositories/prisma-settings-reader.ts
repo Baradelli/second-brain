@@ -11,6 +11,10 @@ export class PrismaSettingsReader implements SettingsReader {
   async getByUserId(userId: string): Promise<UserSettings | null> {
     const s = await this.prisma.settings.findUnique({ where: { userId } });
     if (!s) return null;
-    return { timezone: s.timezone, reviewWeekday: s.reviewWeekday };
+    return {
+      timezone: s.timezone,
+      reviewWeekday: s.reviewWeekday,
+      recapWeekday: s.recapWeekday,
+    };
   }
 }

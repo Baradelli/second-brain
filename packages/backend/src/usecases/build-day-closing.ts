@@ -1,11 +1,10 @@
 import { DateTime } from 'luxon';
 
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import type { EventRepository } from './ports/event-repository.js';
 import type { GoalRepository } from './ports/goal-repository.js';
 import type { SettingsReader } from './ports/settings-reader.js';
 import { SelectTodaysGoals } from './select-todays-goals.js';
-
-const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
 
 export interface BuildDayClosingInput {
   userId: string;
@@ -51,6 +50,7 @@ export class BuildDayClosing {
       userId: input.userId,
       reference: input.reference,
       timezone,
+      weekStartsOn: userSettings?.recapWeekday,
     });
 
     const pending: DayClosingItem[] = items

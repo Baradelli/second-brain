@@ -16,9 +16,13 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('@cerebro/shared/client', () => ({
   getCalendar: vi.fn(),
+  getSettings: vi.fn(),
 }));
 
+import { currentMonthISO, shiftMonth } from '@cerebro/shared';
 import * as endpoints from '@cerebro/shared/client';
+
+const TZ = 'America/Sao_Paulo';
 
 function makeMonth(month: string, days: Partial<MonthDay>[] = []) {
   const [y, m] = month.split('-').map(Number) as [number, number];
@@ -48,6 +52,10 @@ interface MonthDay {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // O calendário agora resolve "que mês é hoje" pelo timezone do Settings.
+  vi.mocked(endpoints.getSettings).mockResolvedValue({
+    timezone: TZ,
+  } as never);
   vi.mocked(endpoints.getCalendar).mockResolvedValue(
     makeMonth('2026-06', [
       {
@@ -85,11 +93,10 @@ describe('CalendarPage', () => {
   });
 
   it('navigates to the previous and next month', async () => {
-    // A página inicia no mês corrente local; computamos o esperado do mesmo jeito.
-    const now = new Date();
-    const cur = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const prev = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+    // A página inicia no mês corrente DO FUSO DO SETTINGS (não do dispositivo);
+    // computamos o esperado com os mesmos helpers do shared.
+    const cur = currentMonthISO(TZ);
+    const prev = shiftMonth(cur, -1);
 
     const user = userEvent.setup();
     render(<CalendarPage />);

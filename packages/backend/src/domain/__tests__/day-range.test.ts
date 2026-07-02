@@ -50,7 +50,7 @@ describe('dayRange — DST histórico (horário de verão)', () => {
 });
 
 describe('dayRange — scope WEEK', () => {
-  it('returns a 7-day interval (Monday–Sunday local week)', () => {
+  it('returns a 7-day interval', () => {
     // June 1 2026 is a Monday in São Paulo
     const reference = new Date('2026-06-01T12:00:00.000Z'); // 09:00 SP on Monday
     const { from, to } = dayRange(reference, TZ, 'WEEK');
@@ -59,10 +59,21 @@ describe('dayRange — scope WEEK', () => {
     expect(to.getTime() - from.getTime() + 1).toBe(sevenDaysMs);
   });
 
-  it('week starting mid-week still covers Monday to Sunday', () => {
-    // June 2 2026 is a Tuesday
+  it('default week starts on Sunday (DEFAULT_WEEK_STARTS_ON = recapWeekday)', () => {
+    // June 2 2026 is a Tuesday → default (Sunday) week = May 31 .. June 6 local.
     const reference = new Date('2026-06-02T12:00:00.000Z'); // Tuesday
     const { from, to } = dayRange(reference, TZ, 'WEEK');
+
+    // Sunday of this week = May 31 00:00 SP = May 31 03:00 UTC
+    expect(from).toEqual(new Date('2026-05-31T03:00:00.000Z'));
+    // Saturday end = June 6 23:59:59.999 SP = June 7 02:59:59.999 UTC
+    expect(to).toEqual(new Date('2026-06-07T02:59:59.999Z'));
+  });
+
+  it('respects an explicit weekStartsOn (1 = Monday)', () => {
+    // June 2 2026 is a Tuesday → Monday week = June 1 .. June 7 local.
+    const reference = new Date('2026-06-02T12:00:00.000Z'); // Tuesday
+    const { from, to } = dayRange(reference, TZ, 'WEEK', 1);
 
     // Monday of this week = June 1 00:00 SP = June 1 03:00 UTC
     expect(from).toEqual(new Date('2026-06-01T03:00:00.000Z'));

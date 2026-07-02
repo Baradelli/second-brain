@@ -2,6 +2,7 @@ import type { NoteType } from '@cerebro/shared';
 import { DateTime } from 'luxon';
 
 import { dayRange } from '../domain/day-range.js';
+import { DEFAULT_TIMEZONE } from '../domain/settings.js';
 import type { EventRepository } from './ports/event-repository.js';
 import type { GoalRepository } from './ports/goal-repository.js';
 import type { NoteRepository } from './ports/note-repository.js';
@@ -10,8 +11,6 @@ import {
   SelectTodaysGoals,
   type TodaysGoalKind,
 } from './select-todays-goals.js';
-
-const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
 
 export type DayDetailStatus = 'done' | 'skipped' | 'pending';
 
